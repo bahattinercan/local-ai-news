@@ -1,0 +1,9 @@
+[
+  { "key": "hf_models", "status": 200, "items": 5, "note": "search + pagination" },
+  { "key": "hf_model_detail", "status": 200, "items": 21, "note": "cardData, safetensors, siblings, spaces" },
+  { "key": "hf_trending", "status": 200, "items": 20, "note": "authorData.avatarUrl is only available here" },
+  { "key": "hf_daily_papers", "status": 200, "items": 50, "note": "?date=YYYY-MM-DD, ~50/day" },
+  { "key": "hf_blog_rss", "status": 404, "items": 0, "note": "404 — no RSS feed exists" },
+  { "key": "hf_users", "status": "error", "items": 0, "note": "error without a token" },
+  { "key": "hf_organizations", "status": "error", "items": 0, "note": "error without a token" }
+]
