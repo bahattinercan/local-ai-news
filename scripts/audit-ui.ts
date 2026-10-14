@@ -6,8 +6,9 @@ const PAGES_ALL = [
   { path: "/en", label: "feed-en" },
   { path: "/tr", label: "feed-tr" },
   { path: "/en/c/image", label: "category-image" },
+  { path: "/en/c/coding", label: "category-coding" },
   { path: "/en/c/llm", label: "category-llm" },
-  { path: "/en/m/rony-ministral3-3b-reasoning-typed-decisions", label: "model-detail" },
+  { path: "/en/m/Cdimabusinessent-Qwen-Image-2.1-viggle-turbo", label: "model-detail" },
   { path: "/en/news", label: "news" },
   { path: "/en/stats", label: "stats" },
   { path: "/en/compare", label: "compare" }

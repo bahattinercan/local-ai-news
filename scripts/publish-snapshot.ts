@@ -1,6 +1,16 @@
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { put } from "@vercel/blob";
+
+/* Scripts do not load .env the way the Next.js app does, so read it here. */
+if (existsSync(".env")) {
+  for (const line of readFileSync(".env", "utf-8").split("\n")) {
+    const match = line.match(/^([A-Z_]+)=(.*)$/);
+    if (match && !process.env[match[1]]) {
+      process.env[match[1]] = match[2].replace(/^"|"$/g, "");
+    }
+  }
+}
 
 /**
  * Publishes data/feed.json to Vercel Blob (decision 2 reversed: no Postgres).
@@ -19,7 +29,17 @@ if (!existsSync(path)) {
 }
 
 const body = readFileSync(path, "utf-8");
-const blob = await put("feed.json", body, { access: "public", token, allowOverwrite: true });
+let blob;
+try {
+  blob = await put("feed.json", body, { access: "public", token, allowOverwrite: true });
+} catch (error) {
+  if (error instanceof Error && error.message.includes("private access")) {
+    console.warn("store is private — uploading with private access (the app reads it with the token)");
+    blob = await put("feed.json", body, { access: "private", token, allowOverwrite: true });
+  } else {
+    throw error;
+  }
+}
 
 console.log("SNAPSHOT PUBLISHED");
 console.log(`url:      ${blob.url}`);

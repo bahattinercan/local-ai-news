@@ -84,7 +84,34 @@ async function resolveSnapshotUrl(): Promise<string | null> {
     const result = await list({ limit: 1, token });
     blobUrl = result.blobs[0]?.url ?? null;
     return blobUrl;
-  } catch {
+  } catch (error) {
+    console.warn("blob list failed:", (error as Error).message);
+    return null;
+  }
+}
+
+async function fetchSnapshot(url: string): Promise<Snapshot | null> {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  if (token) {
+    try {
+      const { get } = await import("@vercel/blob");
+      const result = await get(url, { token, access: "private" });
+      if (result && result.statusCode === 200) {
+        const parsed = JSON.parse(await new Response(result.stream).text()) as Snapshot;
+        if (isUsable(parsed)) return parsed;
+      }
+    } catch (error) {
+      console.warn("blob read failed:", (error as Error).message);
+    }
+  }
+
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    const parsed = (await response.json()) as Snapshot;
+    return isUsable(parsed) ? parsed : null;
+  } catch (error) {
+    console.warn("snapshot fetch failed:", (error as Error).message);
     return null;
   }
 }
@@ -94,17 +121,10 @@ export async function loadSnapshot(): Promise<Snapshot | null> {
 
   const remoteUrl = await resolveSnapshotUrl();
   if (remoteUrl) {
-    try {
-      const response = await fetch(remoteUrl, { cache: "no-store" });
-      if (response.ok) {
-        const parsed = (await response.json()) as Snapshot;
-        if (isUsable(parsed)) {
-          cache = { snapshot: parsed, fetchedAt: Date.now() };
-          return parsed;
-        }
-      }
-    } catch {
-      /* remote unavailable: fall back to the bundled snapshot */
+    const parsed = await fetchSnapshot(remoteUrl);
+    if (parsed) {
+      cache = { snapshot: parsed, fetchedAt: Date.now() };
+      return parsed;
     }
   }
 
