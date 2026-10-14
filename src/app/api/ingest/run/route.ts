@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       pagesPerCategory: 2,
       windowDays: 7,
       token: process.env.HF_TOKEN,
-      maxRequests: 92
+      maxRequests: 400
     });
     return NextResponse.json(result);
   } catch (error) {

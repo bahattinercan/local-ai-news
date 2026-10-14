@@ -14,6 +14,7 @@ export interface IngestOptions {
   windowDays: number;
   token?: string;
   maxRequests: number;
+  maxDetailLookups?: number;
 }
 
 export interface IngestResult {
@@ -21,6 +22,8 @@ export interface IngestResult {
   itemsNew: number;
   itemsGatePassed: number;
   requestsUsed: number;
+  detailLookups: number;
+  budgetExhausted: boolean;
   categoryDistribution: Record<string, number>;
   newsCount: number;
   snapshotPath: string | null;
@@ -95,32 +98,51 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
   let total = 0;
   let newCount = 0;
   let gatePassed = 0;
+  let detailLookups = 0;
+  let budgetExhausted = false;
+  const maxDetailLookups = options.maxDetailLookups ?? Math.max(0, options.maxRequests - 30);
+
+  async function attempt<T>(call: () => Promise<T>, fallback: T): Promise<T> {
+    try {
+      return await call();
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith("rate limit budget")) {
+        budgetExhausted = true;
+      }
+      return fallback;
+    }
+  }
 
   for (const rule of CATEGORY_RULES) {
-    if (rule.key === "news") continue;
+    if (rule.key === "news" || budgetExhausted) continue;
 
     let cursor: string | null = null;
     for (let page = 0; page < options.pagesPerCategory; page += 1) {
-      const result = await client.listModels({
-        pipelineTag: rule.pipelineTags[0],
-        search: rule.searchQuery,
-        sort: "createdAt",
-        limit: Math.min(options.maxPerCategory, 100),
-        cursor: cursor ?? undefined
-      });
+      const result = await attempt(
+        () =>
+          client.listModels({
+            pipelineTag: rule.pipelineTags[0],
+            search: rule.searchQuery,
+            sort: "createdAt",
+            limit: Math.min(options.maxPerCategory, 100),
+            cursor: cursor ?? undefined
+          }),
+        { items: [], nextCursor: null }
+      );
+      if (budgetExhausted) break;
 
       for (const item of result.items) {
         total += 1;
         const gate = evaluateGate(item);
         if (!gate.passed && !gate.storeRaw) continue;
 
-        if (gate.passed && !item.safetensors && client.requestsUsed < options.maxRequests - 10) {
-          try {
-            const detail = await client.getModel(item.id);
+        if (gate.passed && !item.safetensors && detailLookups < maxDetailLookups) {
+          const detail = await attempt(() => client.getModel(item.id), null);
+          if (detail) {
+            detailLookups += 1;
             Object.assign(item, detail);
-          } catch {
-            /* detail is optional; keep the list payload */
           }
+          if (budgetExhausted) break;
         }
 
         const normalized = normalizeModel(item, { firstSeenAt: now });
@@ -142,7 +164,7 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
     }
   }
 
-  const papers = await client.getDailyPapers();
+  const papers = await attempt(() => client.getDailyPapers(), []);
   for (const paper of papers) {
     const entry = paperToNews(paper, models);
     const existingEntry = news.find((n) => n.externalId === entry.externalId);
@@ -158,6 +180,8 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
     itemsNew: newCount,
     itemsGatePassed: gatePassed,
     requestsUsed: client.requestsUsed,
+    detailLookups,
+    budgetExhausted,
     categoryDistribution: distribution,
     newsCount: news.length,
     snapshotPath: null

@@ -13,7 +13,8 @@ const result = await runIngest({
   pagesPerCategory: arg("pages", 2),
   windowDays: arg("window-days", 7),
   token: process.env.HF_TOKEN,
-  maxRequests: 92
+  maxRequests: arg("max-requests", 400),
+  maxDetailLookups: arg("max-detail-lookups", 300)
 });
 
 console.log("INGEST REPORT");
@@ -22,7 +23,11 @@ console.log(`items scanned:     ${result.itemsTotal}`);
 console.log(`items new:         ${result.itemsNew}`);
 console.log(`gate passed:       ${result.itemsGatePassed}`);
 console.log(`news rows:         ${result.newsCount}`);
-console.log(`requests used:     ${result.requestsUsed} / 92 budget`);
+console.log(`requests used:     ${result.requestsUsed} / ${arg("max-requests", 400)} budget`);
+console.log(`detail lookups:    ${result.detailLookups}`);
+if (result.budgetExhausted) {
+  console.warn("warning: the HF budget ran out mid-run; the snapshot holds what was fetched");
+}
 console.log(`snapshot:          ${result.snapshotPath ?? "not written"}`);
 console.log("\nCATEGORY DISTRIBUTION");
 for (const [key, count] of Object.entries(result.categoryDistribution)) {

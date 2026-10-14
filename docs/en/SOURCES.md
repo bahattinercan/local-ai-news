@@ -15,7 +15,9 @@ Measured 2026-10-13. Live check: `npm run sources-check` (offline: `npm run sour
 ## Hard constraints
 
 - Rate limit: `RateLimit-Policy: fixed window; "api"; q=500; w=300` → 500 requests / 300 s per IP.
-- Per-run budget in `scripts/ingest.ts`: 92 requests.
+- Per-run budget in `scripts/ingest.ts`: 400 requests (HF allows 500 per 300s
+  unauthenticated), with at most 300 model-detail lookups. A run that runs out
+  of budget finishes with what it fetched instead of crashing.
 - `?full=true` on the **list** endpoint returns `siblings` but **not** `safetensors` → one detail request per gate-passing model.
 - Pagination cursor is a base64 blob in the `Link` header; carry it as an opaque string.
 - `pipeline_tag` can be null.

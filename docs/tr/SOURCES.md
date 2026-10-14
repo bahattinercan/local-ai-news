@@ -15,7 +15,9 @@
 ## Sert kısıtlar
 
 - Rate limit: `RateLimit-Policy: fixed window; "api"; q=500; w=300` → IP başına 500 istek / 300 sn.
-- `scripts/ingest.ts` run bütçesi: 92 istek.
+- `scripts/ingest.ts` run bütçesi: 400 istek (HF kimlik olmadan 300s'de 500
+  izin veriyor), en fazla 300 model detay sorgusu. Bütçe ortada tükenirse run
+  crash etmek yerine aldığı veriyle bitiyor.
 - `?full=true` **list** endpoint'inde `siblings` döndürür ama `safetensors` **döndürmez** → kapıyı geçen model başına bir detay isteği.
 - Pagination cursor `Link` başlığındaki base64 blob'dur; opak string olarak taşınır.
 - `pipeline_tag` null olabilir.
