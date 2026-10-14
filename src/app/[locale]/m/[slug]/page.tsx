@@ -33,7 +33,8 @@ export default async function ModelPage({
     sort: "trending",
     gate: "passed",
     excludeGated: true,
-    limit: 6
+    limit: 6,
+    page: 1
   });
 
   return (
@@ -77,9 +78,11 @@ export default async function ModelPage({
           <dd>{model.quantizations.join(" · ") || "—"}</dd>
         </div>
         <div>
-          <dt className="text-muted">
-            {t(dict, "card.vram")} ~{model.vramEstGb ?? "—"} GB
-          </dt>
+          <dt className="text-muted">{t(dict, "card.vram")}</dt>
+          <dd>{model.vramEstGb ? `~${model.vramEstGb} GB` : "—"}</dd>
+        </div>
+        <div>
+          <dt className="text-muted">{t(dict, "detail.popularity")}</dt>
           <dd>
             ♥ {formatNumber(model.likes)} · ⬇ {formatNumber(model.downloads)}
           </dd>
@@ -95,7 +98,7 @@ export default async function ModelPage({
       </dl>
 
       <h2 className="mt-6 text-lg font-semibold">{t(dict, "detail.runCommand")}</h2>
-      <pre className="mt-2 rounded border border-border bg-surface p-3 font-mono text-sm">
+      <pre className="mt-2 rounded border border-border bg-surface p-3 font-mono text-sm whitespace-pre-wrap break-words">
         {runCommand(model)}
       </pre>
 

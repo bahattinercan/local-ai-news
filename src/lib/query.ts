@@ -12,7 +12,8 @@ export const feedQuerySchema = z.object({
   maxParams: z.coerce.number().positive().optional(),
   license: z.string().min(1).optional(),
   q: z.string().min(1).optional(),
-  limit: z.coerce.number().int().positive().max(100).default(60)
+  limit: z.coerce.number().int().positive().max(100).default(60),
+  page: z.coerce.number().int().positive().default(1)
 });
 
 export type FeedQueryInput = z.infer<typeof feedQuerySchema>;
@@ -41,6 +42,7 @@ export function normalizeFeedQuery(input: FeedQueryInput) {
     excludeGated: true,
     q: input.q,
     limit: input.limit,
+    page: input.page,
     gateForced: input.gate === "all" && gate === "passed"
   };
 }

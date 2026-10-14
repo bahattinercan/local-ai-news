@@ -38,12 +38,24 @@ export async function FeedView({
           <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
         </div>
       ) : (
-        <div className="mt-4 grid gap-3">
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
           {models.map((model) => (
             <FeedCard key={model.externalId} model={model} locale={locale} />
           ))}
         </div>
       )}
+
+      {models.length === query.limit ? (
+        <p className="mt-4 flex flex-wrap gap-3 text-sm">
+          <a
+            href={`?${new URLSearchParams({ ...formValues, page: String(query.page + 1) })}`}
+            className="rounded border border-border px-3 py-1.5"
+          >
+            {t(dict, "common.loadMore")}
+          </a>
+          <span className="text-muted">{t(dict, "common.page", { page: query.page })}</span>
+        </p>
+      ) : null}
     </>
   );
 }

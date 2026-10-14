@@ -16,6 +16,7 @@ export interface RawPaper {
 export interface HfListParams {
   pipelineTag?: string;
   tag?: string;
+  search?: string;
   sort?: "createdAt" | "lastModified" | "downloads" | "likes" | "trendingScore";
   limit?: number;
   cursor?: string;
@@ -32,6 +33,16 @@ export interface HfClientOptions {
   windowMs?: number;
   maxWaitMs?: number;
   fetchImpl?: typeof fetch;
+}
+
+function organizationName(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (typeof record.fullname === "string" && record.fullname) return record.fullname;
+    if (typeof record.name === "string" && record.name) return record.name;
+  }
+  return null;
 }
 
 export class RateLimitBudget {
@@ -124,6 +135,7 @@ export class HfClient {
     const url = new URL(`${BASE}/api/models`);
     if (params.pipelineTag) url.searchParams.set("pipeline_tag", params.pipelineTag);
     if (params.tag) url.searchParams.set("tag", params.tag);
+    if (params.search) url.searchParams.set("search", params.search);
     if (params.sort) url.searchParams.set("sort", params.sort);
     url.searchParams.set("limit", String(Math.min(params.limit ?? 100, 100)));
     if (params.cursor) url.searchParams.set("cursor", params.cursor);
@@ -163,7 +175,7 @@ export class HfClient {
         title: String(paper.title ?? ""),
         summary: (paper.summary as string) ?? undefined,
         thumbnail: (paper.thumbnail as string) ?? (entry.thumbnail as string) ?? undefined,
-        organization: (paper.organization as string) ?? (entry.organization as string) ?? null,
+        organization: organizationName(paper.organization) ?? organizationName(entry.organization) ?? organizationName(paper.authors),
         githubRepo: (paper.githubRepo as string) ?? null,
         projectPage: (paper.projectPage as string) ?? null,
         upvotes: (paper.upvotes as number) ?? (entry.numComments as number) ?? 0,

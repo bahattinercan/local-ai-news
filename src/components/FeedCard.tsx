@@ -21,7 +21,12 @@ export function FeedCard({ model, locale }: { model: ClassifiedModel; locale: Lo
             className="h-24 w-24 rounded object-cover"
           />
         ) : (
-          <div className="h-24 w-24 rounded bg-border" aria-hidden="true" />
+          <div
+            className="h-24 w-24 rounded border border-border bg-surface grid place-items-center font-semibold text-muted"
+            aria-hidden="true"
+          >
+            {(model.author || model.name).slice(0, 2).toUpperCase()}
+          </div>
         )}
 
         <div className="min-w-0 flex-1">
@@ -32,7 +37,7 @@ export function FeedCard({ model, locale }: { model: ClassifiedModel; locale: Lo
           <div className="mt-1 flex flex-wrap gap-2 text-sm text-muted">
             <span>{categoryLabel(model.primaryCategory, locale)}</span>
             <span>{model.libraryName ?? "—"}</span>
-            <span>{formatParams(model.paramsTotal)} {t(dict, "card.params")}</span>
+            <span>{model.paramsTotal ? `${formatParams(model.paramsTotal)} ${t(dict, "card.params")}` : t(dict, "card.paramsUnknown")}</span>
           </div>
 
           <div className="mt-2 flex flex-wrap gap-2 text-sm">
@@ -56,11 +61,14 @@ export function FeedCard({ model, locale }: { model: ClassifiedModel; locale: Lo
               {t(dict, "card.runners")}: {model.runners.length ? model.runners.join(" · ") : "—"}
             </span>
             <span>
-              {t(dict, "card.vram")} ~{model.vramEstGb ?? "—"} GB
+              {t(dict, "card.vram")} {model.vramEstGb ? `~${model.vramEstGb} GB` : "—"}
             </span>
             <span>
               {t(dict, "card.license")}: {model.license ?? "—"}
             </span>
+            <a href={hrefFor(locale, `/compare?ids=${model.slug}`)} className="text-accent">
+              {t(dict, "compare.add")}
+            </a>
           </div>
         </div>
       </div>

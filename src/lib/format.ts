@@ -17,6 +17,14 @@ export function minutesSince(iso: string): number {
   return Math.max(0, Math.round((Date.now() - then) / 60_000));
 }
 
+export function relativeTime(iso: string): string {
+  const minutes = minutesSince(iso);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  return `${Math.round(hours / 24)}d`;
+}
+
 export function formatNumber(value: number | null): string {
   if (value === null) return "0";
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;

@@ -36,6 +36,7 @@ export interface FeedQuery {
   excludeGated: boolean;
   q?: string;
   limit: number;
+  page: number;
 }
 
 export interface NewsQuery {
@@ -88,7 +89,7 @@ function snapshotFeed(query: FeedQuery): ClassifiedModel[] {
     likes: (a, b) => (b.likes ?? 0) - (a.likes ?? 0)
   };
 
-  return [...rows].sort(order[query.sort]).slice(0, query.limit);
+  return [...rows].sort(order[query.sort]).slice((query.page - 1) * query.limit, query.page * query.limit);
 }
 
 function mapModelRow(row: typeof models.$inferSelect): ClassifiedModel {
@@ -147,7 +148,8 @@ export async function getFeed(query: FeedQuery): Promise<ClassifiedModel[]> {
     .from(models)
     .where(and(...conditions))
     .orderBy(desc(orderColumn))
-    .limit(query.limit);
+    .limit(query.limit)
+    .offset((query.page - 1) * query.limit);
 
   return rows.map(mapModelRow);
 }
@@ -167,7 +169,10 @@ export async function getNews(query: NewsQuery): Promise<SnapshotNews[]> {
   if (!isDbConfigured()) {
     const snapshot = readSnapshot();
     if (!snapshot) return [];
-    let rows = snapshot.news;
+    let rows = snapshot.news.map((item) => ({
+      ...item,
+      organization: typeof item.organization === "string" ? item.organization : null
+    }));
     if (query.category) rows = rows.filter((n) => n.categoryKey === query.category);
     if (query.kind) rows = rows.filter((n) => n.kind === query.kind);
     rows = rows.filter((n) => withinWindow(n.publishedAt, query.windowDays));

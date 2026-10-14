@@ -3,6 +3,7 @@ export interface CategoryRule {
   labelEn: string;
   labelTr: string;
   pipelineTags: string[];
+  searchQuery?: string;
   nameRegex?: string;
   tagRegex?: string;
   sortOrder: number;
@@ -29,6 +30,7 @@ export const CATEGORY_RULES: CategoryRule[] = [
     labelEn: "Coding",
     labelTr: "Kod",
     pipelineTags: [],
+    searchQuery: "coder",
     nameRegex: "(^|[-_. ])(code|coder|codex|coding|swe|agentic)([-_. ]|$)",
     tagRegex: "^(code-generation|coding|codex|swe|agentic)$",
     sortOrder: 4

@@ -10,7 +10,7 @@ export function TabBar({ locale, active }: { locale: Locale; active?: string }) 
   ];
 
   return (
-    <nav className="flex gap-2 overflow-x-auto py-3 text-sm" aria-label={t(dict, "brand")}>
+    <nav className="flex flex-wrap gap-2 py-3 text-sm" aria-label={t(dict, "brand")}>
       {tabs.map((tab) => {
         const href = tab.key ? hrefFor(locale, `/c/${tab.key}`) : hrefFor(locale, "/");
         const isActive = tab.key === (active ?? "");

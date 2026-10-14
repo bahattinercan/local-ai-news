@@ -103,6 +103,7 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
     for (let page = 0; page < options.pagesPerCategory; page += 1) {
       const result = await client.listModels({
         pipelineTag: rule.pipelineTags[0],
+        search: rule.searchQuery,
         sort: "createdAt",
         limit: Math.min(options.maxPerCategory, 100),
         cursor: cursor ?? undefined
