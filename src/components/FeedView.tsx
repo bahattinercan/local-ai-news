@@ -2,7 +2,9 @@ import { FeedCard } from "./FeedCard";
 import { FilterBar } from "./FilterBar";
 import { EmptyState, DataNotice } from "./EmptyState";
 import { SavedFilters } from "./SavedFilters";
-import { getFeed } from "@/lib/store";
+import { Pagination } from "./Pagination";
+import { PulseStrip } from "./PulseStrip";
+import { getFeed, countFeed } from "@/lib/store";
 import { dictionary, t, type Locale } from "@/i18n";
 import type { normalizeFeedQuery } from "@/lib/query";
 
@@ -19,6 +21,7 @@ export async function FeedView({
 }) {
   const dict = dictionary(locale);
   const models = await getFeed(query);
+  const total = await countFeed(query);
 
   const formValues: Record<string, string | undefined> = {
     ...raw,
@@ -27,8 +30,11 @@ export async function FeedView({
     gate: raw.gate ?? query.gate
   };
 
+  const maxDownloads = models.reduce((max, model) => Math.max(max, model.downloads ?? 0), 0);
+
   return (
     <>
+      <PulseStrip locale={locale} days={query.windowDays} />
       <DataNotice locale={locale} />
       <FilterBar locale={locale} category={category} query={formValues} gateForced={query.gateForced} />
       <SavedFilters locale={locale} currentQuery={new URLSearchParams(Object.entries(raw).filter((entry): entry is [string, string] => entry[1] !== undefined)).toString()} />
@@ -39,23 +45,15 @@ export async function FeedView({
         </div>
       ) : (
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          {models.map((model) => (
-            <FeedCard key={model.externalId} model={model} locale={locale} />
+          {models.map((model, index) => (
+            <div key={model.externalId} className="fade-up" style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}>
+              <FeedCard model={model} locale={locale} maxDownloads={maxDownloads} />
+            </div>
           ))}
         </div>
       )}
 
-      {models.length === query.limit ? (
-        <p className="mt-4 flex flex-wrap gap-3 text-sm">
-          <a
-            href={`?${new URLSearchParams({ ...formValues, page: String(query.page + 1) })}`}
-            className="rounded border border-border px-3 py-1.5"
-          >
-            {t(dict, "common.loadMore")}
-          </a>
-          <span className="text-muted">{t(dict, "common.page", { page: query.page })}</span>
-        </p>
-      ) : null}
+      <Pagination locale={locale} page={query.page} total={total} limit={query.limit} formValues={formValues} />
     </>
   );
 }

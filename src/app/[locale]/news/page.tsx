@@ -1,9 +1,12 @@
-import { getNews } from "@/lib/store";
+import { getNews, countNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 import { NewsCard } from "@/components/NewsCard";
 import { EmptyState, DataNotice } from "@/components/EmptyState";
-import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
+import { dictionary, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
+import { CATEGORY_RULES } from "@/lib/classify/rules";
+import { Field, SubmitButton } from "@/components/ui/Controls";
+import { Pagination } from "@/components/Pagination";
 
 export default async function NewsPage({
   params,
@@ -16,6 +19,19 @@ export default async function NewsPage({
   const query = parseNewsQuery(await searchParams);
   const dict = dictionary(locale);
   const items = await getNews(query);
+  const total = await countNews(query);
+
+  const groups = new Map<string, typeof items>();
+  for (const item of items) {
+    const day = item.publishedAt.slice(0, 10);
+    groups.set(day, [...(groups.get(day) ?? []), item]);
+  }
+
+  const formatter = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
 
   return (
     <>
@@ -33,29 +49,36 @@ export default async function NewsPage({
         }}
       />
 
-      <h1 className="mb-3 text-xl font-semibold">{t(dict, "news.title")}</h1>
+      <h1 className="mb-3 text-2xl font-semibold tracking-tight">{t(dict, "news.title")}</h1>
 
-      <form method="get" className="mb-4 flex flex-wrap gap-3 text-sm">
-        <label className="flex flex-col gap-1">
-          <span className="text-muted">{t(dict, "filters.window")}</span>
-          <select name="window" defaultValue={query.windowDays === 1 ? "24h" : `${query.windowDays}d`}>
-            {["24h", "7d", "30d", "90d"].map((w) => (
-              <option key={w} value={w}>{w}</option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1">
-          <span className="text-muted">{t(dict, "news.kind")}</span>
-          <select name="kind" defaultValue={query.kind ?? ""}>
-            <option value="">—</option>
-            <option value="paper">{t(dict, "news.paper")}</option>
-            <option value="release">{t(dict, "news.release")}</option>
-            <option value="announcement">{t(dict, "news.announcement")}</option>
-          </select>
-        </label>
-        <button type="submit" className="rounded border border-border px-3 py-1.5">
-          {t(dict, "filters.apply")}
-        </button>
+      <form method="get" className="card p-3 mb-4 flex flex-wrap items-end gap-3 text-sm">
+        <Field
+          name="window"
+          label={t(dict, "filters.window")}
+          value={query.windowDays === 1 ? "24h" : `${query.windowDays}d`}
+          options={[["24h", "24h"], ["7d", "7d"], ["30d", "30d"], ["90d", "90d"]]}
+        />
+        <Field
+          name="kind"
+          label={t(dict, "news.kind")}
+          value={query.kind ?? ""}
+          options={[
+            ["", "—"],
+            ["paper", t(dict, "news.paper")],
+            ["release", t(dict, "news.release")],
+            ["announcement", t(dict, "news.announcement")]
+          ]}
+        />
+        <Field
+          name="category"
+          label={t(dict, "filters.category")}
+          value={query.category ?? ""}
+          options={[
+            ["", "—"],
+            ...CATEGORY_RULES.map((rule) => [rule.key, locale === "tr" ? rule.labelTr : rule.labelEn])
+          ]}
+        />
+        <SubmitButton label={t(dict, "filters.apply")} />
       </form>
 
       <DataNotice locale={locale} />
@@ -63,15 +86,37 @@ export default async function NewsPage({
       {items.length === 0 ? (
         <EmptyState locale={locale} message={t(dict, "empty.noNews")} />
       ) : (
-        <div className="mt-4 grid gap-3">
-          {items.map((item) => (
-            <NewsCard key={item.externalId} item={item} locale={locale} />
+        <div className="grid gap-3">
+          {[...groups.entries()].map(([day, dayItems]) => (
+            <section key={day} className="card p-4">
+              <div className="flex items-center justify-between gap-2 mb-3 text-xs text-muted font-mono">
+                <span>{formatter.format(new Date(day))}</span>
+                <span>{dayItems.length}</span>
+              </div>
+              <div className="grid gap-3">
+                {dayItems.map((item) => (
+                  <NewsCard key={item.externalId} item={item} locale={locale} />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}
 
-      <p className="mt-6 text-sm">
-        <a href={hrefFor(locale, "/news")} className="text-muted">RSS: <a href={`/feed.rss?lang=${locale}`}>/feed.rss</a></a>
+      <Pagination
+        locale={locale}
+        page={query.page}
+        total={total}
+        limit={query.limit}
+        formValues={{
+          window: query.windowDays === 1 ? "24h" : `${query.windowDays}d`,
+          kind: query.kind ?? "",
+          category: query.category ?? ""
+        }}
+      />
+
+      <p className="mt-6 text-sm text-muted">
+        RSS: <a href={`/feed.rss?lang=${locale}`} className="text-accent hover:text-text">/feed.rss</a>
       </p>
     </>
   );

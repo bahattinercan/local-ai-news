@@ -12,7 +12,7 @@ export const feedQuerySchema = z.object({
   maxParams: z.coerce.number().positive().optional(),
   license: z.string().min(1).optional(),
   q: z.string().min(1).optional(),
-  limit: z.coerce.number().int().positive().max(100).default(60),
+  limit: z.coerce.number().int().positive().max(100).default(24),
   page: z.coerce.number().int().positive().default(1)
 });
 
@@ -65,7 +65,8 @@ export const newsQuerySchema = z.object({
   window: z.enum(WINDOWS).default("7d"),
   category: z.string().min(1).optional(),
   kind: z.enum(["paper", "release", "announcement"]).optional(),
-  limit: z.coerce.number().int().positive().max(100).default(50)
+  limit: z.coerce.number().int().positive().max(100).default(30),
+  page: z.coerce.number().int().positive().default(1)
 });
 
 export function parseNewsQuery(search: Record<string, string | string[] | undefined>) {
@@ -75,5 +76,5 @@ export function parseNewsQuery(search: Record<string, string | string[] | undefi
     kind: search.kind,
     limit: search.limit
   });
-  return { windowDays: windowDays(parsed.window), category: parsed.category, kind: parsed.kind, limit: parsed.limit };
+  return { windowDays: windowDays(parsed.window), category: parsed.category, kind: parsed.kind, limit: parsed.limit, page: parsed.page };
 }

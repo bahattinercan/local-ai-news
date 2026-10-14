@@ -20,7 +20,7 @@ export default async function FeedPage({
 
   return (
     <>
-      <h1 className="mb-3 text-xl font-semibold">{t(dict, "nav.all")}</h1>
+      <h1 className="mb-3 text-2xl font-semibold tracking-tight">{t(dict, "nav.all")}</h1>
       <FeedView locale={locale} query={query} raw={normalizeRaw(raw)} />
     </>
   );

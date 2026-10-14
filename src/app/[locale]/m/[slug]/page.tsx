@@ -1,12 +1,16 @@
+import Image from "next/image";
+import { Activity, Box, Clock, Cpu, HardDrive, Heart, Layers, Link as LinkIcon, ShieldCheck, Zap } from "lucide-react";
 import { getModel, getFeed } from "@/lib/store";
 import { runCommand } from "@/lib/runner/command";
 import { categoryLabel } from "@/lib/classify/rules";
-import { formatNumber, daysSince } from "@/lib/format";
+import { formatBytes, formatNumber, daysSince, relativeTime } from "@/lib/format";
 import { formatParams } from "@/lib/runner/vram";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { EmptyState, DataNotice } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
 import { FeedCard } from "@/components/FeedCard";
+import { Chip } from "@/components/ui/Chip";
+import { CopyCommand } from "@/components/CopyCommand";
 
 export default async function ModelPage({
   params
@@ -37,6 +41,20 @@ export default async function ModelPage({
     page: 1
   });
 
+  const specs: Array<{ icon: typeof Cpu; label: string; value: string }> = [];
+  if (model.paramsTotal) specs.push({ icon: Cpu, label: t(dict, "card.params"), value: formatParams(model.paramsTotal) });
+  if (model.storageBytes) specs.push({ icon: HardDrive, label: t(dict, "card.storage"), value: formatBytes(model.storageBytes) });
+  if (model.quantizations.length) specs.push({ icon: Layers, label: t(dict, "detail.quantizations"), value: model.quantizations.join(" · ") });
+  if (model.runners.length) specs.push({ icon: Zap, label: t(dict, "card.runners"), value: model.runners.join(" · ") });
+  if (model.vramEstGb) specs.push({ icon: Box, label: t(dict, "card.vram"), value: `~${model.vramEstGb} GB` });
+  if (model.licenseName || model.license) specs.push({ icon: ShieldCheck, label: t(dict, "card.license"), value: model.licenseName ?? model.license ?? "—" });
+  specs.push({ icon: Heart, label: t(dict, "detail.popularity"), value: `♥ ${formatNumber(model.likes)} · ⬇ ${formatNumber(model.downloads)}` });
+  specs.push({ icon: Clock, label: t(dict, "card.new"), value: `${daysSince(model.firstSeenAt)}d (${relativeTime(model.firstSeenAt)})` });
+  if (model.gateReason) specs.push({ icon: ShieldCheck, label: t(dict, "detail.gateReason"), value: model.gateReason });
+  if (model.spaces.length) specs.push({ icon: LinkIcon, label: t(dict, "detail.spaces"), value: model.spaces.slice(0, 5).join(", ") });
+
+  const command = runCommand(model);
+
   return (
     <>
       <JsonLd
@@ -54,69 +72,83 @@ export default async function ModelPage({
 
       <DataNotice locale={locale} />
 
-      <h1 className="text-2xl font-semibold">{model.externalId}</h1>
-      <p className="mt-1 text-sm text-muted">
-        {categoryLabel(model.primaryCategory, locale)} · {model.libraryName ?? "—"} ·{" "}
-        {formatParams(model.paramsTotal)} {t(dict, "card.params")} · {t(dict, "card.new")} ({daysSince(model.firstSeenAt)}d)
-      </p>
+      <section className="card p-5">
+        <div className="flex flex-wrap gap-4">
+          {model.sampleImages[0] ? (
+            <Image
+              src={model.sampleImages[0]}
+              alt={model.name}
+              width={220}
+              height={220}
+              className="h-[180px] w-[180px] rounded-md border border-border object-cover"
+            />
+          ) : (
+            <div
+              className="h-[180px] w-[180px] rounded-md border border-dashed border-border bg-raised grid place-items-center font-mono text-lg text-muted"
+              aria-hidden="true"
+            >
+              {(model.author || model.name).slice(0, 2).toUpperCase()}
+            </div>
+          )}
 
-      {model.sampleImages[0] ? (
-        <img src={model.sampleImages[0]} alt={model.name} className="mt-4 max-h-64 rounded" />
-      ) : null}
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-semibold tracking-tight">{model.externalId}</h1>
+            <p className="mt-1 text-sm text-muted">
+              {categoryLabel(model.primaryCategory, locale)} · {model.libraryName ?? "—"} ·{" "}
+              {model.paramsTotal ? `${formatParams(model.paramsTotal)} ${t(dict, "card.params")}` : t(dict, "card.paramsUnknown")}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Chip
+                label={model.qualityPassed ? t(dict, "card.gatePassed") : t(dict, "card.gateFailed")}
+                tone={model.qualityPassed ? "ok" : "warn"}
+              />
+              <Chip label={`${t(dict, "card.new")} ${daysSince(model.firstSeenAt)}d`} tone="accent" />
+              <a href={model.url} className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-sm text-accent">
+                <Activity size={13} aria-hidden="true" />
+                {model.externalId}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
-        <div>
-          <dt className="text-muted">{t(dict, "detail.gateReason")}</dt>
-          <dd>{model.gateReason}</dd>
-        </div>
-        <div>
-          <dt className="text-muted">{t(dict, "card.runners")}</dt>
-          <dd>{model.runners.join(" · ") || "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted">{t(dict, "detail.quantizations")}</dt>
-          <dd>{model.quantizations.join(" · ") || "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted">{t(dict, "card.vram")}</dt>
-          <dd>{model.vramEstGb ? `~${model.vramEstGb} GB` : "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted">{t(dict, "detail.popularity")}</dt>
-          <dd>
-            ♥ {formatNumber(model.likes)} · ⬇ {formatNumber(model.downloads)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-muted">{t(dict, "card.license")}</dt>
-          <dd>{model.licenseName ?? model.license ?? "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted">{t(dict, "detail.spaces")}</dt>
-          <dd>{model.spaces.length ? model.spaces.slice(0, 5).join(", ") : "—"}</dd>
-        </div>
-      </dl>
+      <section className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {specs.map((spec) => {
+          const Icon = spec.icon;
+          return (
+            <div key={spec.label} className="card p-3">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted whitespace-nowrap">
+                <Icon size={13} aria-hidden="true" />
+                {spec.label}
+              </div>
+              <div className="mt-1 font-mono text-sm break-words">{spec.value}</div>
+            </div>
+          );
+        })}
+      </section>
 
-      <h2 className="mt-6 text-lg font-semibold">{t(dict, "detail.runCommand")}</h2>
-      <pre className="mt-2 rounded border border-border bg-surface p-3 font-mono text-sm whitespace-pre-wrap break-words">
-        {runCommand(model)}
-      </pre>
+      <section className="mt-4">
+        <h2 className="text-lg font-semibold mb-2">{t(dict, "detail.runCommand")}</h2>
+        <div className="card p-3 flex flex-wrap items-center gap-3">
+          <pre className="flex-1 min-w-[220px] font-mono text-sm whitespace-pre-wrap break-words">{command}</pre>
+          <CopyCommand text={command} label={t(dict, "common.copy")} />
+        </div>
+      </section>
 
-      <p className="mt-3">
-        <a href={model.url} className="text-accent">
-          {model.externalId}
-        </a>
-      </p>
-
-      <h2 className="mt-6 text-lg font-semibold">{t(dict, "detail.related")}</h2>
-      <div className="mt-3 grid gap-3">
-        {related.filter((row) => row.externalId !== model.externalId).slice(0, 5).map((row) => (
-          <FeedCard key={row.externalId} model={row} locale={locale} />
-        ))}
-      </div>
+      <section className="mt-6">
+        <h2 className="text-lg font-semibold mb-3">{t(dict, "detail.related")}</h2>
+        <div className="grid gap-3 lg:grid-cols-2">
+          {related
+            .filter((row) => row.externalId !== model.externalId)
+            .slice(0, 4)
+            .map((row) => (
+              <FeedCard key={row.externalId} model={row} locale={locale} />
+            ))}
+        </div>
+      </section>
 
       <p className="mt-6 text-sm">
-        <a href={hrefFor(locale, `/c/${model.primaryCategory}`)} className="text-muted">
+        <a href={hrefFor(locale, `/c/${model.primaryCategory}`)} className="text-muted hover:text-text">
           {t(dict, "common.home")}
         </a>
       </p>

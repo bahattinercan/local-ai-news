@@ -1,28 +1,39 @@
 import Image from "next/image";
-import { cn, daysSince, formatNumber } from "@/lib/format";
+import { Clock, Download, HardDrive, Heart, Scale } from "lucide-react";
+import { cn, daysSince, formatBytes, formatNumber } from "@/lib/format";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { categoryLabel } from "@/lib/classify/rules";
 import { formatParams } from "@/lib/runner/vram";
 import type { ClassifiedModel } from "@/lib/model";
+import { Chip } from "./ui/Chip";
+import { Meter } from "./ui/Stat";
 
-export function FeedCard({ model, locale }: { model: ClassifiedModel; locale: Locale }) {
+export function FeedCard({
+  model,
+  locale,
+  maxDownloads = 0
+}: {
+  model: ClassifiedModel;
+  locale: Locale;
+  maxDownloads?: number;
+}) {
   const dict = dictionary(locale);
   const age = daysSince(model.firstSeenAt);
 
   return (
-    <article className="border border-border rounded-lg bg-surface p-3 overflow-hidden">
-      <div className="flex flex-wrap gap-3">
+    <article className="card p-4 overflow-hidden">
+      <div className="flex gap-3">
         {model.sampleImages[0] ? (
           <Image
             src={model.sampleImages[0]}
             alt={model.name}
-            width={120}
-            height={120}
-            className="h-24 w-24 rounded object-cover"
+            width={88}
+            height={88}
+            className="h-22 w-22 rounded-md object-cover border border-border"
           />
         ) : (
           <div
-            className="h-24 w-24 rounded border border-border bg-surface grid place-items-center font-semibold text-muted"
+            className="h-22 w-22 rounded-md border border-border bg-raised grid place-items-center font-mono text-sm text-muted"
             aria-hidden="true"
           >
             {(model.author || model.name).slice(0, 2).toUpperCase()}
@@ -30,43 +41,54 @@ export function FeedCard({ model, locale }: { model: ClassifiedModel; locale: Lo
         )}
 
         <div className="min-w-0 flex-1">
-          <a href={hrefFor(locale, `/m/${model.slug}`)} className="font-medium break-words">
-            {model.externalId}
-          </a>
-
-          <div className="mt-1 flex flex-wrap gap-2 text-sm text-muted">
-            <span>{categoryLabel(model.primaryCategory, locale)}</span>
-            <span>{model.libraryName ?? "—"}</span>
-            <span>{model.paramsTotal ? `${formatParams(model.paramsTotal)} ${t(dict, "card.params")}` : t(dict, "card.paramsUnknown")}</span>
+          <div className="flex items-start justify-between gap-2">
+            <a href={hrefFor(locale, `/m/${model.slug}`)} className="font-medium break-words hover:text-accent">
+              {model.externalId}
+            </a>
+            <Chip
+              label={model.qualityPassed ? t(dict, "card.gatePassed") : t(dict, "card.gateFailed")}
+              tone={model.qualityPassed ? "ok" : "warn"}
+            />
           </div>
 
-          <div className="mt-2 flex flex-wrap gap-2 text-sm">
-            <span className={cn("rounded px-2 py-0.5", age <= 7 ? "text-ok" : "text-muted")}>
+          <div className="mt-1 flex flex-wrap gap-2 text-xs text-muted">
+            <span>{categoryLabel(model.primaryCategory, locale)}</span>
+            <span aria-hidden="true">·</span>
+            <span>{model.libraryName ?? "—"}</span>
+            <span aria-hidden="true">·</span>
+            <span>{model.paramsTotal ? `${formatParams(model.paramsTotal)} ${t(dict, "card.params")}` : t(dict, "card.paramsUnknown")}</span>
+            <span aria-hidden="true">·</span>
+            <span className={cn(age <= 7 ? "text-ok" : "text-muted")}>
               {t(dict, "card.new")} ({age}d)
             </span>
-            <span className="text-muted">♥ {formatNumber(model.likes)}</span>
-            <span className="text-muted">⬇ {formatNumber(model.downloads)}</span>
-            <span
-              className={cn(
-                "rounded px-2 py-0.5",
-                model.qualityPassed ? "text-ok" : "text-warn"
-              )}
-            >
-              {model.qualityPassed ? t(dict, "card.gatePassed") : t(dict, "card.gateFailed")}
+          </div>
+
+          <div className="mt-2 flex flex-wrap items-center gap-3 font-mono text-xs text-muted">
+            <span className="flex items-center gap-1">
+              <Heart size={12} aria-hidden="true" /> {formatNumber(model.likes)}
+            </span>
+            <span className="flex items-center gap-1">
+              <Download size={12} aria-hidden="true" /> {formatNumber(model.downloads)}
+            </span>
+            {model.storageBytes ? (
+              <span className="flex items-center gap-1">
+                <HardDrive size={12} aria-hidden="true" /> {formatBytes(model.storageBytes)}
+              </span>
+            ) : null}
+            <span className="flex items-center gap-1">
+              <Clock size={12} aria-hidden="true" /> {model.runners.length ? model.runners.join(" · ") : "—"}
             </span>
           </div>
 
-          <div className="mt-2 flex flex-wrap gap-2 text-sm text-muted">
-            <span>
-              {t(dict, "card.runners")}: {model.runners.length ? model.runners.join(" · ") : "—"}
-            </span>
-            <span>
-              {t(dict, "card.vram")} {model.vramEstGb ? `~${model.vramEstGb} GB` : "—"}
-            </span>
-            <span>
-              {t(dict, "card.license")}: {model.license ?? "—"}
-            </span>
-            <a href={hrefFor(locale, `/compare?ids=${model.slug}`)} className="text-accent">
+          <div className="mt-2">
+            <Meter value={model.downloads} max={maxDownloads} tone={model.qualityPassed ? "accent" : "muted"} />
+          </div>
+
+          <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            {model.license ? <Chip label={model.license} /> : null}
+            {model.vramEstGb ? <Chip label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB`} tone="accent" /> : null}
+            <a href={hrefFor(locale, `/compare?ids=${model.slug}`)} className="flex items-center gap-1 text-accent">
+              <Scale size={12} aria-hidden="true" />
               {t(dict, "compare.add")}
             </a>
           </div>

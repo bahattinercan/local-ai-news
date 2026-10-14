@@ -6,6 +6,15 @@ import { dictionary, pickLocale, t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
 import type { ClassifiedModel } from "@/lib/model";
 
+type Direction = "max" | "min" | null;
+
+interface Row {
+  label: string;
+  get: (_model: ClassifiedModel) => string;
+  numeric?: (_model: ClassifiedModel) => number | null;
+  direction?: Direction;
+}
+
 export default async function ComparePage({
   params,
   searchParams
@@ -16,7 +25,7 @@ export default async function ComparePage({
   const locale = pickLocale((await params).locale);
   const dict = dictionary(locale);
   const raw = (await searchParams).ids ?? "";
-  const slugs = String(raw).split(",").map((s) => s.trim()).filter(Boolean).slice(0, 6);
+  const slugs = String(raw).split(",").map((slug) => slug.trim()).filter(Boolean).slice(0, 6);
 
   if (slugs.length === 0) {
     return <EmptyState locale={locale} message={t(dict, "compare.title")} />;
@@ -26,43 +35,90 @@ export default async function ComparePage({
     (model): model is ClassifiedModel => model !== null
   );
 
-  const rows = [
-    { label: categoryLabel("llm", locale), get: (m: (typeof models)[number]) => categoryLabel(m.primaryCategory, locale) },
-    { label: t(dict, "card.params"), get: (m: (typeof models)[number]) => formatParams(m.paramsTotal) },
-    { label: t(dict, "card.vram"), get: (m: (typeof models)[number]) => `~${m.vramEstGb ?? "—"} GB` },
-    { label: t(dict, "detail.quantizations"), get: (m: (typeof models)[number]) => m.quantizations.join(", ") || "—" },
-    { label: t(dict, "card.runners"), get: (m: (typeof models)[number]) => m.runners.join(", ") || "—" },
-    { label: t(dict, "card.license"), get: (m: (typeof models)[number]) => m.license ?? "—" },
-    { label: "♥ / ⬇", get: (m: (typeof models)[number]) => `${formatNumber(m.likes)} / ${formatNumber(m.downloads)}` }
+  if (models.length === 0) {
+    return <EmptyState locale={locale} message={t(dict, "empty.noModels")} />;
+  }
+
+  const rows: Row[] = [
+    { label: t(dict, "filters.category"), get: (m) => categoryLabel(m.primaryCategory, locale) },
+    {
+      label: t(dict, "card.params"),
+      get: (m) => formatParams(m.paramsTotal),
+      numeric: (m) => m.paramsTotal,
+      direction: "min"
+    },
+    {
+      label: t(dict, "card.vram"),
+      get: (m) => (m.vramEstGb ? `~${m.vramEstGb} GB` : "—"),
+      numeric: (m) => m.vramEstGb,
+      direction: "min"
+    },
+    { label: t(dict, "detail.quantizations"), get: (m) => m.quantizations.join(", ") || "—" },
+    { label: t(dict, "card.runners"), get: (m) => m.runners.join(", ") || "—" },
+    { label: t(dict, "card.license"), get: (m) => m.license ?? "—" },
+    {
+      label: t(dict, "card.downloads"),
+      get: (m) => formatNumber(m.downloads),
+      numeric: (m) => m.downloads,
+      direction: "max"
+    },
+    {
+      label: t(dict, "card.likes"),
+      get: (m) => formatNumber(m.likes),
+      numeric: (m) => m.likes,
+      direction: "max"
+    }
   ];
+
+  const bestIndex = (row: Row): number | null => {
+    if (!row.numeric || !row.direction) return null;
+    const values = models.map(row.numeric).filter((value): value is number => value !== null && value > 0);
+    if (values.length < 2) return null;
+    const target = row.direction === "max" ? Math.max(...values) : Math.min(...values);
+    return models.findIndex((model) => row.numeric!(model) === target);
+  };
 
   return (
     <>
-      <h1 className="mb-3 text-xl font-semibold">{t(dict, "compare.title")}</h1>
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className="border-b border-border text-left">
-            <th className="py-2 pr-3 text-muted">{t(dict, "common.viewModel")}</th>
-            {models.map((model) => (
-              <th key={model!.slug} className="py-2 pr-3">
-                {model!.externalId}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.label} className="border-b border-border">
-              <td className="py-2 pr-3 text-muted">{row.label}</td>
+      <h1 className="mb-3 text-2xl font-semibold tracking-tight">{t(dict, "compare.title")}</h1>
+
+      <div className="card overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead className="sticky top-0">
+            <tr className="border-b border-border text-left">
+              <th className="py-3 pr-3 text-xs uppercase tracking-wide text-muted">{t(dict, "common.viewModel")}</th>
               {models.map((model) => (
-                <td key={model!.slug} className="py-2 pr-3">
-                  {row.get(model!)}
-                </td>
+                <th key={model.slug} className="py-3 pr-3 font-medium">
+                  <a href={`/m/${model.slug}`} className="hover:text-accent">
+                    {model.externalId}
+                  </a>
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row) => {
+              const best = bestIndex(row);
+              return (
+                <tr key={row.label} className="border-b border-border">
+                  <td className="py-2.5 pr-3 text-xs uppercase tracking-wide text-muted">{row.label}</td>
+                  {models.map((model, index) => (
+                    <td
+                      key={model.slug}
+                      className={
+                        "py-2.5 pr-3 font-mono" + (index === best ? " text-accent font-semibold" : "")
+                      }
+                    >
+                      {row.get(model)}
+                      {index === best ? <span className="text-xs text-muted"> · {t(dict, "compare.best")}</span> : null}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

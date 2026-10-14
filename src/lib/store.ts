@@ -42,6 +42,7 @@ export interface NewsQuery {
   category?: string;
   kind?: "paper" | "release" | "announcement";
   limit: number;
+  page?: number;
 }
 
 /**
@@ -150,10 +151,16 @@ function normalizeNews(snapshot: Snapshot): SnapshotNews[] {
   }));
 }
 
-export async function getFeed(query: FeedQuery): Promise<ClassifiedModel[]> {
-  const snapshot = await loadSnapshot();
-  if (!snapshot) return [];
+/**
+ * HF `trendingScore` is null for every model in the snapshot (measured: 0/915),
+ * so the `trending` sort would be a no-op. Derive a score at read time instead
+ * of persisting a new field.
+ */
+export function derivedTrending(model: ClassifiedModel): number {
+  return model.trendingScore ?? model.likes * 3 + model.downloads / 10;
+}
 
+function filterModels(snapshot: Snapshot, query: FeedQuery): ClassifiedModel[] {
   let rows = snapshot.models;
   if (query.category) rows = rows.filter((model) => model.primaryCategory === query.category);
   if (query.gate === "passed") rows = rows.filter((model) => model.qualityPassed);
@@ -165,16 +172,84 @@ export async function getFeed(query: FeedQuery): Promise<ClassifiedModel[]> {
     const needle = query.q.toLowerCase();
     rows = rows.filter((model) => model.externalId.toLowerCase().includes(needle));
   }
-  rows = rows.filter((model) => withinWindow(model.firstSeenAt, query.windowDays));
+  return rows.filter((model) => withinWindow(model.firstSeenAt, query.windowDays));
+}
+
+export async function getFeed(query: FeedQuery): Promise<ClassifiedModel[]> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return [];
+
+  const rows = filterModels(snapshot, query);
 
   const order: Record<FeedQuery["sort"], (_left: ClassifiedModel, _right: ClassifiedModel) => number> = {
     new: (a, b) => new Date(b.firstSeenAt).getTime() - new Date(a.firstSeenAt).getTime(),
-    trending: (a, b) => (b.trendingScore ?? 0) - (a.trendingScore ?? 0),
+    trending: (a, b) => derivedTrending(b) - derivedTrending(a),
     downloads: (a, b) => (b.downloads ?? 0) - (a.downloads ?? 0),
     likes: (a, b) => (b.likes ?? 0) - (a.likes ?? 0)
   };
 
   return [...rows].sort(order[query.sort]).slice((query.page - 1) * query.limit, query.page * query.limit);
+}
+
+export async function countFeed(query: FeedQuery): Promise<number> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return 0;
+  return filterModels(snapshot, query).length;
+}
+
+export interface Pulse {
+  tracked: number;
+  passed: number;
+  topCategory: string | null;
+  topCategoryCount: number;
+  generatedAt: string | null;
+  hot: ClassifiedModel[];
+}
+
+export async function getPulse(days: number): Promise<Pulse | null> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return null;
+
+  const rows = filterModels(snapshot, {
+    windowDays: days,
+    sort: "new",
+    gate: "passed",
+    excludeGated: true,
+    limit: 100,
+    page: 1
+  });
+
+  const counts = new Map<string, number>();
+  for (const model of rows) counts.set(model.primaryCategory, (counts.get(model.primaryCategory) ?? 0) + 1);
+  const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
+
+  const hot = [...rows]
+    .sort((a, b) => (b.downloads ?? 0) - (a.downloads ?? 0))
+    .slice(0, 5);
+
+  return {
+    tracked: filterModels(snapshot, { windowDays: days, sort: "new", gate: "all", excludeGated: true, limit: 1, page: 1 }).length,
+    passed: rows.length,
+    topCategory: top?.[0] ?? null,
+    topCategoryCount: top?.[1] ?? 0,
+    generatedAt: snapshot.generatedAt,
+    hot
+  };
+}
+
+export async function getDailySeries(days: number): Promise<Array<{ date: string; count: number }>> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return [];
+
+  const buckets = new Map<string, number>();
+  for (const model of snapshot.models) {
+    if (!withinWindow(model.firstSeenAt, days)) continue;
+    const date = model.firstSeenAt.slice(0, 10);
+    buckets.set(date, (buckets.get(date) ?? 0) + 1);
+  }
+  return [...buckets.entries()]
+    .map(([date, count]) => ({ date, count }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 export async function getModel(slug: string): Promise<ClassifiedModel | null> {
@@ -191,9 +266,18 @@ export async function getNews(query: NewsQuery): Promise<SnapshotNews[]> {
   if (query.kind) rows = rows.filter((item) => item.kind === query.kind);
   rows = rows.filter((item) => withinWindow(item.publishedAt, query.windowDays));
 
-  return [...rows]
-    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-    .slice(0, query.limit);
+  const sorted = [...rows].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  const page = query.page ?? 1;
+  return sorted.slice((page - 1) * query.limit, page * query.limit);
+}
+
+export async function countNews(query: NewsQuery): Promise<number> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return 0;
+  let rows = normalizeNews(snapshot);
+  if (query.category) rows = rows.filter((item) => item.categoryKey === query.category);
+  if (query.kind) rows = rows.filter((item) => item.kind === query.kind);
+  return rows.filter((item) => withinWindow(item.publishedAt, query.windowDays)).length;
 }
 
 export async function getStats(days: number): Promise<Array<{ category: string; count: number }>> {

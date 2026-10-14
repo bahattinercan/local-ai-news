@@ -12,6 +12,7 @@ Her doküman iki dilde eşleşir. **EN kaynaktır, TR eşdeğerdir.** Bir dilde 
 | Source inventory | en/SOURCES.md | tr/SOURCES.md |
 | Category rules | en/CATEGORIES.md | tr/CATEGORIES.md |
 | Decisions log | [en/DECISIONS.md](en/DECISIONS.md) | [tr/DECISIONS.md](tr/DECISIONS.md) |
+| Design system & redesign plan | [en/DESIGN.md](en/DESIGN.md) | [tr/DESIGN.md](tr/DESIGN.md) |
 | Data storage (no Neon) | [en/DATA-STORAGE.md](en/DATA-STORAGE.md) | [tr/DATA-STORAGE.md](tr/DATA-STORAGE.md) |
 
 ## Conventions / Kurallar

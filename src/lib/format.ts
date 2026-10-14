@@ -31,3 +31,10 @@ export function formatNumber(value: number | null): string {
   if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
   return String(value);
 }
+
+export function formatBytes(bytes: number | null): string {
+  if (!bytes) return "—";
+  if (bytes >= 1_000_000_000) return `${(bytes / 1_000_000_000).toFixed(2)} GB`;
+  if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
+  return `${Math.round(bytes / 1000)} kB`;
+}

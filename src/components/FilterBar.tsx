@@ -1,6 +1,8 @@
+import { Filter, X } from "lucide-react";
 import { RUNNERS } from "@/lib/runner/detect";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { SORTS, WINDOWS } from "@/lib/query";
+import { Field, SubmitButton, TextInput } from "./ui/Controls";
 
 const SIZES = [3, 8, 13, 30];
 
@@ -31,31 +33,40 @@ export function FilterBar({
     { name: "license", label: t(dict, "filters.license"), options: [["", "—"], ["apache-2.0", "apache-2.0"], ["mit", "mit"], ["other", "other"]] }
   ];
 
+  const active = fields
+    .filter((field) => String(query[field.name] ?? "") !== "")
+    .map((field) => `${field.label}: ${String(query[field.name])}`);
+
   return (
-    <form method="get" action={action} className="flex flex-wrap items-end gap-3 border border-border rounded-lg bg-surface p-3 text-sm">
-      {fields.map((field) => (
-        <label key={field.name} className="flex flex-col gap-1">
-          <span className="text-muted">{field.label}</span>
-          <select name={field.name} defaultValue={String(query[field.name] ?? "")} className="rounded border border-border bg-bg px-2 py-1">
-            {field.options.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
+    <form
+      method="get"
+      action={action}
+      className="card p-3 flex flex-wrap items-end gap-3 text-sm"
+    >
+      <div className="flex flex-wrap items-end gap-3">
+        {fields.map((field) => (
+          <Field key={field.name} name={field.name} label={field.label} value={String(query[field.name] ?? "")} options={field.options} />
+        ))}
+        <label className="flex flex-col gap-1 min-w-[180px]">
+          <span className="text-xs uppercase tracking-wide text-muted">{t(dict, "filters.search")}</span>
+          <TextInput name="q" value={String(query.q ?? "")} placeholder="model name…" />
         </label>
-      ))}
+        <SubmitButton label={t(dict, "filters.apply")} />
+      </div>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-muted">{t(dict, "filters.search")}</span>
-        <input name="q" defaultValue={String(query.q ?? "")} className="rounded border border-border bg-bg px-2 py-1" />
-      </label>
-
-      <button type="submit" className="rounded border border-border bg-bg px-3 py-1.5">
-        {t(dict, "filters.apply")}
-      </button>
-
-      {gateForced ? <span className="text-warn">{t(dict, "filters.showEverything")} ≤ 30d + category</span> : null}
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+        {active.length > 0 ? (
+          <span className="flex items-center gap-2">
+            <Filter size={12} aria-hidden="true" />
+            {t(dict, "filters.active")}: {active.join(" · ")}
+          </span>
+        ) : null}
+        <a href={action} className="flex items-center gap-1 hover:text-text">
+          <X size={12} aria-hidden="true" />
+          {t(dict, "filters.clear")}
+        </a>
+        {gateForced ? <span className="text-warn">{t(dict, "filters.showEverything")} ≤ 30d + category</span> : null}
+      </div>
     </form>
   );
 }

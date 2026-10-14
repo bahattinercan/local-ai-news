@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
-import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
+import { dictionary, pickLocale, t } from "@/i18n";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { TabBar } from "@/components/TabBar";
+import { grotesk, mono } from "../fonts";
 import "../globals.css";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -8,9 +11,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const dict = dictionary(pickLocale(locale));
   return {
     title: `${t(dict, "brand")} — ${t(dict, "tagline")}`,
-    description: t(dict, "tagline")
+    description: t(dict, "tagline"),
+    icons: { icon: "/icon.svg", apple: "/apple-icon.png" }
   };
 }
+
+/** Read the saved theme before the first paint so there is no flash. */
+const THEME_BOOTSTRAP = `try{const s=localStorage.getItem("owr.theme");const t=s||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.dataset.theme=t;}catch(e){}`;
 
 export default async function Layout({
   children,
@@ -21,35 +28,21 @@ export default async function Layout({
 }) {
   const raw = (await params).locale;
   const locale = pickLocale(raw);
-  const dict = dictionary(locale);
 
   return (
-    <html lang={locale} data-theme="dark">
+    <html lang={locale} data-theme="dark" className={`${grotesk.className} ${mono.className}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
+      </head>
       <body>
-        <header className="border-b border-border px-4 py-3">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4">
-            <a href={hrefFor(locale, "/")} className="font-semibold">
-              {t(dict, "brand")}
-            </a>
-            <span className="text-sm text-muted">{t(dict, "tagline")}</span>
-            <nav className="ml-auto flex gap-2 text-sm">
-              {(["en", "tr"] as const).map((option) => (
-                <a
-                  key={option}
-                  href={hrefFor(option, "/")}
-                  className={option === locale ? "text-accent" : "text-muted"}
-                >
-                  {option.toUpperCase()}
-                </a>
-              ))}
-            </nav>
-          </div>
-        </header>
+        <Header locale={locale} />
 
         <div className="mx-auto max-w-6xl px-4">
           <TabBar locale={locale} />
           <main className="py-6">{children}</main>
         </div>
+
+        <Footer locale={locale} />
       </body>
     </html>
   );
