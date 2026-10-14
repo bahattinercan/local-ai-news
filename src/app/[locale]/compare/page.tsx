@@ -1,4 +1,4 @@
-import { getModel } from "@/lib/db/store";
+import { getModel } from "@/lib/store";
 import { formatParams } from "@/lib/runner/vram";
 import { categoryLabel } from "@/lib/classify/rules";
 import { formatNumber } from "@/lib/format";

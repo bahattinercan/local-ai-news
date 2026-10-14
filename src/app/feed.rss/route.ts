@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { buildRss } from "@/lib/rss";
-import { getNews } from "@/lib/db/store";
+import { getNews } from "@/lib/store";
 
 const CACHE = "public, s-maxage=300";
 

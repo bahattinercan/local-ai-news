@@ -1,6 +1,9 @@
 # Local AI News — Detailed Plan v2 (EN)
 
 > Turkish mirror: [docs/tr/PLAN.md](../tr/PLAN.md)
+>
+> **Update 2026-10-14:** decision 2 (Neon Postgres) was reversed — there is no
+> database. See [DATA-STORAGE.md](DATA-STORAGE.md).
 
 **Product:** a public website that tracks newly released **locally runnable (open-weight) AI models** by category tabs, with a news feed that updates on a schedule.
 

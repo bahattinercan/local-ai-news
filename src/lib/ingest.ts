@@ -5,7 +5,7 @@ import { evaluateGate } from "./classify/gate.ts";
 import { normalizeModel } from "./runner/normalize.ts";
 import { HfClient, type RawPaper } from "./sources/hf.ts";
 import type { ClassifiedModel } from "./model.ts";
-import type { Snapshot, SnapshotNews } from "./db/store.ts";
+import type { Snapshot, SnapshotNews } from "./store.ts";
 
 export interface IngestOptions {
   dryRun: boolean;
@@ -165,13 +165,43 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
 
   if (options.dryRun) return result;
 
-  const snapshot: Snapshot = { generatedAt: now, models, news };
+  applyOverrides(models);
+  models.sort((a, b) => new Date(b.firstSeenAt).getTime() - new Date(a.firstSeenAt).getTime());
+  news.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+
+  const snapshot: Snapshot = {
+    generatedAt: now,
+    models: models.slice(0, MAX_SNAPSHOT_MODELS),
+    news: news.slice(0, MAX_SNAPSHOT_NEWS)
+  };
   const path = join(process.cwd(), "data", "feed.json");
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, JSON.stringify(snapshot, null, 2));
   result.snapshotPath = path;
 
   return result;
+}
+
+const MAX_SNAPSHOT_MODELS = 2000;
+const MAX_SNAPSHOT_NEWS = 1000;
+
+function applyOverrides(models: ClassifiedModel[]): void {
+  const path = join(process.cwd(), "data", "overrides.json");
+  if (!existsSync(path)) return;
+
+  let overrides: Record<string, string>;
+  try {
+    overrides = JSON.parse(readFileSync(path, "utf-8")) as Record<string, string>;
+  } catch {
+    return;
+  }
+
+  for (const model of models) {
+    const override = overrides[model.externalId];
+    if (!override) continue;
+    model.primaryCategory = override;
+    if (!model.categories.includes(override)) model.categories.unshift(override);
+  }
 }
 
 export function printSourceHealth(rows: Array<{ key: string; status: number | string; items: number; note: string }>): void {

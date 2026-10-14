@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getModel } from "@/lib/db/store";
+import { getModel } from "@/lib/store";
 
 const CACHE = "public, s-maxage=900";
 

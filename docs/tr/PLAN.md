@@ -1,6 +1,9 @@
 # Local AI News — Detaylı Plan v2 (TR)
 
 > İngilizce eşdeğer: [docs/en/PLAN.md](../en/PLAN.md)
+>
+> **Güncelleme 14 Ekim 2026:** karar 2 (Neon Postgres) geri alındı — veritabanı
+> yok. Bkz. [DATA-STORAGE.md](DATA-STORAGE.md).
 
 **Ürün:** Yeni çıkan **yerelde çalıştırılabilir (open-weight) AI modellerini** kategori sekmeleriyle takip eden, haber akışı düzenli güncellenen **public** bir website.
 

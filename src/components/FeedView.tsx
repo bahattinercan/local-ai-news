@@ -1,8 +1,8 @@
 import { FeedCard } from "./FeedCard";
 import { FilterBar } from "./FilterBar";
-import { EmptyState, SnapshotNotice } from "./EmptyState";
+import { EmptyState, DataNotice } from "./EmptyState";
 import { SavedFilters } from "./SavedFilters";
-import { getFeed, isDbConfigured } from "@/lib/db/store";
+import { getFeed } from "@/lib/store";
 import { dictionary, t, type Locale } from "@/i18n";
 import type { normalizeFeedQuery } from "@/lib/query";
 
@@ -29,7 +29,7 @@ export async function FeedView({
 
   return (
     <>
-      {!isDbConfigured() ? <SnapshotNotice locale={locale} /> : null}
+      <DataNotice locale={locale} />
       <FilterBar locale={locale} category={category} query={formValues} gateForced={query.gateForced} />
       <SavedFilters locale={locale} currentQuery={new URLSearchParams(Object.entries(raw).filter((entry): entry is [string, string] => entry[1] !== undefined)).toString()} />
 

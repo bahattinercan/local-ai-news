@@ -42,7 +42,7 @@
   "compare.add": "Karşılaştırmaya ekle",
   "empty.noModels": "Bu filtrelerle eşleşen model yok.",
   "empty.noNews": "Bu pencerede haber yok.",
-  "db.snapshot": "data/feed.json okunuyor. Neon için DATABASE_URL tanımla.",
+  "data.updated": "Veriler {when} önce Hugging Face'ten yenilendi.",
   "common.viewModel": "Modeli gör",
   "detail.popularity": "Popülerlik",
   "card.paramsUnknown": "param bilgisi yok",

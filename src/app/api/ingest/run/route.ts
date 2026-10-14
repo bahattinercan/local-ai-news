@@ -2,9 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { runIngest } from "@/lib/ingest";
 
 /**
- * Called by cron-job.org through GitHub Actions (decision 6). On Vercel the
- * filesystem is read-only, so this route needs DATABASE_URL; the snapshot
- * writer is for local development only.
+ * Local/dev only. Production ingest runs in GitHub Actions (decision 6) and
+ * publishes the snapshot to Vercel Blob; Vercel's filesystem is read-only, so
+ * this route cannot persist anything there.
  */
 export async function POST(request: NextRequest) {
   const secret = request.headers.get("x-ingest-secret") ?? request.nextUrl.searchParams.get("secret");
@@ -16,14 +16,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const result = await runIngest({
-    dryRun: false,
-    maxPerCategory: 200,
-    pagesPerCategory: 2,
-    windowDays: 7,
-    token: process.env.HF_TOKEN,
-    maxRequests: 92
-  });
-
-  return NextResponse.json(result);
+  try {
+    const result = await runIngest({
+      dryRun: false,
+      maxPerCategory: 200,
+      pagesPerCategory: 2,
+      windowDays: 7,
+      token: process.env.HF_TOKEN,
+      maxRequests: 92
+    });
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "cannot write the snapshot here — run the ingest in GitHub Actions",
+        detail: (error as Error).message
+      },
+      { status: 501 }
+    );
+  }
 }

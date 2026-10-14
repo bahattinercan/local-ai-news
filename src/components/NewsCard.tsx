@@ -1,6 +1,6 @@
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { relativeTime, formatNumber } from "@/lib/format";
-import type { SnapshotNews } from "@/lib/db/store";
+import type { SnapshotNews } from "@/lib/store";
 
 export function NewsCard({ item, locale }: { item: SnapshotNews; locale: Locale }) {
   const dict = dictionary(locale);

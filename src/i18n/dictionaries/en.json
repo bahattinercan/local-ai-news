@@ -42,7 +42,7 @@
   "compare.add": "Add to compare",
   "empty.noModels": "No models match these filters.",
   "empty.noNews": "No news in this window.",
-  "db.snapshot": "Reading from data/feed.json. Set DATABASE_URL to use Neon.",
+  "data.updated": "Data refreshed {when} ago from Hugging Face.",
   "common.viewModel": "View model",
   "detail.popularity": "Popularity",
   "card.paramsUnknown": "params unknown",

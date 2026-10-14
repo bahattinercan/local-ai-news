@@ -1,10 +1,10 @@
-import { getModel, getFeed } from "@/lib/db/store";
+import { getModel, getFeed } from "@/lib/store";
 import { runCommand } from "@/lib/runner/command";
 import { categoryLabel } from "@/lib/classify/rules";
 import { formatNumber, daysSince } from "@/lib/format";
 import { formatParams } from "@/lib/runner/vram";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
-import { EmptyState, SnapshotNotice } from "@/components/EmptyState";
+import { EmptyState, DataNotice } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
 import { FeedCard } from "@/components/FeedCard";
 
@@ -21,7 +21,7 @@ export default async function ModelPage({
   if (!model) {
     return (
       <>
-        <SnapshotNotice locale={locale} />
+        <DataNotice locale={locale} />
         <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
       </>
     );
@@ -52,7 +52,7 @@ export default async function ModelPage({
         }}
       />
 
-      <SnapshotNotice locale={locale} />
+      <DataNotice locale={locale} />
 
       <h1 className="text-2xl font-semibold">{model.externalId}</h1>
       <p className="mt-1 text-sm text-muted">

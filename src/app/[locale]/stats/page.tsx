@@ -1,6 +1,6 @@
-import { getStats } from "@/lib/db/store";
+import { getStats } from "@/lib/store";
 import { categoryLabel } from "@/lib/classify/rules";
-import { SnapshotNotice } from "@/components/EmptyState";
+import { DataNotice } from "@/components/EmptyState";
 import { dictionary, pickLocale, t } from "@/i18n";
 
 export default async function StatsPage({
@@ -19,7 +19,7 @@ export default async function StatsPage({
 
   return (
     <>
-      <SnapshotNotice locale={locale} />
+      <DataNotice locale={locale} />
       <h1 className="mb-3 text-xl font-semibold">
         {t(dict, "stats.title")} ({days}d)
       </h1>

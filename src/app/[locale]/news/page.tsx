@@ -1,7 +1,7 @@
-import { getNews, isDbConfigured } from "@/lib/db/store";
+import { getNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 import { NewsCard } from "@/components/NewsCard";
-import { EmptyState, SnapshotNotice } from "@/components/EmptyState";
+import { EmptyState, DataNotice } from "@/components/EmptyState";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
 
@@ -58,7 +58,7 @@ export default async function NewsPage({
         </button>
       </form>
 
-      {!isDbConfigured() ? <SnapshotNotice locale={locale} /> : null}
+      <DataNotice locale={locale} />
 
       {items.length === 0 ? (
         <EmptyState locale={locale} message={t(dict, "empty.noNews")} />

@@ -19,8 +19,11 @@ jobs:
         run: npm run sources-check
       - name: Ingest
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: npm run ingest
       - name: Regression gate
         run: npm run classify-check
+      - name: Publish snapshot to Vercel Blob
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+        run: npm run publish

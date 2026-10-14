@@ -1,4 +1,6 @@
 import { dictionary, t, type Locale } from "@/i18n";
+import { relativeTime } from "@/lib/format";
+import { getGeneratedAt } from "@/lib/store";
 
 export function EmptyState({ locale, message }: { locale: Locale; message: string }) {
   const dict = dictionary(locale);
@@ -9,7 +11,9 @@ export function EmptyState({ locale, message }: { locale: Locale; message: strin
   );
 }
 
-export function SnapshotNotice({ locale }: { locale: Locale }) {
+export async function DataNotice({ locale }: { locale: Locale }) {
+  const generatedAt = await getGeneratedAt();
+  if (!generatedAt) return null;
   const dict = dictionary(locale);
-  return <p className="mb-4 text-sm text-muted break-words">{t(dict, "db.snapshot")}</p>;
+  return <p className="mb-4 text-sm text-muted break-words">{t(dict, "data.updated", { when: relativeTime(generatedAt) })}</p>;
 }

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getNews } from "@/lib/db/store";
+import { getNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 
 const CACHE = "public, s-maxage=300";
