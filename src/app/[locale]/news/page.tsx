@@ -67,7 +67,9 @@ export default async function NewsPage({
             ["", "—"],
             ["paper", t(dict, "news.paper")],
             ["release", t(dict, "news.release")],
-            ["announcement", t(dict, "news.announcement")]
+            ["announcement", t(dict, "news.announcement")],
+            ["runtime", t(dict, "news.runtime")],
+            ["community", t(dict, "news.community")]
           ]}
         />
         <Field

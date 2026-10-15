@@ -1,9 +1,14 @@
 [
   { "key": "hf_models", "status": 200, "items": 5, "note": "search + pagination" },
-  { "key": "hf_model_detail", "status": 200, "items": 21, "note": "cardData, safetensors, siblings, spaces" },
-  { "key": "hf_trending", "status": 200, "items": 20, "note": "authorData.avatarUrl is only available here" },
+  { "key": "hf_model_detail", "status": 200, "items": 16, "note": "cardData, safetensors, siblings, spaces" },
+  { "key": "hf_trending", "status": 200, "items": 10, "note": "authorData.avatarUrl is only available here" },
   { "key": "hf_daily_papers", "status": 200, "items": 50, "note": "?date=YYYY-MM-DD, ~50/day" },
-  { "key": "hf_blog_rss", "status": 404, "items": 0, "note": "404 — no RSS feed exists" },
-  { "key": "hf_users", "status": "error", "items": 0, "note": "error without a token" },
-  { "key": "hf_organizations", "status": "error", "items": 0, "note": "error without a token" }
+  { "key": "reddit_localllama", "status": 200, "items": 25, "note": "needs a browser User-Agent + Accept; 200 on a first call, 429 on bursts (measured 2026-10-15)" },
+  { "key": "gh_llama_cpp", "status": 200, "items": 10, "note": "runtime releases" },
+  { "key": "gh_ollama", "status": 200, "items": 10, "note": "runtime releases" },
+  { "key": "gh_vllm", "status": 200, "items": 10, "note": "runtime releases" },
+  { "key": "hf_blog_rss", "status": "disabled", "items": 0, "note": "404 — no RSS feed exists" },
+  { "key": "hf_users", "status": "disabled", "items": 0, "note": "error without a token" },
+  { "key": "hf_organizations", "status": "disabled", "items": 0, "note": "error without a token" },
+  { "key": "lmstudio_changelog", "status": "disabled", "items": 0, "note": "HTML only, no feed (measured 2026-10-15)" }
 ]

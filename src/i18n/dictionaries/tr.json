@@ -36,6 +36,8 @@
   "news.paper": "Paper",
   "news.release": "Release",
   "news.announcement": "Duyuru",
+  "news.runtime": "Runtime",
+  "news.community": "Topluluk",
   "news.updated": "{when} önce güncellendi",
   "news.kind": "Tür",
   "stats.title": "Kategori bazlı hacim",

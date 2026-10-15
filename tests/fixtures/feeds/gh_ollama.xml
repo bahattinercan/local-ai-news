@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xml:lang="en-US">
+  <id>tag:github.com,2008:https://github.com/ollama/ollama/releases</id>
+  <link type="text/html" rel="alternate" href="https://github.com/ollama/ollama/releases"/>
+  <link type="application/atom+xml" rel="self" href="https://github.com/ollama/ollama/releases.atom"/>
+  <title>Release notes from ollama</title>
+  <updated>2026-10-15T16:11:12Z</updated>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+<entry>
+    <id>tag:github.com,2008:Repository/658928958/v0.40.5</id>
+    <updated>2026-10-15T19:18:39Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/ollama/ollama/releases/tag/v0.40.5"/>
+    <title>v0.40.5</title>
+    <content type="html">&lt;h2&gt;NVIDIA Nemotron 3.5 Super&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://ollama.com/library/nemotron-3.5-super&quot; rel=&quot;nofollow&quot;&gt;NVIDIA Nemotron 3.5 Super&lt;/a&gt; is a vision-language model for coding, reasoning, tool use, and document understanding. It pairs a 120B-parameter hybrid Mamba-2/Transformer mixture-of-experts backbone (12B active per token) with a C-RADIO vision encoder, and supports tool calling, an on/off thinking mode, and context up to 1M tokens.&lt;/p&gt;
+&lt;div class=&quot;snippet-clipboard-content notranslate position-relative overflow-auto&quot; data-snippet-clipboard-copy-content=&quot;ollama run nemotron-3.5-super&quot;&gt;&lt;pre class=&quot …</content>
+    <author>
+      <name>github-actions[bot]</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/in/15368?s=60&amp;v=4"/>
+  </entry><entry>
+    <id>tag:github.com,2008:Repository/658928958/v0.40.5-rc2</id>
+    <updated>2026-10-15T16:11:12Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/ollama/ollama/releases/tag/v0.40.5-rc2"/>
+    <title>v0.40.5-rc2</title>
+    <content type="html">&lt;p&gt;llama.cpp: version bump b11669 (&lt;a class=&quot;issue-link js-issue-link&quot; data-error-text=&quot;Failed to load title&quot; data-id=&quot;5869218550&quot; data-permission-text=&quot;Title is private&quot; data-url=&quot;https://github.com/ollama/ollama/issues/19032&quot; data-hovercard-type=&quot;pull_request&quot; data-hovercard-url=&quot;/ollama/ollama/pull/19032/hovercard&quot; href=&quot;https://github.com/ollama/ollama/pull/19032&quot;&gt;#19032&lt;/a&gt;)&lt;/p&gt;</content>
+    <author>
+      <name>dhiltgen</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/4033016?s=60&amp;v=4"/>
+  </entry><entry>
+    <id>tag:github.com,2008:Repository/658928958/v0.40.5-rc1</id>
+    <updated>2026-10-15T14:28:26Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/ollama/ollama/releases/tag/v0.40.5-rc1"/>
+    <title>v0.40.5-rc1: New model... (#19030)</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;ci: shorten Windows Vulkan build path&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Keep the nested shader-generator compiler probes below Windows path limits in checkouts with longer repository names.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;mlx: fix Nemotron bugs and support global scales&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Accept published Nemotron layer names while retaining legacy aliases, and&lt;br&gt;
+fix layer-count inference and detached MTP quantization. Stabilize Mamba&lt;br&gt;
+softplus, preserve FP32 vision normalization, and compile Mamba gate and&lt;br&gt;
+norm scaling.&lt;/p&gt;
+&lt;p&gt;Support per-expert F32 global scales and preserve activation-scale&lt;br&gt;
+companions in …</content>
+    <author>
+      <name>dhiltgen</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/4033016?s=60&amp;v=4"/>
+  </entry></feed>

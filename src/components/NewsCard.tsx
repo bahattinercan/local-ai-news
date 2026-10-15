@@ -5,10 +5,19 @@ import { relativeTime, formatNumber } from "@/lib/format";
 import { categoryLabel } from "@/lib/classify/rules";
 import type { SnapshotNews } from "@/lib/store";
 
-const KIND_TONE: Record<string, "accent" | "ok" | "warn"> = {
+const KIND_TONE: Record<string, "accent" | "ok" | "warn" | "danger"> = {
   paper: "accent",
   release: "ok",
-  announcement: "warn"
+  announcement: "warn",
+  runtime: "danger",
+  community: "warn"
+};
+
+const KIND_CLASS: Record<string, string> = {
+  accent: "text-accent",
+  ok: "text-ok",
+  warn: "text-warn",
+  danger: "text-danger"
 };
 
 export function NewsCard({ item, locale }: { item: SnapshotNews; locale: Locale }) {
@@ -34,7 +43,7 @@ export function NewsCard({ item, locale }: { item: SnapshotNews; locale: Locale 
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span
             className={
-              { accent: "text-accent", ok: "text-ok", warn: "text-warn" }[KIND_TONE[item.kind] ?? "accent"]
+              KIND_CLASS[KIND_TONE[item.kind] ?? "accent"]
             }
           >
             {t(dict, `news.${item.kind}`)}

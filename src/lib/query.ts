@@ -64,7 +64,7 @@ export function parseFeedQuery(search: Record<string, string | string[] | undefi
 export const newsQuerySchema = z.object({
   window: z.enum(WINDOWS).default("7d"),
   category: z.string().min(1).optional(),
-  kind: z.enum(["paper", "release", "announcement"]).optional(),
+  kind: z.enum(["paper", "release", "announcement", "runtime", "community"]).optional(),
   limit: z.coerce.number().int().positive().max(100).default(30),
   page: z.coerce.number().int().positive().default(1)
 });

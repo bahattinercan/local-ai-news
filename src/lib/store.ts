@@ -5,7 +5,7 @@ import type { ClassifiedModel } from "./model.ts";
 
 export interface SnapshotNews {
   externalId: string;
-  kind: "paper" | "release" | "announcement";
+  kind: "paper" | "release" | "announcement" | "runtime" | "community";
   title: string;
   summary?: string;
   thumbnail?: string;
@@ -40,7 +40,7 @@ export interface FeedQuery {
 export interface NewsQuery {
   windowDays: number;
   category?: string;
-  kind?: "paper" | "release" | "announcement";
+  kind?: "paper" | "release" | "announcement" | "runtime" | "community";
   limit: number;
   page?: number;
 }

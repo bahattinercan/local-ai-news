@@ -36,6 +36,8 @@
   "news.paper": "Paper",
   "news.release": "Release",
   "news.announcement": "Announcement",
+  "news.runtime": "Runtime",
+  "news.community": "Community",
   "news.updated": "Updated {when} ago",
   "news.kind": "Kind",
   "stats.title": "Volume by category",
