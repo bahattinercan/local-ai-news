@@ -18,7 +18,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "hourly"
     });
 
-    for (const rule of CATEGORY_RULES) {
+    // `news` is a rule key but not a user-facing category: getCategories()
+    // already filters it out, so the sitemap must not advertise /c/news.
+    for (const rule of CATEGORY_RULES.filter((r) => r.key !== "news")) {
       entries.push({
         url: `${BASE}/${locale}/c/${rule.key}`,
         alternates: { languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}/c/${rule.key}`])) },
