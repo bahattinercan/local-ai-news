@@ -20,7 +20,7 @@ export async function PulseStrip({ locale, days }: { locale: Locale; days: numbe
         <Stat label={t(dict, "pulse.passed")} value={pulse.passed} tone="ok" />
         <Stat
           label={t(dict, "pulse.top")}
-          value={pulse.topCategory ? categoryLabel(pulse.topCategory, locale) : "—"}
+          value={pulse.topCategory ? categoryLabel(pulse.topCategory) : "—"}
           hint={`${pulse.topCategoryCount}`}
         />
         <Stat

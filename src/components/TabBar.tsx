@@ -1,4 +1,4 @@
-import { CATEGORY_RULES } from "@/lib/classify/rules";
+import { CATEGORY_RULES, categoryLabel } from "@/lib/classify/rules";
 import { getStats } from "@/lib/store";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { cn } from "@/lib/format";
@@ -14,7 +14,7 @@ export async function TabBar({ locale, active }: { locale: Locale; active?: stri
       .filter((rule) => rule.key !== "news")
       .map((rule) => ({
         key: rule.key,
-        label: t(dict, `nav.${rule.key}`),
+        label: categoryLabel(rule.key),
         count: countMap.get(rule.key) ?? 0
       }))
   ];

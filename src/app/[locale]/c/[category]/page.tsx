@@ -21,7 +21,7 @@ export default async function CategoryPage({
 
   return (
     <>
-      <h1 className="mb-3 text-xl font-semibold">{categoryLabel(category, locale)}</h1>
+      <h1 className="mb-3 text-xl font-semibold">{categoryLabel(category)}</h1>
       <FeedView locale={locale} category={category} query={query} raw={normalizeRaw(raw)} />
     </>
   );

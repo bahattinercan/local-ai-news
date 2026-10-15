@@ -56,6 +56,7 @@ Conclusion: the flatness is not taste, it is **1.15:1 surface separation + no hi
 | 6 | **Charts: pure SVG**, no chart dependency | SSR-friendly, zero bundle cost, full control of the token palette. |
 | 7 | **Motion: medium** — scroll reveal, count-up, hover elevation, radar sweep in the header; all disabled under `prefers-reduced-motion` | Impressive without hurting performance or accessibility. |
 | 8 | **No new dependencies** | Tailwind v4 + `lucide-react` (6422 icons, already installed) cover everything. |
+| 9 | **Category names stay English in both locales** | They are taxonomy terms, not UI copy: the Turkish feed showed "Görüntü · kod · Çoklu Mod" beside English library (`gguf`) and runner (`llama.cpp`) names, so the taxonomy became unreadable. `categoryLabel()` no longer takes a locale, which makes a regression a compile error. UI words (filters, buttons, headings) stay translated, and `/api/categories` still serves both `labelEn` and `labelTr`. |
 
 ---
 

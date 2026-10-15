@@ -76,7 +76,7 @@ export default async function NewsPage({
           value={query.category ?? ""}
           options={[
             ["", "—"],
-            ...CATEGORY_RULES.map((rule) => [rule.key, locale === "tr" ? rule.labelTr : rule.labelEn])
+            ...CATEGORY_RULES.map((rule) => [rule.key, rule.labelEn])
           ]}
         />
         <SubmitButton label={t(dict, "filters.apply")} />

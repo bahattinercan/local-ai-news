@@ -40,7 +40,7 @@ export default async function ComparePage({
   }
 
   const rows: Row[] = [
-    { label: t(dict, "filters.category"), get: (m) => categoryLabel(m.primaryCategory, locale) },
+    { label: t(dict, "filters.category"), get: (m) => categoryLabel(m.primaryCategory) },
     {
       label: t(dict, "card.params"),
       get: (m) => formatParams(m.paramsTotal),

@@ -44,7 +44,7 @@ export default async function StatsPage({
       <div className="stats-grid">
         <section className="card p-4">
           <h2 className="text-sm uppercase tracking-wide text-muted mb-3">{t(dict, "stats.title")}</h2>
-          <BarChart rows={stats.map((row) => ({ label: categoryLabel(row.category, locale), value: row.count }))} max={max} />
+          <BarChart rows={stats.map((row) => ({ label: categoryLabel(row.category), value: row.count }))} max={max} />
         </section>
 
         <section className="card p-4 flex flex-col gap-3">

@@ -39,7 +39,7 @@ export function NewsCard({ item, locale }: { item: SnapshotNews; locale: Locale 
           >
             {t(dict, `news.${item.kind}`)}
           </span>
-          {item.categoryKey ? <span className="text-muted">{categoryLabel(item.categoryKey, locale)}</span> : null}
+          {item.categoryKey ? <span className="text-muted">{categoryLabel(item.categoryKey)}</span> : null}
           <span className="flex items-center gap-1 text-muted font-mono">
             <Clock size={11} aria-hidden="true" /> {relativeTime(item.publishedAt)}
           </span>

@@ -56,6 +56,7 @@ Sonuç: düzlük bir zevk meselesi değil, **1.15:1 yüzey ayrımı + hiyerarşi
 | 6 | **Grafikler: pure SVG**, chart bağımlılığı yok | SSR dostu, sıfır bundle maliyeti, palet tam kontrol. |
 | 7 | **Motion: orta** — scroll reveal, count-up, hover derinliği, header'da radar sweep; `prefers-reduced-motion`'da hepsi kapalı | Etkileyici ama performans/erişilebilirliği düşürmez. |
 | 8 | **Yeni dependency yok** | Tailwind v4 + `lucide-react` (6422 ikon, kurulu) her şeyi karşılıyor. |
+| 9 | **Kategori adları iki dilde de İngilizce kalır** | Bunlar taksonomi terimleri, arayüz metni değil: Türkçe feed'de "Görüntü · kod · Çoklu Mod" İngilizce kütüphane (`gguf`) ve runner (`llama.cpp`) adlarının yanında durunca taksonomi okunamaz hale geliyordu. `categoryLabel()` artık locale parametresi almıyor, böylece geri dönüş bir derleme hatası olur. Arayüz kelimeleri (filtreler, butonlar, başlıklar) çevrilmeye devam eder; `/api/categories` hâlâ hem `labelEn` hem `labelTr` sunar. |
 
 ---
 

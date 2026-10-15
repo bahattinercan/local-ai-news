@@ -169,8 +169,14 @@ export function classifyModel(
   return { primary: ordered[0], all: ordered };
 }
 
-export function categoryLabel(key: string, locale: "en" | "tr"): string {
+/**
+ * Category names are taxonomy terms, not UI copy: they stay English in every
+ * locale (product decision 2026-10-15). Only UI labels are translated. The
+ * locale parameter was removed on purpose so a call site cannot silently
+ * reintroduce Turkish category names.
+ */
+export function categoryLabel(key: string): string {
   const rule = CATEGORY_RULES.find((r) => r.key === key);
   if (!rule) return key;
-  return locale === "tr" ? rule.labelTr : rule.labelEn;
+  return rule.labelEn;
 }
