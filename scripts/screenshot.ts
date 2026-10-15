@@ -18,7 +18,7 @@ async function main(): Promise<void> {
   await new Promise((resolve) => ws.addEventListener("open", resolve));
 
   let id = 1;
-  const pending = new Map<number, (value: unknown) => void>();
+  const pending = new Map<number, (_value: unknown) => void>();
   ws.addEventListener("message", (event) => {
     const message = JSON.parse(String(event.data));
     if (message.id && pending.has(message.id)) {

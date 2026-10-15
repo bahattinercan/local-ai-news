@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import { getNews, countNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 import { NewsCard } from "@/components/NewsCard";
@@ -87,18 +88,21 @@ export default async function NewsPage({
         <EmptyState locale={locale} message={t(dict, "empty.noNews")} />
       ) : (
         <div className="grid gap-3">
-          {[...groups.entries()].map(([day, dayItems]) => (
-            <section key={day} className="card p-4">
-              <div className="flex items-center justify-between gap-2 mb-3 text-xs text-muted font-mono">
-                <span>{formatter.format(new Date(day))}</span>
+          {[...groups.entries()].map(([day, dayItems], index) => (
+            <details key={day} className="card p-4" open={index === 0}>
+              <summary className="flex cursor-pointer items-center justify-between gap-2 text-xs text-muted font-mono">
+                <span className="flex items-center gap-2">
+                  <ChevronDown size={14} aria-hidden="true" className="chev" />
+                  {formatter.format(new Date(day))}
+                </span>
                 <span>{dayItems.length}</span>
-              </div>
-              <div className="grid gap-3">
+              </summary>
+              <div className="mt-3 grid gap-3">
                 {dayItems.map((item) => (
                   <NewsCard key={item.externalId} item={item} locale={locale} />
                 ))}
               </div>
-            </section>
+            </details>
           ))}
         </div>
       )}

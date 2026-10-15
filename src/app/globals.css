@@ -162,6 +162,24 @@ a {
   animation: fade-up 420ms ease both;
 }
 
+/* Collapsible day groups: `display:flex` on summary hides the native marker,
+   so the affordance has to be drawn explicitly. */
+summary {
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+.chev {
+  transition: transform 160ms ease;
+}
+
+details[open] > summary .chev {
+  transform: rotate(180deg);
+}
+
 .skeleton {
   background: linear-gradient(90deg, var(--surface) 0%, var(--raised) 40%, var(--surface) 80%);
   background-size: 200% 100%;

@@ -9,3 +9,6 @@ next-env.d.ts
 .shots/
 .server.log
 .chrome.log
+
+# local headless-chrome profile (must live outside the repo for Turbopack)
+.chrome-profile/
