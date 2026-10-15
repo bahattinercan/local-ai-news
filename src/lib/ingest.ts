@@ -17,6 +17,8 @@ export interface IngestOptions {
   token?: string;
   maxRequests: number;
   maxDetailLookups?: number;
+  /** Detail lookups spent on models already in the snapshot (never gated by `seen`). */
+  maxBackfills?: number;
 }
 
 export interface IngestResult {
@@ -28,6 +30,8 @@ export interface IngestResult {
   budgetExhausted: boolean;
   categoryDistribution: Record<string, number>;
   newsCount: number;
+  /** Models that gained detail data in this run (gate pass, previously missing). */
+  backfilled: number;
   /** Sources that failed this run; their previous items were kept (gate G5). */
   feedFailures: string[];
   snapshotPath: string | null;
@@ -147,6 +151,51 @@ export async function ingestFeeds(
   return failures;
 }
 
+/**
+ * Backfill detail data for models already in the snapshot.
+ *
+ * The main loop skips a known model before enriching it (`if (seen.has(...))
+ * continue`), so a model that missed a detail lookup at first sight could never
+ * gain one: measured 2026-10-15, 407 models passed the gate but only 300 detail
+ * lookups ran, leaving 107 permanently without `files`/`cardMeta`. This pass is
+ * keyed on the missing field instead of on `seen`.
+ *
+ * Fields are merged, never overwritten with a null: the stored `firstSeenAt` and
+ * gate verdict are what make a row "new", so they are left alone.
+ */
+export async function backfillDetails(
+  client: HfClient,
+  models: ClassifiedModel[],
+  limit: number
+): Promise<number> {
+  const targets = models.filter((model) => model.qualityPassed && !model.gated && !model.files).slice(0, limit);
+  let enriched = 0;
+
+  for (const model of targets) {
+    let detail = null;
+    try {
+      detail = await client.getModel(model.externalId);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith("rate limit budget")) break;
+      continue;
+    }
+    if (!detail) continue;
+
+    const fresh = normalizeModel(detail, { firstSeenAt: model.firstSeenAt });
+    model.files = fresh.files ?? model.files;
+    model.cardMeta = fresh.cardMeta ?? model.cardMeta;
+    model.storageBytes = fresh.storageBytes ?? model.storageBytes;
+    model.paramsTotal = fresh.paramsTotal ?? model.paramsTotal;
+    model.paramDtypes = fresh.paramDtypes ?? model.paramDtypes;
+    if (fresh.quantizations.length > 0) model.quantizations = fresh.quantizations;
+    if (fresh.spaces.length > 0) model.spaces = fresh.spaces;
+    if (model.sampleImages.length === 0 && fresh.sampleImages.length > 0) model.sampleImages = fresh.sampleImages;
+    enriched += 1;
+  }
+
+  return enriched;
+}
+
 function loadExistingSnapshot(): Snapshot | null {
   const path = join(process.cwd(), "data", "feed.json");
   if (!existsSync(path)) return null;
@@ -245,6 +294,15 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
 
   const feedFailures = await ingestFeeds(models, news);
 
+  // Backfill after the main loop so freshly discovered models get the first
+  // slice of the detail budget, and reserve 10 requests of headroom so the
+  // listing work is never starved on the next run.
+  const backfillBudget = Math.max(
+    0,
+    Math.min(options.maxBackfills ?? 120, options.maxRequests - client.requestsUsed - 10)
+  );
+  const backfilled = backfillBudget > 0 ? await backfillDetails(client, models, backfillBudget) : 0;
+
   const result: IngestResult = {
     itemsTotal: total,
     itemsNew: newCount,
@@ -254,6 +312,7 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
     budgetExhausted,
     categoryDistribution: distribution,
     newsCount: news.length,
+    backfilled,
     feedFailures,
     snapshotPath: null
   };

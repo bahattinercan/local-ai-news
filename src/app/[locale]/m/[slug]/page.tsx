@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Activity, Box, Clock, Cpu, HardDrive, Heart, Layers, Link as LinkIcon, ShieldCheck, Zap } from "lucide-react";
+import { Activity, Box, Clock, Cpu, Database, Globe, HardDrive, Heart, Layers, Link as LinkIcon, ShieldCheck, Zap } from "lucide-react";
 import { getModel, getFeed } from "@/lib/store";
 import { runCommand } from "@/lib/runner/command";
 import { categoryLabel } from "@/lib/classify/rules";
@@ -11,6 +11,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { FeedCard } from "@/components/FeedCard";
 import { Chip } from "@/components/ui/Chip";
 import { CopyCommand } from "@/components/CopyCommand";
+import { VramCalculator } from "@/components/VramCalculator";
 
 export default async function ModelPage({
   params
@@ -52,6 +53,9 @@ export default async function ModelPage({
   specs.push({ icon: Clock, label: t(dict, "card.new"), value: `${daysSince(model.firstSeenAt)}d (${relativeTime(model.firstSeenAt)})` });
   if (model.gateReason) specs.push({ icon: ShieldCheck, label: t(dict, "detail.gateReason"), value: model.gateReason });
   if (model.spaces.length) specs.push({ icon: LinkIcon, label: t(dict, "detail.spaces"), value: model.spaces.slice(0, 5).join(", ") });
+  if (model.cardMeta?.baseModel) specs.push({ icon: LinkIcon, label: t(dict, "detail.baseModel"), value: model.cardMeta.baseModel });
+  if (model.cardMeta?.datasets?.length) specs.push({ icon: Database, label: t(dict, "detail.datasets"), value: model.cardMeta.datasets.join(" · ") });
+  if (model.cardMeta?.languages?.length) specs.push({ icon: Globe, label: t(dict, "detail.languages"), value: model.cardMeta.languages.join(" · ") });
 
   const command = runCommand(model);
 
@@ -126,6 +130,45 @@ export default async function ModelPage({
           );
         })}
       </section>
+
+      <section className="mt-4">
+        <h2 className="text-lg font-semibold mb-2">{t(dict, "detail.vramCalc")}</h2>
+        <VramCalculator
+          paramsTotal={model.paramsTotal}
+          quantizations={model.quantizations}
+          labels={{
+            params: t(dict, "detail.calcParams"),
+            quantization: t(dict, "detail.calcQuant"),
+            context: t(dict, "detail.calcContext"),
+            result: t(dict, "detail.calcResult"),
+            manual: t(dict, "detail.calcManual"),
+            derived: t(dict, "detail.calcDerived")
+          }}
+        />
+      </section>
+
+      {model.files && model.files.length > 0 ? (
+        <section className="mt-4">
+          <h2 className="flex flex-wrap items-baseline gap-2 text-lg font-semibold mb-2">
+            {t(dict, "detail.files")}
+            <span className="text-xs font-normal text-muted">{t(dict, "detail.filesNote")}</span>
+          </h2>
+          <div className="card overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <tbody>
+                {model.files.map((file) => (
+                  <tr key={file.name} className="border-b border-border last:border-0">
+                    <td className="py-2 pr-3 font-mono text-xs break-all">{file.name}</td>
+                    <td className="py-2 pl-3 text-right font-mono text-xs text-muted whitespace-nowrap">
+                      {formatBytes(file.bytes)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ) : null}
 
       <section className="mt-4">
         <h2 className="text-lg font-semibold mb-2">{t(dict, "detail.runCommand")}</h2>

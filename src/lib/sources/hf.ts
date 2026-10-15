@@ -150,7 +150,9 @@ export class HfClient {
   }
 
   async getModel(id: string): Promise<RawModel> {
-    const response = await this.request(`${BASE}/api/models/${id}?full=true`);
+    // `blobs=true` is what makes per-file sizes available; `full=true` alone returns
+    // only rfilename. Measured 2026-10-15: full=true -> no size, full=true&blobs=true -> size.
+    const response = await this.request(`${BASE}/api/models/${id}?full=true&blobs=true`);
     return mapModelItem((await response.json()) as Record<string, unknown>);
   }
 
@@ -201,6 +203,11 @@ function mapModelItem(item: Record<string, unknown>): RawModel {
     lastModified: String(item.lastModified ?? ""),
     siblings: Array.isArray(item.siblings)
       ? (item.siblings as Array<{ rfilename: string }>).map((s) => s.rfilename)
+      : undefined,
+    siblingSizes: Array.isArray(item.siblings)
+      ? (item.siblings as Array<{ rfilename: string; size?: number }>)
+          .filter((s) => typeof s.size === "number")
+          .map((s) => ({ name: s.rfilename, bytes: Number(s.size) }))
       : undefined,
     cardData: (item.cardData as Record<string, unknown>) ?? null,
     safetensors: (item.safetensors as RawModel["safetensors"]) ?? null,

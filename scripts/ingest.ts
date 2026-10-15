@@ -14,7 +14,8 @@ const result = await runIngest({
   windowDays: arg("window-days", 7),
   token: process.env.HF_TOKEN,
   maxRequests: arg("max-requests", 400),
-  maxDetailLookups: arg("max-detail-lookups", 300)
+  maxDetailLookups: arg("max-detail-lookups", 300),
+  maxBackfills: arg("max-backfills", 120)
 });
 
 console.log("INGEST REPORT");
@@ -25,6 +26,7 @@ console.log(`gate passed:       ${result.itemsGatePassed}`);
 console.log(`news rows:         ${result.newsCount}`);
 console.log(`requests used:     ${result.requestsUsed} / ${arg("max-requests", 400)} budget`);
 console.log(`detail lookups:    ${result.detailLookups}`);
+console.log(`backfilled:        ${result.backfilled} models gained detail data`);
 if (result.feedFailures.length > 0) {
   console.warn(`feed failures:     ${result.feedFailures.join("; ")}`);
   console.warn("                   (their previous items were kept — gate G5)");

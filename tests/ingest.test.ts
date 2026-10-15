@@ -168,3 +168,75 @@ test("gate G5: a 429 on one source does not empty the feed", async () => {
     `expected a 429 failure line, got ${JSON.stringify(failures)}`
   );
 });
+
+// --- Phase 1: detail backfill for models already in the snapshot ---
+
+import { backfillDetails } from "../src/lib/ingest.ts";
+import type { HfClient } from "../src/lib/sources/hf.ts";
+
+function stubClient(detail: RawModel | null): HfClient {
+  return { getModel: async () => detail } as unknown as HfClient;
+}
+
+test("backfill enriches a model that has no file list yet", async () => {
+  const model = normalizeModel(base, { firstSeenAt: "2026-10-13T16:00:00.000Z" });
+  assert.equal(model.files ?? null, null);
+
+  const withSizes: RawModel = {
+    ...base,
+    siblingSizes: [
+      { name: "model.safetensors", bytes: 14_000_000_000 },
+      { name: "preview.png", bytes: 900_000 },
+      { name: "model.Q4_K_M.gguf", bytes: 4_200_000_000 }
+    ],
+    cardData: { ...base.cardData, base_model: "stabilityai/base", datasets: ["laion"], language: ["en"] }
+  };
+
+  const enriched = await backfillDetails(stubClient(withSizes), [model], 5);
+
+  assert.equal(enriched, 1);
+  // only weight files, largest first; the png is filtered out
+  assert.deepEqual(
+    model.files?.map((file) => file.name),
+    ["model.safetensors", "model.Q4_K_M.gguf"]
+  );
+  assert.equal(model.cardMeta?.baseModel, "stabilityai/base");
+  assert.deepEqual(model.cardMeta?.datasets, ["laion"]);
+  // the fields that define "new" are not touched
+  assert.equal(model.firstSeenAt, "2026-10-13T16:00:00.000Z");
+  assert.equal(model.qualityPassed, true);
+});
+
+test("a model that already has files is not fetched again", async () => {
+  const model = normalizeModel(base, { firstSeenAt: "2026-10-13T16:00:00.000Z" });
+  model.files = [{ name: "already.safetensors", bytes: 1 }];
+
+  let calls = 0;
+  const client = { getModel: async () => { calls += 1; return base; } } as unknown as HfClient;
+
+  assert.equal(await backfillDetails(client, [model], 5), 0);
+  assert.equal(calls, 0);
+});
+
+test("a failing detail lookup leaves the stored row intact", async () => {
+  const model = normalizeModel(base, { firstSeenAt: "2026-10-13T16:00:00.000Z" });
+  const before = { ...model };
+
+  const failing = { getModel: async () => { throw new Error("boom"); } } as unknown as HfClient;
+  assert.equal(await backfillDetails(failing, [model], 5), 0);
+  assert.deepEqual(model, before);
+});
+
+test("a rate-limit error stops the backfill instead of hammering the api", async () => {
+  const models = [0, 1, 2].map(() => normalizeModel(base, { firstSeenAt: "2026-10-13T16:00:00.000Z" }));
+  let calls = 0;
+  const limited = {
+    getModel: async () => {
+      calls += 1;
+      throw new Error("rate limit budget exhausted (500 per 300s)");
+    }
+  } as unknown as HfClient;
+
+  assert.equal(await backfillDetails(limited, models, 3), 0);
+  assert.equal(calls, 1, "it kept calling after the budget ran out");
+});

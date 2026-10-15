@@ -16,6 +16,8 @@ export interface RawModel {
   createdAt: string;
   lastModified: string;
   siblings?: string[];
+  /** Per-file sizes; only the `?blobs=true` detail response carries them. */
+  siblingSizes?: Array<{ name: string; bytes: number }>;
   cardData?: Record<string, unknown> | null;
   safetensors?: SafetensorsInfo | null;
   usedStorage?: number | null;
@@ -51,6 +53,13 @@ export interface ClassifiedModel {
   sampleImages: string[];
   spaces: string[];
   url: string;
+  /** Weight files only, capped; see MAX_STORED_FILES. */
+  files?: Array<{ name: string; bytes: number }> | null;
+  cardMeta?: {
+    baseModel?: string;
+    datasets?: string[];
+    languages?: string[];
+  } | null;
 }
 
 export function slugify(externalId: string): string {
