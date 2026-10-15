@@ -2,7 +2,7 @@ import { Filter, X } from "lucide-react";
 import { RUNNERS } from "@/lib/runner/detect";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { SORTS, WINDOWS } from "@/lib/query";
-import { Field, SubmitButton, TextInput } from "./ui/Controls";
+import { Field, SubmitButton } from "./ui/Controls";
 
 const SIZES = [3, 8, 13, 30];
 
@@ -38,23 +38,28 @@ export function FilterBar({
     .map((field) => `${field.label}: ${String(query[field.name])}`);
 
   return (
-    <form
-      method="get"
-      action={action}
-      className="card p-3 flex flex-wrap items-end gap-3 text-sm"
-    >
-      <div className="flex flex-wrap items-end gap-3">
+    /* One line at desktop widths: the fixed controls total ~903px (6 selects +
+       Apply + 7 x 8px gaps) and the search field is the only item with flex-1,
+       so it absorbs the slack instead of pushing Apply onto a second row.
+       Measured row width is 1094px at a 1440+ viewport. */
+    <form method="get" action={action} className="card p-3 text-sm">
+      <div className="flex flex-wrap items-end gap-2">
         {fields.map((field) => (
           <Field key={field.name} name={field.name} label={field.label} value={String(query[field.name] ?? "")} options={field.options} />
         ))}
-        <label className="flex flex-col gap-1 min-w-[180px]">
-          <span className="text-xs uppercase tracking-wide text-muted">{t(dict, "filters.search")}</span>
-          <TextInput name="q" value={String(query.q ?? "")} placeholder="model name…" />
+        <label className="flex min-w-[140px] flex-1 flex-col gap-1 xl:min-w-[180px]">
+          <span className="text-xs uppercase tracking-wide text-muted whitespace-nowrap">{t(dict, "filters.search")}</span>
+          <input
+            name="q"
+            defaultValue={String(query.q ?? "")}
+            placeholder="model name…"
+            className="w-full rounded-md border border-border bg-raised px-2.5 py-1.5 text-sm text-text"
+          />
         </label>
         <SubmitButton label={t(dict, "filters.apply")} />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted">
         {active.length > 0 ? (
           <span className="flex items-center gap-2">
             <Filter size={12} aria-hidden="true" />

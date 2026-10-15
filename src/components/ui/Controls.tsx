@@ -31,22 +31,11 @@ export function Field({
   );
 }
 
-export function TextInput({ name, value, placeholder }: { name: string; value: string; placeholder?: string }) {
-  return (
-    <input
-      name={name}
-      defaultValue={value}
-      placeholder={placeholder}
-      className="rounded-md border border-border bg-raised px-2.5 py-1.5 text-sm text-text min-w-[160px]"
-    />
-  );
-}
-
 export function SubmitButton({ label }: { label: string }) {
   return (
     <button
       type="submit"
-      className="rounded-md border border-transparent bg-accent px-3.5 py-2 text-sm font-medium text-[#071014]"
+      className="shrink-0 whitespace-nowrap rounded-md border border-transparent bg-accent px-3.5 py-2 text-sm font-medium text-[#071014]"
     >
       {label}
     </button>
