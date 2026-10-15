@@ -42,12 +42,12 @@ export default async function ModelPage({
     page: 1
   });
 
-  const specs: Array<{ icon: typeof Cpu; label: string; value: string }> = [];
-  if (model.paramsTotal) specs.push({ icon: Cpu, label: t(dict, "card.params"), value: formatParams(model.paramsTotal) });
+  const specs: Array<{ icon: typeof Cpu; label: string; value: string; glossary?: string }> = [];
+  if (model.paramsTotal) specs.push({ icon: Cpu, label: t(dict, "card.params"), value: formatParams(model.paramsTotal), glossary: "params" });
   if (model.storageBytes) specs.push({ icon: HardDrive, label: t(dict, "card.storage"), value: formatBytes(model.storageBytes) });
-  if (model.quantizations.length) specs.push({ icon: Layers, label: t(dict, "detail.quantizations"), value: model.quantizations.join(" · ") });
+  if (model.quantizations.length) specs.push({ icon: Layers, label: t(dict, "detail.quantizations"), value: model.quantizations.join(" · "), glossary: "quantization" });
   if (model.runners.length) specs.push({ icon: Zap, label: t(dict, "card.runners"), value: model.runners.join(" · ") });
-  if (model.vramEstGb) specs.push({ icon: Box, label: t(dict, "card.vram"), value: `~${model.vramEstGb} GB` });
+  if (model.vramEstGb) specs.push({ icon: Box, label: t(dict, "card.vram"), value: `~${model.vramEstGb} GB`, glossary: "vram" });
   if (model.licenseName || model.license) specs.push({ icon: ShieldCheck, label: t(dict, "card.license"), value: model.licenseName ?? model.license ?? "—" });
   specs.push({ icon: Heart, label: t(dict, "detail.popularity"), value: `♥ ${formatNumber(model.likes)} · ⬇ ${formatNumber(model.downloads)}` });
   specs.push({ icon: Clock, label: t(dict, "card.new"), value: `${daysSince(model.firstSeenAt)}d (${relativeTime(model.firstSeenAt)})` });
@@ -123,7 +123,13 @@ export default async function ModelPage({
             <div key={spec.label} className="card p-3">
               <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted whitespace-nowrap">
                 <Icon size={13} aria-hidden="true" />
-                {spec.label}
+                {spec.glossary ? (
+                  <a href={hrefFor(locale, `/glossary/${spec.glossary}`)} className="hover:text-accent">
+                    {spec.label}
+                  </a>
+                ) : (
+                  spec.label
+                )}
               </div>
               <div className="mt-1 font-mono text-sm break-words">{spec.value}</div>
             </div>

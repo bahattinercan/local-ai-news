@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { CATEGORY_RULES } from "@/lib/classify/rules";
 import { loadSnapshot } from "@/lib/store";
+import { GLOSSARY } from "@/lib/glossary";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://openweightradar.com";
 const LOCALES = ["en", "tr"];
@@ -28,11 +29,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    for (const path of ["news", "research", "stats", "compare"]) {
+    for (const path of ["news", "research", "glossary", "stats", "compare"]) {
       entries.push({
         url: `${BASE}/${locale}/${path}`,
         alternates: { languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}/${path}`])) },
         changeFrequency: "hourly"
+      });
+    }
+  }
+
+  for (const entry of GLOSSARY) {
+    for (const locale of LOCALES) {
+      entries.push({
+        url: `${BASE}/${locale}/glossary/${entry.slug}`,
+        alternates: { languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}/glossary/${entry.slug}`])) },
+        changeFrequency: "monthly"
       });
     }
   }

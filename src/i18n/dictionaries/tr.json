@@ -98,5 +98,10 @@
   "nav.research": "Araştırma",
   "news.subtitle": "Yerelde çalıştırabileceğin yeni açık ağırlıklı modeller ve runtime sürümleri.",
   "research.title": "Araştırma",
-  "research.subtitle": "Hugging Face günlük akışından makaleler. Model ve runtime haberleri Haberler altında."
+  "research.subtitle": "Hugging Face günlük akışından makaleler. Model ve runtime haberleri Haberler altında.",
+  "nav.glossary": "Sözlük",
+  "glossary.title": "Sözlük",
+  "glossary.subtitle": "Spec sheet'lerin arkasındaki terimler: kuantizasyon, VRAM, GGUF, MoE ve bu sitenin neyi yeni saydığı.",
+  "glossary.related": "İlgili",
+  "glossary.learnMore": "Bu nedir?"
 }

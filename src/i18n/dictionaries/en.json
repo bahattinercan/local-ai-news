@@ -98,5 +98,10 @@
   "nav.research": "Research",
   "news.subtitle": "New open-weight models and runtime releases you can run locally.",
   "research.title": "Research",
-  "research.subtitle": "Papers from the Hugging Face daily feed. Model and runtime news lives under News."
+  "research.subtitle": "Papers from the Hugging Face daily feed. Model and runtime news lives under News.",
+  "nav.glossary": "Glossary",
+  "glossary.title": "Glossary",
+  "glossary.subtitle": "The terms behind the spec sheets: quantization, VRAM, GGUF, MoE and how this site decides what is new.",
+  "glossary.related": "Related",
+  "glossary.learnMore": "What is this?"
 }

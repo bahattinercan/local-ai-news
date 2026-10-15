@@ -24,6 +24,9 @@ export async function Footer({ locale }: { locale: Locale }) {
         <a href={`/feed.rss?lang=${locale}`} className="hover:text-text">
           RSS
         </a>
+        <a href={`/${locale}/glossary`} className="hover:text-text">
+          {t(dict, "nav.glossary")}
+        </a>
         {repoUrl ? (
           <a href={repoUrl} className="hover:text-text">
             {t(dict, "footer.docs")}

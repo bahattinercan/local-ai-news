@@ -127,7 +127,7 @@ Planı değiştirdiği için kodu okuyarak doğrulandı:
 - İlgili model bloğu yalnızca `modelSlug` varsa (G3).
 - Kabul: 154 haberin her biri çalışan kaynak linkiyle bir detay sayfası render eder.
 
-### Faz 4 — Opsiyonel: kavram sözlüğü (A2)
+### Faz 4 — Kavram sözlüğü (A2) — **tamam**
 İki dilli açıklayıcı sayfalar (quantization, VRAM, MoE, LoRA, context window, GGUF vs safetensors). İçerik yazımı ve iki dilde bakım gerektirir; bilinçli olarak en sonda.
 
 ---
@@ -190,9 +190,15 @@ Faz 0, 2, 3 ve 1 uygulandı. Canlı snapshot `generatedAt 2026-10-15T22:14Z`: 10
 5. **`t()` anahtar yoksa anahtarın kendisini döndürüyor**, bu yüzden yeni bir `kind` sözlük kayıtlarıyla aynı sürümde inmeli.
 6. **`_` ile başlayan route klasörü** App Router'da private folder'dır ve hiç route olmaz.
 
+### Faz 4: sözlük
+
+Dört kategoride on giriş (kuantizasyon, VRAM, bağlam penceresi, GGUF, safetensors, parametre, MoE, LoRA, kalite kapısı, "yeni = ilk görülme"); `/{locale}/glossary` ve `/{locale}/glossary/[slug]`. Birkaç giriş genel tanım yerine bu projenin kendi ölçümlerini taşıyor: GGUF parametre boşluğu (46 repo, %0'ında sayı var), VRAM örneklerinin arkasındaki KV önbelleği büyümesi ve çürütülen boyuttan türetme.
+
+Her girişte iki dil tek nesnenin zorunlu alanları; yani eksik çeviri yayına çıkmak yerine derlemeyi düşürür. Testler bütünlüğü, benzersiz URL-güvenli slug'ları, her `related` linkinin çözülmesini, hiçbir girişin kendine bağlanmamasını ve model sayfasının bağlandığı üç slug'ın hâlâ var olduğunu doğruluyor.
+
 ### Hâlâ açık
 
-- Faz 4 (kavram sözlüğü) başlanmadı; iki dilli içerik yazımı gerektiriyor.
+- ~~Faz 4 (kavram sözlüğü) başlanmadı~~ — **tamam**: `/{locale}/glossary` altında 10 giriş; iki dil tip tarafından zorunlu olduğu için eksik çeviri derleme hatası verir. Altbilgiden ve model sayfalarındaki spec etiketlerinden (parametre, kuantizasyon, VRAM) bağlantılı.
 - Haber listesinde `?page` sorgu ayrıştırıcısı tarafından düşürülüyordu, yani 2. sayfa 1. sayfayı render ediyordu. `scope` eklenirken düzeltildi ve testle korundu.
 ~~- Feed hâlâ %72 paper (150/209)~~ — **çözüldü**: `scope` yüzeyleri ayırıyor. `/news` `release`, `announcement`, `runtime`, `community` sahibi; `/research` `paper` sahibi. Kümeler ayrık ve bir testle korunuyor; RSS çıktısı `/news`'ü yansıtıyor.
 - `files` kapsaması bugün kapı geçenlerin %29'u ve yalnızca geri doldurma bütçesi kadar hızlı büyüyor.

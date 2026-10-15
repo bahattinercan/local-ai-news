@@ -127,7 +127,7 @@ Verified by reading the code, because they change the plan:
 - Related-model block only when `modelSlug` exists (G3).
 - Acceptance: every one of the 154 news rows renders a detail page with a working source link.
 
-### Phase 4 — Optional: concept glossary (A2)
+### Phase 4 — Concept glossary (A2) — **done**
 Two-language explanatory pages (quantization, VRAM, MoE, LoRA, context window, GGUF vs safetensors). Needs content authoring and maintenance in both locales; deliberately last.
 
 ---
@@ -190,9 +190,15 @@ Phases 0, 2, 3 and 1 are implemented. Live snapshot `generatedAt 2026-10-15T22:1
 5. **`t()` falls back to the raw key**, so a new `kind` needs its dictionary entries in the same release or the UI prints `news.runtime`.
 6. **A `_`-prefixed route folder is a private folder** in the App Router and never routes.
 
+### Phase 4: glossary
+
+Ten entries (quantization, VRAM, context window, GGUF, safetensors, parameters, MoE, LoRA, quality gate, "new = first seen") in four categories, at `/{locale}/glossary` and `/{locale}/glossary/[slug]`. Several entries carry this project's own measurements rather than generic definitions: the GGUF parameter gap (46 repos, 0% with a count), the KV-cache growth behind the VRAM examples, and the refuted size-derived parameter count.
+
+Both languages are required fields of one object per entry, so a missing translation fails the build instead of shipping. Tests assert completeness, unique url-safe slugs, that every `related` link resolves, that no entry links to itself, and that the three slugs the model page links to still exist.
+
 ### Still open
 
-- Phase 4 (concept glossary) is not started; it needs bilingual content authoring.
+- ~~Phase 4 (concept glossary) is not started~~ — **done**: 10 entries under `/{locale}/glossary`, both languages required by the type so a missing translation is a compile error, linked from the footer and from the spec-sheet labels on model pages (params, quantization, VRAM).
 - `?page` on the news list was being dropped by the query parser, so page 2 rendered page 1. Fixed while adding `scope`, and covered by a test.
 ~~- The feed is still 72% papers (150/209)~~ — **resolved**: `scope` splits the surfaces. `/news` owns `release`, `announcement`, `runtime`, `community`; `/research` owns `paper`. The sets are disjoint and covered by a test, and the RSS output mirrors `/news`.
 - `files` coverage is 29% of gate-passing models today and grows only as fast as the backfill budget; raising `maxBackfills` (or `maxRequests`) speeds it up.
