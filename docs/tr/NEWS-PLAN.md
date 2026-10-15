@@ -162,3 +162,36 @@ gh run view --log | grep -E "gate passed|detail lookups|requests used"
 # kaynak sağlığı
 npm run sources-check        # canlı   (çevrimdışı fixture için --dry)
 ```
+
+---
+
+## 8. Sonuçlar (uygulama sonrası ölçüm, 2026-10-15)
+
+Faz 0, 2, 3 ve 1 uygulandı. Canlı snapshot `generatedAt 2026-10-15T22:14Z`: 1059 model, 209 haber.
+
+| Eşik / kriter | Önce | Sonra |
+|---|---|---|
+| farklı haber türü | 2 (`paper`, `release`) | **4** (`paper` 150, `runtime` 30, `community` 25, `release` 4) |
+| haber satırı | 154 | **209** (dört feed'den +55) |
+| 200 + öğe dönen feed | 4'te 0 | **4'te 4** (Reddit 25, llama.cpp 10, ollama 10, vLLM 10) |
+| sitede kendi sayfası olan haber | 0 | **209** (dört tür de doğrulandı) |
+| dosya listesi (`files`) olan model | 0 | **113** (kapı geçen 384'ün 113'ü = %29) |
+| `cardMeta` olan model | 0 | 89 |
+| sonraki koşuda detay kazanabilen model | 0 (`seen` atlıyordu) | **tek CI koşusunda 76 geri dolduruldu** |
+| VRAM hesaplayıcı erişilebilirliği | — | her zaman (gerçek sayı, yoksa kullanıcı girişi — G1) |
+| haberlerde `modelSlug` bağlantısı | 7/154 (%5) | 8/209 (%4) — **G3 hâlâ geçerli, çözülmezse ilgili model bloğu yok** |
+
+### Uygulama sırasında bulunan plan düzeltmeleri
+
+1. **Dosya boyutları için `?blobs=true` gerekiyor.** `?full=true` `siblings`'ı boyutsuz döndürüyor, yani planlanan dosya tablosu imkânsız görünüyordu. `full=true&blobs=true` boyutları veriyor.
+2. **Geri doldurma bir optimizasyon değil, düzeltmenin kendisi.** Ana döngü bilinen id'yi zenginleştirmeden önce atlıyor, bu yüzden kapı geçen 407 modelin 107'si detay verisi hiç kazanamıyordu. Geçiş eksik alana göre çalışıyor.
+3. **Detay kapsaması birikiyor, koşu başına değil.** Her koşu `files`'ı olmayan en fazla 120 modeli daha geri dolduruyor.
+4. **Next 16 dinamik segment'i çözmüyor.** `params.id` yüzde kodlu geliyordu; yalnızca özel karakter içermeyen id'ler çalışıyordu. Bkz. Faz 3 / commit `a38f42a`.
+5. **`t()` anahtar yoksa anahtarın kendisini döndürüyor**, bu yüzden yeni bir `kind` sözlük kayıtlarıyla aynı sürümde inmeli.
+6. **`_` ile başlayan route klasörü** App Router'da private folder'dır ve hiç route olmaz.
+
+### Hâlâ açık
+
+- Faz 4 (kavram sözlüğü) başlanmadı; iki dilli içerik yazımı gerektiriyor.
+- Feed hâlâ %72 paper (150/209). Local-AI sinyali hacimden önemliyse haber sayfası `runtime` + `community`'ye göre filtrelemeli.
+- `files` kapsaması bugün kapı geçenlerin %29'u ve yalnızca geri doldurma bütçesi kadar hızlı büyüyor.

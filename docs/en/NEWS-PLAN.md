@@ -162,3 +162,36 @@ gh run view --log | grep -E "gate passed|detail lookups|requests used"
 # source health
 npm run sources-check        # live   (add --dry for the offline fixture)
 ```
+
+---
+
+## 8. Results (measured after implementation, 2026-10-15)
+
+Phases 0, 2, 3 and 1 are implemented. Live snapshot `generatedAt 2026-10-15T22:14Z`: 1059 models, 209 news.
+
+| Gate / criterion | Before | After |
+|---|---|---|
+| distinct news kinds | 2 (`paper`, `release`) | **4** (`paper` 150, `runtime` 30, `community` 25, `release` 4) |
+| news rows | 154 | **209** (+55 from the four feeds) |
+| feeds answering 200 with items | 0 of 4 | **4 of 4** (Reddit 25, llama.cpp 10, ollama 10, vLLM 10) |
+| news items with an on-site page | 0 | **209** (all four kinds verified) |
+| models with a file list (`files`) | 0 | **113** (113 of 384 gate-passing = 29%) |
+| models with `cardMeta` | 0 | 89 |
+| models that could gain detail on a later run | 0 (skipped by `seen`) | **76 backfilled in one CI run** |
+| VRAM calculator reachable | n/a | always (real count, else user input — G1) |
+| `modelSlug` cross-link on news | 7/154 (5%) | 8/209 (4%) — **G3 still holds, no related block unless it resolves** |
+
+### Plan corrections found while implementing
+
+1. **Per-file sizes need `?blobs=true`.** `?full=true` returns `siblings` without a size, so the planned file table looked impossible. `full=true&blobs=true` returns sizes.
+2. **The backfill is not an optimisation, it is the fix.** The main loop skips a known id before enriching it, so 107 of 407 gate-passing models could never gain detail data. The pass is keyed on the missing field.
+3. **Detail coverage accumulates, it is not per-run.** Each run backfills up to 120 more models that lack `files`, so coverage climbs over successive runs instead of resetting at the per-run detail cap.
+4. **Next 16 does not decode a dynamic segment.** `params.id` arrived percent-encoded; only ids without special characters worked. See NEWS-PLAN Phase 3 / commit `a38f42a`.
+5. **`t()` falls back to the raw key**, so a new `kind` needs its dictionary entries in the same release or the UI prints `news.runtime`.
+6. **A `_`-prefixed route folder is a private folder** in the App Router and never routes.
+
+### Still open
+
+- Phase 4 (concept glossary) is not started; it needs bilingual content authoring.
+- The feed is still 72% papers (150/209). If local-AI signal matters more than volume, the news page should filter or default to `runtime` + `community`.
+- `files` coverage is 29% of gate-passing models today and grows only as fast as the backfill budget; raising `maxBackfills` (or `maxRequests`) speeds it up.
