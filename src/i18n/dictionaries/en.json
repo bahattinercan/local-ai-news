@@ -81,5 +81,7 @@
   "stats.share": "Category share",
   "stats.noHistory": "Not enough history yet for a trend chart.",
   "compare.best": "best",
-  "news.today": "Today"
+  "news.today": "Today",
+  "news.source": "Source",
+  "news.detail": "Details"
 }

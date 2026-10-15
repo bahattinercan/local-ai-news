@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ArrowUp, Clock } from "lucide-react";
+import { ArrowUp, Clock, ExternalLink } from "lucide-react";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { relativeTime, formatNumber } from "@/lib/format";
 import { categoryLabel } from "@/lib/classify/rules";
@@ -59,7 +59,7 @@ export function NewsCard({ item, locale }: { item: SnapshotNews; locale: Locale 
         </div>
 
         <h2 className="mt-1.5 font-medium leading-snug">
-          <a href={item.url} className="hover:text-accent">
+          <a href={hrefFor(locale, `/n/${encodeURIComponent(item.externalId)}`)} className="hover:text-accent">
             {item.title}
           </a>
         </h2>
@@ -70,13 +70,22 @@ export function NewsCard({ item, locale }: { item: SnapshotNews; locale: Locale 
           </p>
         ) : null}
 
-        {item.modelSlug ? (
-          <p className="mt-2 text-sm">
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+          {item.modelSlug ? (
             <a href={hrefFor(locale, `/m/${item.modelSlug}`)} className="text-accent hover:text-text">
               {t(dict, "common.viewModel")}
             </a>
-          </p>
-        ) : null}
+          ) : null}
+          <a
+            href={item.url}
+            rel="noopener noreferrer nofollow"
+            target="_blank"
+            className="flex items-center gap-1 text-muted hover:text-text"
+          >
+            <ExternalLink size={11} aria-hidden="true" />
+            {t(dict, "news.source")}
+          </a>
+        </div>
       </div>
     </article>
   );

@@ -86,3 +86,26 @@ test("feed requests carry the headers Reddit requires", () => {
   assert.match(FEED_HEADERS["User-Agent"], /Mozilla\/5\.0/);
   assert.match(FEED_HEADERS.Accept, /atom\+xml/);
 });
+
+// --- news detail id resolution (Next 16 keeps the segment percent-encoded) ---
+
+import { newsIdCandidates } from "../src/lib/store.ts";
+
+test("a percent-encoded news id resolves to the stored external id", () => {
+  const encoded = encodeURIComponent("reddit_localllama:t3_1x6yk1f");
+  assert.equal(encoded, "reddit_localllama%3At3_1x6yk1f");
+  assert.deepEqual(newsIdCandidates(encoded), [encoded, "reddit_localllama:t3_1x6yk1f"]);
+});
+
+test("a release id containing a slash survives the round trip", () => {
+  const externalId = "release:ZhengmingYu/DMAD";
+  const encoded = encodeURIComponent(externalId);
+  // without encoding, the slash would split the path into two segments
+  assert.ok(encoded.includes("%2F"));
+  assert.equal(newsIdCandidates(encoded).at(-1), externalId);
+});
+
+test("a plain id is returned once and a malformed escape does not throw", () => {
+  assert.deepEqual(newsIdCandidates("2610.19696"), ["2610.19696"]);
+  assert.deepEqual(newsIdCandidates("%E0%A4%A"), ["%E0%A4%A"]);
+});

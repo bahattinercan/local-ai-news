@@ -257,6 +257,37 @@ export async function getModel(slug: string): Promise<ClassifiedModel | null> {
   return snapshot?.models.find((model) => model.slug === slug) ?? null;
 }
 
+/**
+ * Next 16 hands a dynamic segment through **still percent-encoded**: `params.id`
+ * arrived as `reddit_localllama%3At3_1x6yk1f` (length 30) for both the raw and
+ * the encoded request url. Encoding is not optional on the way in — external ids
+ * contain `:` and releases even a literal `/` (`release:ZhengmingYu/DMAD`) — so
+ * the lookup accepts both forms. A malformed escape yields just the raw value
+ * instead of throwing.
+ */
+export function newsIdCandidates(rawId: string): string[] {
+  try {
+    const decoded = decodeURIComponent(rawId);
+    return decoded === rawId ? [rawId] : [rawId, decoded];
+  } catch {
+    return [rawId];
+  }
+}
+
+export async function getNewsItemByParam(rawId: string): Promise<SnapshotNews | null> {
+  for (const candidate of newsIdCandidates(rawId)) {
+    const item = await getNewsItem(candidate);
+    if (item) return item;
+  }
+  return null;
+}
+
+export async function getNewsItem(externalId: string): Promise<SnapshotNews | null> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return null;
+  return snapshot.news.find((item) => item.externalId === externalId) ?? null;
+}
+
 export async function getNews(query: NewsQuery): Promise<SnapshotNews[]> {
   const snapshot = await loadSnapshot();
   if (!snapshot) return [];

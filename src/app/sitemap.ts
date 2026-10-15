@@ -1,10 +1,14 @@
 import type { MetadataRoute } from "next";
 import { CATEGORY_RULES } from "@/lib/classify/rules";
+import { loadSnapshot } from "@/lib/store";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://openweightradar.com";
 const LOCALES = ["en", "tr"];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+/** The newest news detail pages, which are canonical since decision D1. */
+const NEWS_DETAIL_CAP = 200;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
   for (const locale of LOCALES) {
@@ -29,6 +33,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "hourly"
       });
     }
+  }
+
+  const snapshot = await loadSnapshot();
+  for (const item of (snapshot?.news ?? []).slice(0, NEWS_DETAIL_CAP)) {
+    const segment = `n/${encodeURIComponent(item.externalId)}`;
+    entries.push({
+      url: `${BASE}/en/${segment}`,
+      alternates: { languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}/${segment}`])) },
+      lastModified: item.publishedAt,
+      changeFrequency: "weekly"
+    });
   }
 
   return entries;

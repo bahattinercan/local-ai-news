@@ -81,5 +81,7 @@
   "stats.share": "Kategori payı",
   "stats.noHistory": "Trend grafiği için henüz yeterli geçmiş yok.",
   "compare.best": "en iyi",
-  "news.today": "Bugün"
+  "news.today": "Bugün",
+  "news.source": "Kaynak",
+  "news.detail": "Detay"
 }
