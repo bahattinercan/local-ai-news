@@ -13,7 +13,7 @@ export function BarChart({
   return (
     <div className="grid gap-2">
       {rows.map((row) => (
-        <div key={row.label} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 items-center">
+        <div key={row.label} className="bar-row items-center">
           <div className="min-w-0">
             <div className="flex items-center justify-between gap-2 mb-1">
               <span className="text-sm text-muted truncate">{row.label}</span>

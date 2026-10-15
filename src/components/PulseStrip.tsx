@@ -36,17 +36,24 @@ export async function PulseStrip({ locale, days }: { locale: Locale; days: numbe
             {t(dict, "pulse.hot")}
             <span className="text-xs">{t(dict, "pulse.hotHint")}</span>
           </div>
+          {/* Each row is its own grid with an identical template, so the time and
+              download columns line up across rows. A flex row pushed them to a
+              different x per row because the name length varied (measured:
+              "1d" sat at x=1289/575/735/886/1046). */}
           <ol className="grid gap-2">
             {pulse.hot.map((model, index) => (
-              <li key={model.externalId} className="flex items-center gap-3 text-sm">
+              <li
+                key={model.externalId}
+                className="hot-row text-sm"
+              >
                 <span className="font-mono text-xs text-muted">{index + 1}</span>
-                <a href={hrefFor(locale, `/m/${model.slug}`)} className="min-w-0 truncate hover:text-accent">
+                <a href={hrefFor(locale, `/m/${model.slug}`)} className="truncate hover:text-accent">
                   {model.externalId}
                 </a>
-                <span className="font-mono text-xs text-muted">
+                <span className="flex items-center justify-end gap-1 font-mono text-xs text-muted">
                   <Clock size={12} aria-hidden="true" /> {relativeTime(model.firstSeenAt)}
                 </span>
-                <span className="font-mono text-xs text-accent">
+                <span className="flex items-center justify-end gap-1 font-mono text-xs text-accent">
                   <Activity size={12} aria-hidden="true" /> {formatNumber(model.downloads)}
                 </span>
               </li>

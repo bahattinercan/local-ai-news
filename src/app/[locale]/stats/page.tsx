@@ -41,7 +41,7 @@ export default async function StatsPage({
         <span className="font-mono text-xs text-muted">{total} models</span>
       </form>
 
-      <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+      <div className="stats-grid">
         <section className="card p-4">
           <h2 className="text-sm uppercase tracking-wide text-muted mb-3">{t(dict, "stats.title")}</h2>
           <BarChart rows={stats.map((row) => ({ label: categoryLabel(row.category, locale), value: row.count }))} max={max} />
