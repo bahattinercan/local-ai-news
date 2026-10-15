@@ -74,6 +74,7 @@ export function Donut({ slices }: { slices: Array<{ label: string; value: number
         const dash = `${length} ${circumference - length}`;
         const circle = (
           <circle
+            key={slice.label}
             cx="70"
             cy="70"
             r={radius}

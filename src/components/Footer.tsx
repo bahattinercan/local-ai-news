@@ -5,6 +5,9 @@ import { dictionary, t, type Locale } from "@/i18n";
 export async function Footer({ locale }: { locale: Locale }) {
   const dict = dictionary(locale);
   const generatedAt = await getGeneratedAt();
+  // Only render the repo link when it is actually configured: a guessed URL
+  // shipped as a dead 404 link before.
+  const repoUrl = process.env.NEXT_PUBLIC_REPO_URL;
 
   return (
     <footer className="mt-8 border-t border-border">
@@ -21,9 +24,11 @@ export async function Footer({ locale }: { locale: Locale }) {
         <a href={`/feed.rss?lang=${locale}`} className="hover:text-text">
           RSS
         </a>
-        <a href="https://github.com/bahattinercan/local-ai-news" className="hover:text-text">
-          {t(dict, "footer.docs")}
-        </a>
+        {repoUrl ? (
+          <a href={repoUrl} className="hover:text-text">
+            {t(dict, "footer.docs")}
+          </a>
+        ) : null}
       </div>
     </footer>
   );
