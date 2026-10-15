@@ -109,3 +109,34 @@ test("a plain id is returned once and a malformed escape does not throw", () => 
   assert.deepEqual(newsIdCandidates("2610.19696"), ["2610.19696"]);
   assert.deepEqual(newsIdCandidates("%E0%A4%A"), ["%E0%A4%A"]);
 });
+
+// --- surface split: /news owns local-AI kinds, /research owns papers ---
+
+import { NEWS_SCOPE_KINDS, parseNewsQuery } from "../src/lib/query.ts";
+
+test("the news scope excludes papers and the research scope is papers only", () => {
+  assert.ok(!NEWS_SCOPE_KINDS.news?.includes("paper"));
+  assert.deepEqual(NEWS_SCOPE_KINDS.research, ["paper"]);
+  assert.equal(NEWS_SCOPE_KINDS.all, null);
+  // runtime and community are exactly what the feeds produce
+  assert.ok(NEWS_SCOPE_KINDS.news?.includes("runtime"));
+  assert.ok(NEWS_SCOPE_KINDS.news?.includes("community"));
+});
+
+test("the news scope is the default and an unknown scope is rejected", () => {
+  assert.equal(parseNewsQuery({}).scope, "news");
+  assert.equal(parseNewsQuery({ scope: "research" }).scope, "research");
+  assert.throws(() => parseNewsQuery({ scope: "papers" }));
+});
+
+test("?page is carried through, it used to be dropped", () => {
+  assert.equal(parseNewsQuery({}).page, 1);
+  assert.equal(parseNewsQuery({ page: "3" }).page, 3);
+  assert.equal(parseNewsQuery({ scope: "research", page: "2" }).page, 2);
+});
+
+test("news and research cannot overlap on a kind", () => {
+  const news = new Set(NEWS_SCOPE_KINDS.news);
+  const research = new Set(NEWS_SCOPE_KINDS.research);
+  for (const kind of research) assert.ok(!news.has(kind), `${kind} is on both surfaces`);
+});

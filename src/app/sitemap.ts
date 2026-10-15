@@ -26,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    for (const path of ["news", "stats", "compare"]) {
+    for (const path of ["news", "research", "stats", "compare"]) {
       entries.push({
         url: `${BASE}/${locale}/${path}`,
         alternates: { languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}/${path}`])) },

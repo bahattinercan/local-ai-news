@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CATEGORY_RULES } from "./classify/rules.ts";
+import { NEWS_SCOPE_KINDS } from "./query.ts";
 import type { ClassifiedModel } from "./model.ts";
 
 export interface SnapshotNews {
@@ -39,6 +40,8 @@ export interface FeedQuery {
 
 export interface NewsQuery {
   windowDays: number;
+  /** Which surface asked; defaults to the news scope so papers stay out of /news. */
+  scope?: "news" | "research" | "all";
   category?: string;
   kind?: "paper" | "release" | "announcement" | "runtime" | "community";
   limit: number;
@@ -288,15 +291,22 @@ export async function getNewsItem(externalId: string): Promise<SnapshotNews | nu
   return snapshot.news.find((item) => item.externalId === externalId) ?? null;
 }
 
+/** Shared by getNews and countNews so the two can never disagree. */
+function filterNews(snapshot: Snapshot, query: NewsQuery): SnapshotNews[] {
+  const scopeKinds = NEWS_SCOPE_KINDS[query.scope ?? "news"];
+
+  let rows = normalizeNews(snapshot);
+  if (scopeKinds) rows = rows.filter((item) => scopeKinds.includes(item.kind));
+  if (query.kind) rows = rows.filter((item) => item.kind === query.kind);
+  if (query.category) rows = rows.filter((item) => item.categoryKey === query.category);
+  return rows.filter((item) => withinWindow(item.publishedAt, query.windowDays));
+}
+
 export async function getNews(query: NewsQuery): Promise<SnapshotNews[]> {
   const snapshot = await loadSnapshot();
   if (!snapshot) return [];
 
-  let rows = normalizeNews(snapshot);
-  if (query.category) rows = rows.filter((item) => item.categoryKey === query.category);
-  if (query.kind) rows = rows.filter((item) => item.kind === query.kind);
-  rows = rows.filter((item) => withinWindow(item.publishedAt, query.windowDays));
-
+  const rows = filterNews(snapshot, query);
   const sorted = [...rows].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
   const page = query.page ?? 1;
   return sorted.slice((page - 1) * query.limit, page * query.limit);
@@ -305,10 +315,7 @@ export async function getNews(query: NewsQuery): Promise<SnapshotNews[]> {
 export async function countNews(query: NewsQuery): Promise<number> {
   const snapshot = await loadSnapshot();
   if (!snapshot) return 0;
-  let rows = normalizeNews(snapshot);
-  if (query.category) rows = rows.filter((item) => item.categoryKey === query.category);
-  if (query.kind) rows = rows.filter((item) => item.kind === query.kind);
-  return rows.filter((item) => withinWindow(item.publishedAt, query.windowDays)).length;
+  return filterNews(snapshot, query).length;
 }
 
 export async function getStats(days: number): Promise<Array<{ category: string; count: number }>> {

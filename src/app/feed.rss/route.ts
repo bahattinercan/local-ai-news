@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
   const category = request.nextUrl.searchParams.get("category") ?? undefined;
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://openweightradar.com";
 
-  const items = await getNews({ windowDays: 7, category, limit: 50 });
+  // The feed mirrors /news, which excludes papers since the two surfaces split.
+  const items = await getNews({ windowDays: 7, scope: "news", category, limit: 50 });
 
   const xml = buildRss({
     title: `OpenWeight Radar${category ? ` — ${category}` : ""}`,

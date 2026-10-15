@@ -94,5 +94,9 @@
   "detail.calcContext": "Bağlam",
   "detail.calcResult": "Tahmini VRAM",
   "detail.calcManual": "kayıtlı parametre sayısı yok — elle girin",
-  "detail.calcDerived": "model metadatasından"
+  "detail.calcDerived": "model metadatasından",
+  "nav.research": "Araştırma",
+  "news.subtitle": "Yerelde çalıştırabileceğin yeni açık ağırlıklı modeller ve runtime sürümleri.",
+  "research.title": "Araştırma",
+  "research.subtitle": "Hugging Face günlük akışından makaleler. Model ve runtime haberleri Haberler altında."
 }

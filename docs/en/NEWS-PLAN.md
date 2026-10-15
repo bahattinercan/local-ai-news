@@ -193,5 +193,6 @@ Phases 0, 2, 3 and 1 are implemented. Live snapshot `generatedAt 2026-10-15T22:1
 ### Still open
 
 - Phase 4 (concept glossary) is not started; it needs bilingual content authoring.
-- The feed is still 72% papers (150/209). If local-AI signal matters more than volume, the news page should filter or default to `runtime` + `community`.
+- `?page` on the news list was being dropped by the query parser, so page 2 rendered page 1. Fixed while adding `scope`, and covered by a test.
+~~- The feed is still 72% papers (150/209)~~ — **resolved**: `scope` splits the surfaces. `/news` owns `release`, `announcement`, `runtime`, `community`; `/research` owns `paper`. The sets are disjoint and covered by a test, and the RSS output mirrors `/news`.
 - `files` coverage is 29% of gate-passing models today and grows only as fast as the backfill budget; raising `maxBackfills` (or `maxRequests`) speeds it up.

@@ -61,8 +61,21 @@ export function parseFeedQuery(search: Record<string, string | string[] | undefi
   }));
 }
 
+/**
+ * Which kinds a surface owns. `scope` is the surface's default and `kind`
+ * narrows it further, so /news can never accidentally show a paper.
+ */
+export type NewsScope = "news" | "research" | "all";
+
+export const NEWS_SCOPE_KINDS: Record<NewsScope, string[] | null> = {
+  news: ["release", "announcement", "runtime", "community"],
+  research: ["paper"],
+  all: null
+};
+
 export const newsQuerySchema = z.object({
   window: z.enum(WINDOWS).default("7d"),
+  scope: z.enum(["news", "research", "all"]).default("news"),
   category: z.string().min(1).optional(),
   kind: z.enum(["paper", "release", "announcement", "runtime", "community"]).optional(),
   limit: z.coerce.number().int().positive().max(100).default(30),
@@ -72,9 +85,20 @@ export const newsQuerySchema = z.object({
 export function parseNewsQuery(search: Record<string, string | string[] | undefined>) {
   const parsed = newsQuerySchema.parse({
     window: search.window,
+    scope: search.scope,
     category: search.category,
     kind: search.kind,
-    limit: search.limit
+    limit: search.limit,
+    // `page` was missing, so ?page=2 silently rendered page 1.
+    page: search.page
   });
-  return { windowDays: windowDays(parsed.window), category: parsed.category, kind: parsed.kind, limit: parsed.limit, page: parsed.page };
+
+  return {
+    windowDays: windowDays(parsed.window),
+    scope: parsed.scope,
+    category: parsed.category,
+    kind: parsed.kind,
+    limit: parsed.limit,
+    page: parsed.page
+  };
 }

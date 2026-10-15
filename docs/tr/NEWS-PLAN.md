@@ -193,5 +193,6 @@ Faz 0, 2, 3 ve 1 uygulandı. Canlı snapshot `generatedAt 2026-10-15T22:14Z`: 10
 ### Hâlâ açık
 
 - Faz 4 (kavram sözlüğü) başlanmadı; iki dilli içerik yazımı gerektiriyor.
-- Feed hâlâ %72 paper (150/209). Local-AI sinyali hacimden önemliyse haber sayfası `runtime` + `community`'ye göre filtrelemeli.
+- Haber listesinde `?page` sorgu ayrıştırıcısı tarafından düşürülüyordu, yani 2. sayfa 1. sayfayı render ediyordu. `scope` eklenirken düzeltildi ve testle korundu.
+~~- Feed hâlâ %72 paper (150/209)~~ — **çözüldü**: `scope` yüzeyleri ayırıyor. `/news` `release`, `announcement`, `runtime`, `community` sahibi; `/research` `paper` sahibi. Kümeler ayrık ve bir testle korunuyor; RSS çıktısı `/news`'ü yansıtıyor.
 - `files` kapsaması bugün kapı geçenlerin %29'u ve yalnızca geri doldurma bütçesi kadar hızlı büyüyor.

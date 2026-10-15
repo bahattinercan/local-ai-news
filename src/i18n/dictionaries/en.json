@@ -94,5 +94,9 @@
   "detail.calcContext": "Context",
   "detail.calcResult": "Estimated VRAM",
   "detail.calcManual": "no stored parameter count — enter one",
-  "detail.calcDerived": "from model metadata"
+  "detail.calcDerived": "from model metadata",
+  "nav.research": "Research",
+  "news.subtitle": "New open-weight models and runtime releases you can run locally.",
+  "research.title": "Research",
+  "research.subtitle": "Papers from the Hugging Face daily feed. Model and runtime news lives under News."
 }

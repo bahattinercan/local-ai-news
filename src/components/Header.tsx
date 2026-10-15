@@ -1,4 +1,4 @@
-import { BarChart3, Newspaper, Radar, Scale } from "lucide-react";
+import { BarChart3, FlaskConical, Newspaper, Radar, Scale } from "lucide-react";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { cn } from "@/lib/format";
 import { ThemeToggle } from "./ThemeToggle";
@@ -7,6 +7,7 @@ export function Header({ locale }: { locale: Locale }) {
   const dict = dictionary(locale);
   const links = [
     { href: hrefFor(locale, "/news"), label: t(dict, "nav.news"), icon: Newspaper },
+    { href: hrefFor(locale, "/research"), label: t(dict, "nav.research"), icon: FlaskConical },
     { href: hrefFor(locale, "/stats"), label: t(dict, "nav.stats"), icon: BarChart3 },
     { href: hrefFor(locale, "/compare"), label: t(dict, "nav.compare"), icon: Scale }
   ];
