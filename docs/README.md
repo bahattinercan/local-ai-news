@@ -13,6 +13,7 @@ Her doküman iki dilde eşleşir. **EN kaynaktır, TR eşdeğerdir.** Bir dilde 
 | Category rules | en/CATEGORIES.md | tr/CATEGORIES.md |
 | Decisions log | [en/DECISIONS.md](en/DECISIONS.md) | [tr/DECISIONS.md](tr/DECISIONS.md) |
 | Design system & redesign plan | [en/DESIGN.md](en/DESIGN.md) | [tr/DESIGN.md](tr/DESIGN.md) |
+| News & AI-detail expansion plan | [en/NEWS-PLAN.md](en/NEWS-PLAN.md) | [tr/NEWS-PLAN.md](tr/NEWS-PLAN.md) |
 | Data storage (no Neon) | [en/DATA-STORAGE.md](en/DATA-STORAGE.md) | [tr/DATA-STORAGE.md](tr/DATA-STORAGE.md) |
 
 ## Conventions / Kurallar
