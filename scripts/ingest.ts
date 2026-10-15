@@ -25,6 +25,10 @@ console.log(`gate passed:       ${result.itemsGatePassed}`);
 console.log(`news rows:         ${result.newsCount}`);
 console.log(`requests used:     ${result.requestsUsed} / ${arg("max-requests", 400)} budget`);
 console.log(`detail lookups:    ${result.detailLookups}`);
+if (result.feedFailures.length > 0) {
+  console.warn(`feed failures:     ${result.feedFailures.join("; ")}`);
+  console.warn("                   (their previous items were kept — gate G5)");
+}
 if (result.budgetExhausted) {
   console.warn("warning: the HF budget ran out mid-run; the snapshot holds what was fetched");
 }

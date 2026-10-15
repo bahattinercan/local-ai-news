@@ -4,6 +4,8 @@ import { CURATED_ORGS, CATEGORY_RULES } from "./classify/rules.ts";
 import { evaluateGate } from "./classify/gate.ts";
 import { normalizeModel } from "./runner/normalize.ts";
 import { HfClient, type RawPaper } from "./sources/hf.ts";
+import { fetchFeed, type FeedItem } from "./sources/feeds.ts";
+import { newsSources, type SourceDefinition } from "./sources/registry.ts";
 import type { ClassifiedModel } from "./model.ts";
 import type { Snapshot, SnapshotNews } from "./store.ts";
 
@@ -26,6 +28,8 @@ export interface IngestResult {
   budgetExhausted: boolean;
   categoryDistribution: Record<string, number>;
   newsCount: number;
+  /** Sources that failed this run; their previous items were kept (gate G5). */
+  feedFailures: string[];
   snapshotPath: string | null;
 }
 
@@ -42,11 +46,7 @@ export function shouldCreateRelease(model: ClassifiedModel): boolean {
 }
 
 export function paperToNews(paper: RawPaper, models: ClassifiedModel[]): SnapshotNews {
-  const needle = paper.title.toLowerCase();
-  const match = models.find((m) => {
-    const name = m.name.toLowerCase();
-    return name.length > 3 && needle.includes(name);
-  });
+  const match = matchModel(paper.title, models);
 
   return {
     externalId: paper.id,
@@ -77,6 +77,74 @@ export function releaseToNews(model: ClassifiedModel): SnapshotNews {
     modelSlug: model.slug,
     categoryKey: model.primaryCategory
   };
+}
+
+/**
+ * Model names that appear in the headline are linked back to the model page.
+ * Same guard as `paperToNews`: names shorter than four characters match too
+ * eagerly to be trusted.
+ */
+function matchModel(title: string, models: ClassifiedModel[]): ClassifiedModel | undefined {
+  const needle = title.toLowerCase();
+  return models.find((model) => {
+    const name = model.name.toLowerCase();
+    return name.length > 3 && needle.includes(name);
+  });
+}
+
+/**
+ * Feed sources share one shape, so the origin is carried by the external id
+ * prefix (the dedupe key) and by `organization` for display.
+ */
+export function feedToNews(item: FeedItem, source: SourceDefinition, models: ClassifiedModel[] = []): SnapshotNews {
+  const model = matchModel(item.title, models);
+  return {
+    externalId: `${source.key}:${item.id}`,
+    kind: source.newsKind ?? "announcement",
+    title: item.title,
+    summary: item.summary ?? undefined,
+    url: item.url,
+    publishedAt: item.publishedAt,
+    // The label identifies the project (llama.cpp, ollama, r/LocalLLaMA) and is
+    // stable; a GitHub release author is often a bot account, so it is only a
+    // fallback. The poster/release author stays reachable via the source url.
+    organization: source.label ?? item.author ?? source.key,
+    upvotes: null,
+    modelSlug: model ? model.slug : null,
+    categoryKey: model ? model.primaryCategory : null
+  };
+}
+
+/**
+ * Gate G5: a source that fails must never empty the feed. Existing items are
+ * left untouched, the failure is reported, and the run continues.
+ */
+export async function ingestFeeds(
+  models: ClassifiedModel[],
+  news: SnapshotNews[],
+  fetchImpl: typeof fetch = fetch
+): Promise<string[]> {
+  const failures: string[] = [];
+  const sources = newsSources().filter((source) => source.format === "atom" || source.format === "rss");
+
+  for (const source of sources) {
+    try {
+      const items = await fetchFeed(source.baseUrl, source.format === "rss" ? "rss" : "atom", fetchImpl);
+      let added = 0;
+      for (const item of items) {
+        const entry = feedToNews(item, source, models);
+        if (news.some((existing) => existing.externalId === entry.externalId)) continue;
+        news.push(entry);
+        added += 1;
+      }
+      console.log(`feed ${source.key}: ${added} new / ${items.length} fetched`);
+    } catch (error) {
+      failures.push(`${source.key}: ${(error as Error).message}`);
+      console.warn(`feed ${source.key} failed, keeping previous items: ${(error as Error).message}`);
+    }
+  }
+
+  return failures;
 }
 
 function loadExistingSnapshot(): Snapshot | null {
@@ -175,6 +243,8 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
     news.push(entry);
   }
 
+  const feedFailures = await ingestFeeds(models, news);
+
   const result: IngestResult = {
     itemsTotal: total,
     itemsNew: newCount,
@@ -184,6 +254,7 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
     budgetExhausted,
     categoryDistribution: distribution,
     newsCount: news.length,
+    feedFailures,
     snapshotPath: null
   };
 

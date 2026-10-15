@@ -7,6 +7,8 @@ export interface SourceDefinition {
   enabled: boolean;
   /** How the source is polled. Everything that is not `hf-api` needs a feed adapter. */
   format: SourceFormat;
+  /** Human-readable name shown as the origin of a news item. */
+  label?: string;
   note?: string;
   /**
    * News kind produced by this source, if it produces news. Kept here so the
@@ -62,6 +64,7 @@ export const SOURCES: SourceDefinition[] = [
   // --- Local-AI news feeds (added 2026-10-15) ---
   {
     key: "reddit_localllama",
+    label: "r/LocalLLaMA",
     baseUrl: "https://www.reddit.com/r/LocalLLaMA/.rss",
     tier: 2,
     enabled: true,
@@ -71,6 +74,7 @@ export const SOURCES: SourceDefinition[] = [
   },
   {
     key: "gh_llama_cpp",
+    label: "llama.cpp",
     baseUrl: "https://github.com/ggml-org/llama.cpp/releases.atom",
     tier: 2,
     enabled: true,
@@ -80,6 +84,7 @@ export const SOURCES: SourceDefinition[] = [
   },
   {
     key: "gh_ollama",
+    label: "ollama",
     baseUrl: "https://github.com/ollama/ollama/releases.atom",
     tier: 2,
     enabled: true,
@@ -89,6 +94,7 @@ export const SOURCES: SourceDefinition[] = [
   },
   {
     key: "gh_vllm",
+    label: "vLLM",
     baseUrl: "https://github.com/vllm-project/vllm/releases.atom",
     tier: 2,
     enabled: true,

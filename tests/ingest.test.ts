@@ -88,3 +88,83 @@ test("dedupe keeps one row per external id", () => {
   assert.equal(unique.length, 1);
   assert.ok(releaseToNews(model).kind === "release");
 });
+
+// --- Phase 2: feed sources (docs/en/NEWS-PLAN.md) ---
+
+import { feedToNews, ingestFeeds } from "../src/lib/ingest.ts";
+import { getSource } from "../src/lib/sources/registry.ts";
+import type { SnapshotNews } from "../src/lib/store.ts";
+import type { FeedItem } from "../src/lib/sources/feeds.ts";
+
+const feedItem: FeedItem = {
+  id: "t3_abc123",
+  title: "Qwen2.5-Coder runs great on a 3060",
+  summary: "plain text summary",
+  url: "https://www.reddit.com/r/LocalLLaMA/comments/abc123/x/",
+  publishedAt: "2026-10-15T09:00:00.000Z",
+  author: "/u/someone"
+};
+
+test("feedToNews namespaces the dedupe key by source", () => {
+  const reddit = getSource("reddit_localllama")!;
+  const item = feedToNews(feedItem, reddit);
+
+  assert.equal(item.externalId, "reddit_localllama:t3_abc123");
+  assert.equal(item.kind, "community");
+  // the label names the source; the poster is reachable from the url
+  assert.equal(item.summary, "plain text summary");
+  assert.equal(item.organization, "r/LocalLLaMA");
+  assert.equal(item.url, feedItem.url);
+  // no model matches this title, so no cross-link is invented
+  assert.equal(item.modelSlug, null);
+  assert.equal(item.categoryKey, null);
+});
+
+test("feedToNews links a headline back to a model when the name appears", () => {
+  const model = normalizeModel(base, { firstSeenAt: "2026-10-13T16:00:00.000Z" });
+  const item = feedToNews(
+    { ...feedItem, title: "unsloth/LTX-2.5-FP8 is out and it is fast" },
+    getSource("gh_llama_cpp")!,
+    [model]
+  );
+
+  assert.equal(item.kind, "runtime");
+  assert.equal(item.modelSlug, model.slug);
+  assert.equal(item.categoryKey, model.primaryCategory);
+  assert.equal(item.organization, "llama.cpp");
+});
+
+test("gate G5: a failing feed keeps the existing items and reports the failure", async () => {
+  const existing: SnapshotNews[] = [
+    {
+      externalId: "reddit_localllama:t3_old",
+      kind: "community",
+      title: "an older post that must survive",
+      url: "https://www.reddit.com/r/LocalLLaMA/comments/old/",
+      publishedAt: "2026-10-14T00:00:00.000Z"
+    }
+  ];
+
+  const failing = (async () => {
+    throw new Error("simulated network failure");
+  }) as unknown as typeof fetch;
+
+  const failures = await ingestFeeds([], existing, failing);
+
+  assert.equal(existing.length, 1, "the previous item was dropped");
+  assert.equal(existing[0].externalId, "reddit_localllama:t3_old");
+  assert.ok(failures.length > 0, "the failure was not reported");
+});
+
+test("gate G5: a 429 on one source does not empty the feed", async () => {
+  const existing: SnapshotNews[] = [];
+
+  const rateLimited = (async () => new Response("too many requests", { status: 429 })) as unknown as typeof fetch;
+  const failures = await ingestFeeds([], existing, rateLimited);
+
+  assert.equal(existing.length, 0);
+  assert.ok(
+    failures.some((line) => line.includes("429")),
+    `expected a 429 failure line, got ${JSON.stringify(failures)}`
+  );
+});
