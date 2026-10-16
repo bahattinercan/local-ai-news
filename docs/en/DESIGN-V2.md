@@ -60,6 +60,19 @@
 
 ---
 
+### 0.3 Phase 4 (C4, C5, first screen) — landed in the same session
+
+| Item | Result |
+|---|---|
+| **C4** jargon | The site already had a bilingual glossary with entries for "quality gate" and "new = first seen", and the UI never used them: `Quality gate`, `Runner`, `VRAM ~2.1 GB` and `New (8d)` were defined nowhere. `ui/Term.tsx` renders the existing label plus a **24 px** `?` whose tooltip is the glossary summary and whose target is the entry; it is wired to the window filter (`first-seen`), the gate filter and the `Gate passed` stat (`quality-gate`), the card's age (`first-seen`) and the card's VRAM chip (`vram`). 28 term links on the feed, 0 targets below 24 px with them present. A `runner` entry was added (both languages) because that was the one term with no definition at all |
+| **C5** empty states | `EmptyState` takes a `hint` and an `action`, and the four dead ends now teach: `/compare` with no ids (was a **blank 844 px viewport**) explains how to add models and offers "Back to the feed"; a zero-result feed suggests widening the window or the gate and offers "Clear"; `/news` with nothing in the window offers "Show the last 30 days" (`?window=30d&scope=news`); a missing item explains that it has left the snapshot |
+| First screen | firstCardY **585 → 565 px** at 1440×900 (one-line lede, tighter heading margin). The 560 target is 5 px away; the rest is the 65 px header + 60 px strip + 148 px pulse, all of which now carry information rather than padding |
+| Re-verified | 70 route×width combinations (320/360/390/430/768/1024/1440) → 0 overflow; 0 tap targets below 24×24 at 1440 and 390; npm test 82/82; lint, typecheck; i18n parity **125 keys** both languages |
+
+**Design v2 is now implemented except for items nobody has asked for yet** (a saved-filter management UI, per-user state, a chart of VRAM vs params). D8, D9 and D10 are closed; §3's defect list is fully fixed and §4/§5 are done to the plan's acceptance criteria, with the two deviations recorded above (h1 is 24 px on phones instead of 30, and the news summary clamps to three lines rather than two with an expander — the full text lives on the item page).
+
+---
+
 ## 1. Answer to "bu ne böyle, ne olduğu belli değil"
 
 Three measured reasons, in the order a first-time visitor hits them.

@@ -1,12 +1,40 @@
+import Link from "next/link";
 import { dictionary, t, type Locale } from "@/i18n";
 import { relativeTime } from "@/lib/format";
 import { getGeneratedAt } from "@/lib/store";
 
-export function EmptyState({ locale, message }: { locale: Locale; message: string }) {
+/**
+ * An empty result explains itself.
+ *
+ * Measured: `/compare` with no ids rendered a blank viewport (844 px, one screen
+ * of nothing) and the feed's zero-result card said only "no models match these
+ * filters" — both told the reader that something is missing without saying what
+ * to do next. The optional hint and action turn the dead end into the next step.
+ */
+export function EmptyState({
+  locale,
+  message,
+  hint,
+  action
+}: {
+  locale: Locale;
+  message: string;
+  hint?: string;
+  action?: { href: string; label: string };
+}) {
   const dict = dictionary(locale);
   return (
-    <div className="card p-6 text-center text-muted break-words border-dashed">
-      {message || t(dict, "empty.noModels")}
+    <div className="card border-dashed p-6 text-center">
+      <p className="break-words text-muted">{message || t(dict, "empty.noModels")}</p>
+      {hint ? <p className="mx-auto mt-2 max-w-xl text-sm text-muted break-words">{hint}</p> : null}
+      {action ? (
+        <Link
+          href={action.href}
+          className="mt-4 inline-flex h-11 items-center rounded-md border border-border px-3.5 text-sm text-muted hover:border-accent/50 hover:text-accent"
+        >
+          {action.label}
+        </Link>
+      ) : null}
     </div>
   );
 }

@@ -261,6 +261,31 @@ export const GLOSSARY: GlossaryEntry[] = [
     }
   },
   {
+    slug: "runner",
+    category: "hardware",
+    related: ["quantization", "gguf", "vram"],
+    en: {
+      term: "Runner",
+      summary: "The program that actually loads the weights and generates text or images on your machine.",
+      body: [
+        "A model is a file; a runner is the program that reads it. Hugging Face tells this site which one a repository is built for — the `library` field and the tags on the repo — which is why a card can say `transformers · llama.cpp`.",
+        "They are not interchangeable, and the choice decides the file you need. `llama.cpp` and `Ollama` load GGUF files and run well on a CPU with optional GPU offload; `vLLM` and `ExLlama` target GPUs and throughput for serving; `MLX` is Apple silicon; `transformers` runs the original safetensors weights through PyTorch; `ComfyUI` is the image/video workflow tool that loads diffusers checkpoints.",
+        "So a runner is not a quality ranking. A repository that offers GGUF is not better than one that only ships safetensors — it is usable by a different set of programs. The filter on this site narrows the feed to repositories you can run with the tool you already have.",
+        "The run command shown on a model page is generated from this field, which is why it uses the flags of the listed runner rather than a generic example."
+      ]
+    },
+    tr: {
+      term: "Runner (çalıştırıcı)",
+      summary: "Ağırlıkları yükleyip makinenizde metin veya görsel üreten program.",
+      body: [
+        "Model bir dosyadır; runner onu okuyan programdır. Hugging Face bu siteye bir deponun hangi program için hazırlandığını bildirir — depodaki `library` alanı ve etiketler — bu yüzden bir kart `transformers · llama.cpp` yazabilir.",
+        "Birbirlerinin yerine geçmezler ve seçim, ihtiyacınız olan dosyayı belirler. `llama.cpp` ve `Ollama` GGUF dosyalarını yükler, CPU'da iyi çalışır ve isteğe bağlı GPU'ya devredebilir; `vLLM` ve `ExLlama` GPU'ya ve sunum verimine yönelir; `MLX` Apple silicon içindir; `transformers` orijinal safetensors ağırlıklarını PyTorch ile çalıştırır; `ComfyUI` diffusers checkpoint'lerini yükleyen görsel/video iş akışı aracıdır.",
+        "Yani runner bir kalite sıralaması değildir. GGUF sunan bir depo, yalnızca safetensors yayınlayandan daha iyi değildir — farklı programlar tarafından kullanılabilir. Bu sitedeki filtre, akışı elinizdeki araçla çalıştırabileceğiniz depolara daraltır.",
+        "Model sayfasında gösterilen çalıştırma komutu bu alandan üretilir; bu yüzden genel bir örnek yerine listelenen runner'ın kendi bayraklarını kullanır."
+      ]
+    }
+  },
+  {
     slug: "first-seen",
     category: "concepts",
     related: ["quality-gate"],

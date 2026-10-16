@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { cn } from "@/lib/format";
 
 export function Stat({
@@ -7,7 +8,7 @@ export function Stat({
   tone = "neutral",
   size = "md"
 }: {
-  label: string;
+  label: ReactNode;
   value: string | number;
   hint?: string;
   tone?: "neutral" | "accent" | "ok" | "warn";

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/format";
+import { Term } from "./Term";
+import type { Locale } from "@/i18n";
 
 type Option = [string, string] | string[];
 
@@ -7,16 +9,29 @@ export function Field({
   label,
   name,
   value,
-  options
+  options,
+  termSlug,
+  locale
 }: {
   label: string;
   name: string;
   value: string;
   options: Option[];
+  /** Glossary entry that defines this filter, rendered as a `?` next to the label. */
+  termSlug?: string;
+  locale?: Locale;
 }) {
   return (
     <label className="flex flex-col gap-1 min-w-[110px]">
-      <span className="text-xs uppercase tracking-wide text-muted">{label}</span>
+      <span className="text-xs uppercase tracking-wide text-muted">
+        {termSlug && locale ? (
+          <Term slug={termSlug} locale={locale}>
+            {label}
+          </Term>
+        ) : (
+          label
+        )}
+      </span>
       <select
         name={name}
         defaultValue={value}

@@ -60,6 +60,19 @@
 
 ---
 
+### 0.3 Faz 4 (C4, C5, ilk ekran) — aynı oturumda uygulandı
+
+| Madde | Sonuç |
+|---|---|
+| **C4** jargon | Sitede zaten iki dilli bir sözlük vardı ("kalite kapısı" ve "yeni = ilk görülme" girdileri) ve arayüz onu hiç kullanmıyordu: `Kalite kapısı`, `Runner`, `VRAM ~2.1 GB` ve `Yeni (8d)` hiçbir yerde tanımlı değildi. `ui/Term.tsx` mevcut etiketi + **24 px** bir `?` çiziyor; ipucu sözlük özeti, hedefi ilgili girdi. Pencere filtresine (`first-seen`), kapı filtresine ve `Kapıyı geçen` istatistiğine (`quality-gate`), kartın yaşına (`first-seen`) ve kartın VRAM çipine (`vram`) bağlandı. Feed'de 28 terim bağlantısı var ve bunlarla birlikte 24 px altı hedef sayısı 0. Hiçbir yerde tanımı olmayan tek terim olduğu için bir `runner` girdisi eklendi (iki dilde) |
+| **C5** boş durumlar | `EmptyState` artık `hint` ve `action` alıyor; dört çıkmaz sokak da öğretiyor: id'siz `/compare` (eskiden **844 px boş viewport**'tu) model ekleme akışını anlatıp "Akışa dön" sunuyor; sıfır sonuçlu feed pencereyi ya da kapıyı genişletmeyi önerip "Temizle" sunuyor; pencerede haberi olmayan `/news` "Son 30 günü göster" sunuyor (`?window=30d&scope=news`); bulunamayan öğe snapshot'tan çıktığını açıklıyor |
+| İlk ekran | firstCardY 1440×900'de **585 → 565 px** (tek satırlık lede, daha sıkı başlık marjı). 560 hedefi 5 px uzakta; kalan kısım 65 px header + 60 px şerit + 148 px pulse ve hepsi artık dolgu yerine bilgi taşıyor |
+| Yeniden doğrulandı | 70 rota×genişlik kombinasyonu (320/360/390/430/768/1024/1440) → 0 taşma; 1440 ve 390'da 24×24 altı 0 hedef; `npm test` 82/82; lint, typecheck; i18n parite iki dilde **125 anahtar** |
+
+**Design v2 artık, henüz kimsenin istemediği maddeler dışında uygulanmış durumda** (kaydedilmiş filtre yönetimi arayüzü, kullanıcıya özel durum, VRAM-parametre grafiği). D8, D9 ve D10 kapandı; §3'teki kusur listesi tamamen düzeltildi ve §4/§5 plan kabul kriterlerine göre tamamlandı; yukarıda kayıtlı iki sapma ile (h1 telefonda 30 değil 24 px ve haber özeti genişletici yerine üç satıra kırılıyor — tam metin öğe sayfasında).
+
+---
+
 ## 1. "Bu ne böyle, ne olduğu belli değil" sorusunun cevabı
 
 Ziyaretçinin karşılaşma sırasına göre üç ölçülmüş neden.

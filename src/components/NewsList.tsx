@@ -84,7 +84,12 @@ export async function NewsList({ locale, query }: { locale: Locale; query: NewsL
       <DataNotice locale={locale} />
 
       {items.length === 0 ? (
-        <EmptyState locale={locale} message={t(dict, "empty.noNews")} />
+        <EmptyState
+          locale={locale}
+          message={t(dict, "empty.noNews")}
+          hint={t(dict, "empty.hintNews")}
+          action={{ href: `?window=30d&scope=${query.scope}`, label: t(dict, "empty.widen30") }}
+        />
       ) : (
         <div className="grid gap-3">
           {[...groups.entries()].map(([day, dayItems], index) => (

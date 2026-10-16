@@ -6,7 +6,9 @@ import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { categoryLabel } from "@/lib/classify/rules";
 import { formatParams } from "@/lib/runner/vram";
 import type { ClassifiedModel } from "@/lib/model";
+import { getGlossaryEntry, glossaryText } from "@/lib/glossary";
 import { Chip } from "./ui/Chip";
+import { Term } from "./ui/Term";
 import { Meter } from "./ui/Stat";
 
 /**
@@ -33,6 +35,9 @@ export function FeedCard({
   const dict = dictionary(locale);
   const age = daysSince(model.firstSeenAt);
   const share = maxDownloads > 0 && model.downloads > 0 ? Math.round((model.downloads / maxDownloads) * 100) : null;
+  /* The chip links its own definition; VRAM is the most misread metric here. */
+  const vramEntry = getGlossaryEntry("vram");
+  const vramSummary = vramEntry ? glossaryText(vramEntry, locale).summary : "";
 
   return (
     <article className="card p-4 overflow-hidden">
@@ -82,7 +87,9 @@ export function FeedCard({
             ) : null}
             <span aria-hidden="true">·</span>
             <span className={cn(age <= 7 ? "text-ok" : "text-muted")}>
-              {t(dict, "card.new")} ({age}d)
+              <Term slug="first-seen" locale={locale}>
+                {t(dict, "card.new")} ({age}d)
+              </Term>
             </span>
           </div>
 
@@ -116,7 +123,15 @@ export function FeedCard({
 
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
             {model.license ? <Chip label={model.license} /> : null}
-            {model.vramEstGb ? <Chip label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB`} tone="accent" /> : null}
+            {model.vramEstGb ? (
+              <Link
+                href={hrefFor(locale, "/glossary/vram")}
+                title={vramSummary}
+                aria-label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB — ${vramSummary}`}
+              >
+                <Chip label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB`} tone="accent" />
+              </Link>
+            ) : null}
             <Link href={hrefFor(locale, `/compare?ids=${model.slug}`)} className="inline-flex min-h-7 items-center gap-1 text-accent">
               <Scale size={12} aria-hidden="true" />
               {t(dict, "compare.add")}

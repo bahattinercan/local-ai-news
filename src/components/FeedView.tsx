@@ -5,7 +5,7 @@ import { SavedFilters } from "./SavedFilters";
 import { Pagination } from "./Pagination";
 import { PulseStrip } from "./PulseStrip";
 import { getFeed, countFeed } from "@/lib/store";
-import { dictionary, t, type Locale } from "@/i18n";
+import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { FEED_DEFAULTS, clampPage, type normalizeFeedQuery } from "@/lib/query";
 
 export async function FeedView({
@@ -71,15 +71,20 @@ export async function FeedView({
 
       {models.length === 0 ? (
         <section className="mt-6" aria-labelledby="models-heading">
-          <h2 id="models-heading" className="mb-3 flex items-baseline gap-2 text-lg font-semibold tracking-tight">
+          <h2 id="models-heading" className="mb-2 flex items-baseline gap-2 text-lg font-semibold tracking-tight">
             {t(dict, "feed.models")}
             <span className="font-mono text-xs font-normal text-muted">{total}</span>
           </h2>
-          <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
+          <EmptyState
+            locale={locale}
+            message={t(dict, "empty.noModels")}
+            hint={t(dict, "empty.hintFilters")}
+            action={{ href: category ? hrefFor(locale, `/c/${category}`) : hrefFor(locale, "/"), label: t(dict, "filters.clear") }}
+          />
         </section>
       ) : (
         <section className="mt-6" aria-labelledby="models-heading">
-          <h2 id="models-heading" className="mb-3 flex items-baseline gap-2 text-lg font-semibold tracking-tight">
+          <h2 id="models-heading" className="mb-2 flex items-baseline gap-2 text-lg font-semibold tracking-tight">
             {t(dict, "feed.models")}
             <span className="font-mono text-xs font-normal text-muted">{total}</span>
           </h2>

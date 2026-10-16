@@ -2,7 +2,7 @@ import { getModel } from "@/lib/store";
 import { formatParams } from "@/lib/runner/vram";
 import { categoryLabel } from "@/lib/classify/rules";
 import { formatNumber } from "@/lib/format";
-import { dictionary, pickLocale, t } from "@/i18n";
+import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
 import Link from "next/link";
 import { TabBar } from "@/components/TabBar";
@@ -33,7 +33,12 @@ export default async function ComparePage({
     return (
       <>
         <TabBar locale={locale} />
-        <EmptyState locale={locale} message={t(dict, "compare.title")} />
+        <EmptyState
+          locale={locale}
+          message={t(dict, "compare.title")}
+          hint={t(dict, "empty.compareHint")}
+          action={{ href: hrefFor(locale, "/"), label: t(dict, "empty.backToFeed") }}
+        />
       </>
     );
   }
@@ -46,7 +51,12 @@ export default async function ComparePage({
     return (
       <>
         <TabBar locale={locale} />
-        <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
+        <EmptyState
+          locale={locale}
+          message={t(dict, "empty.noModels")}
+          hint={t(dict, "empty.compareHint")}
+          action={{ href: hrefFor(locale, "/"), label: t(dict, "empty.backToFeed") }}
+        />
       </>
     );
   }

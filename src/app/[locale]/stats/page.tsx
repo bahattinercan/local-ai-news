@@ -47,6 +47,8 @@ export default async function StatsPage({
         <Field
           name="gate"
           label={t(dict, "filters.gate")}
+          termSlug="quality-gate"
+          locale={locale}
           value={gate}
           options={[["passed", t(dict, "filters.passedOnly")], ["all", t(dict, "filters.showEverything")]]}
         />

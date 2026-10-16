@@ -5,6 +5,7 @@ import { categoryLabel } from "@/lib/classify/rules";
 import { formatNumber, relativeTime } from "@/lib/format";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { Stat } from "./ui/Stat";
+import { Term } from "./ui/Term";
 
 /**
  * Window summary.
@@ -40,7 +41,15 @@ export async function PulseStrip({ locale, days, category }: { locale: Locale; d
 
       <div className="relative flex flex-wrap items-end gap-x-6 gap-y-3">
         <Stat label={t(dict, "pulse.tracked")} value={pulse.tracked} tone="accent" size="lg" hint={window} />
-        <Stat label={t(dict, "pulse.passed")} value={pulse.passed} tone="ok" />
+        <Stat
+          label={
+            <Term slug="quality-gate" locale={locale}>
+              {t(dict, "pulse.passed")}
+            </Term>
+          }
+          value={pulse.passed}
+          tone="ok"
+        />
         {/* Scoped to a category the "leading category" is the page itself, so it
             is only shown where it carries information. */}
         {category ? null : (

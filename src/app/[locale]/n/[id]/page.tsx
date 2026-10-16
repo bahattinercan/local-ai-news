@@ -38,7 +38,12 @@ export default async function NewsItemPage({
     return (
       <>
         <TabBar locale={locale} />
-        <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
+        <EmptyState
+          locale={locale}
+          message={t(dict, "empty.noModels")}
+          hint={t(dict, "empty.notFoundHint")}
+          action={{ href: hrefFor(locale, "/news"), label: t(dict, "empty.backToNews") }}
+        />
       </>
     );
   }

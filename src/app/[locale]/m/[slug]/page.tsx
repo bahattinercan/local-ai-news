@@ -30,7 +30,12 @@ export default async function ModelPage({
       <>
         <TabBar locale={locale} />
         <DataNotice locale={locale} />
-        <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
+        <EmptyState
+          locale={locale}
+          message={t(dict, "empty.noModels")}
+          hint={t(dict, "empty.notFoundHint")}
+          action={{ href: hrefFor(locale, "/"), label: t(dict, "empty.backToFeed") }}
+        />
       </>
     );
   }

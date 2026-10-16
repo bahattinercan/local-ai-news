@@ -30,15 +30,16 @@ export function FilterBar({
      every page claimed three active filters (window/sort/gate) that the user
      never chose. */
   const fields = [
-    { name: "window", label: t(dict, "filters.window"), defaultValue: FEED_DEFAULTS.window, options: WINDOWS.map((w) => [w, w]) },
+    { name: "window", label: t(dict, "filters.window"), defaultValue: FEED_DEFAULTS.window, options: WINDOWS.map((w) => [w, w]), termSlug: "first-seen" },
     { name: "sort", label: t(dict, "filters.sort"), defaultValue: FEED_DEFAULTS.sort, options: SORTS.map((s) => [s, s]) },
     {
       name: "gate",
       label: t(dict, "filters.gate"),
       defaultValue: FEED_DEFAULTS.gate,
+      termSlug: "quality-gate",
       options: [["passed", t(dict, "filters.passedOnly")], ["all", t(dict, "filters.showEverything")]]
     },
-    { name: "runner", label: t(dict, "filters.runner"), defaultValue: "", options: [["", "—"], ...RUNNERS.map((r) => [r, r])] },
+    { name: "runner", label: t(dict, "filters.runner"), defaultValue: "", options: [["", "—"], ...RUNNERS.map((r) => [r, r])], termSlug: "runner" },
     { name: "maxParams", label: t(dict, "filters.size"), defaultValue: "", options: [["", "—"], ...SIZES.map((s) => [String(s), `≤${s}B`])] },
     { name: "license", label: t(dict, "filters.license"), defaultValue: "", options: [["", "—"], ["apache-2.0", "apache-2.0"], ["mit", "mit"], ["other", "other"]] }
   ];
@@ -68,7 +69,15 @@ export function FilterBar({
     <form method="get" action={action} className="card p-3 text-sm">
       <div className="flex flex-wrap items-end gap-2">
         {primary.map((field) => (
-          <Field key={field.name} name={field.name} label={field.label} value={String(query[field.name] ?? "")} options={field.options} />
+          <Field
+            key={field.name}
+            name={field.name}
+            label={field.label}
+            value={String(query[field.name] ?? "")}
+            options={field.options}
+            termSlug={field.termSlug}
+            locale={locale}
+          />
         ))}
         <label className="flex min-w-[140px] flex-1 flex-col gap-1 xl:min-w-[180px]">
           <span className="text-xs uppercase tracking-wide text-muted whitespace-nowrap">{t(dict, "filters.search")}</span>
@@ -89,7 +98,15 @@ export function FilterBar({
           </summary>
           <div className="mt-2 flex flex-wrap items-end gap-2 rounded-md border border-border bg-raised/40 p-2">
             {secondary.map((field) => (
-              <Field key={field.name} name={field.name} label={field.label} value={String(query[field.name] ?? "")} options={field.options} />
+              <Field
+                key={field.name}
+                name={field.name}
+                label={field.label}
+                value={String(query[field.name] ?? "")}
+                options={field.options}
+                termSlug={field.termSlug}
+                locale={locale}
+              />
             ))}
             {children}
           </div>
