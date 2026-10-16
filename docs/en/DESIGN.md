@@ -2,6 +2,7 @@
 
 > Turkish mirror: [docs/tr/DESIGN.md](../tr/DESIGN.md)
 > Status: **implemented (Phases 0–7), verified 2026-10-14.** All numbers below were measured on 2026-10-14 against the live dev server (`localhost:3101`) and the served snapshot (`data/feed.json`, 915 models / 104 news items).
+> ⚠️ **Corrected 2026-10-16:** the §6 "horizontal overflow 0 px at 360/390" result was a false pass — the check emulated small widths with `mobile: true`, which inflates the layout viewport (`window.innerWidth` becomes 769 px), so `scrollWidth - innerWidth` was 0 by construction. The feed is in fact **769 px wide on a 390 px phone** (cards 753 px). See [DESIGN-V2.md](DESIGN-V2.md) §2.3 and §3 D1.
 
 ---
 

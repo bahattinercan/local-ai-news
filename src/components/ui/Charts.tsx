@@ -45,7 +45,7 @@ export function TrendChart({ points }: { points: Array<{ date: string; count: nu
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto" role="img" aria-label="Daily model volume">
-      <path d={area} fill="rgba(53,208,186,0.14)" />
+      <path d={area} fill="color-mix(in srgb, var(--accent) 14%, transparent)" />
       <path d={path} fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" />
       {points.map((point, index) => (
         <circle
@@ -65,7 +65,7 @@ export function Donut({ slices }: { slices: Array<{ label: string; value: number
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
   let offset = 0;
-  const palette = ["var(--accent)", "var(--accent-2)", "var(--ok)", "var(--warn)", "var(--danger)", "#7f8ea3", "#4a5a72"];
+  const palette = ["var(--accent)", "var(--accent-2)", "var(--ok)", "var(--warn)", "var(--danger)", "var(--muted)", "var(--border)"];
 
   return (
     <svg viewBox="0 0 140 140" className="w-[140px] h-[140px]" role="img" aria-label="Category share">

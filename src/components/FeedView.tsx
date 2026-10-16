@@ -1,12 +1,12 @@
 import { FeedCard } from "./FeedCard";
 import { FilterBar } from "./FilterBar";
-import { EmptyState, DataNotice } from "./EmptyState";
+import { EmptyState } from "./EmptyState";
 import { SavedFilters } from "./SavedFilters";
 import { Pagination } from "./Pagination";
 import { PulseStrip } from "./PulseStrip";
 import { getFeed, countFeed } from "@/lib/store";
 import { dictionary, t, type Locale } from "@/i18n";
-import type { normalizeFeedQuery } from "@/lib/query";
+import { clampPage, type normalizeFeedQuery } from "@/lib/query";
 
 export async function FeedView({
   locale,
@@ -20,8 +20,12 @@ export async function FeedView({
   raw: Record<string, string | undefined>;
 }) {
   const dict = dictionary(locale);
-  const models = await getFeed(query);
+  /* Count first, then clamp: `?page=999` on a 60-page result used to render an
+     empty grid on a page number that does not exist. The clamped number is what
+     the list, the strip and the "Page N" label all have to agree on. */
   const total = await countFeed(query);
+  const page = clampPage(query.page, total, query.limit);
+  const models = await getFeed({ ...query, page });
 
   /* Built from the *parsed* query, not from the raw search params: the selects
      and the active-filter summary must show what the server actually filtered
@@ -44,29 +48,41 @@ export async function FeedView({
   return (
     <>
       <PulseStrip locale={locale} days={query.windowDays} category={category} />
-      <DataNotice locale={locale} />
+      {/* No separate DataNotice here: the pulse card already states "last refresh"
+          and the footer carries the source and the snapshot age. Rendering both
+          cost 28 px of the first screen and repeated the same number. */}
       <FilterBar locale={locale} category={category} query={formValues} gateForced={query.gateForced} />
       <SavedFilters locale={locale} currentQuery={new URLSearchParams(Object.entries(raw).filter((entry): entry is [string, string] => entry[1] !== undefined)).toString()} />
 
       {models.length === 0 ? (
-        <div className="mt-4">
+        <section className="mt-6" aria-labelledby="models-heading">
+          <h2 id="models-heading" className="mb-3 flex items-baseline gap-2 text-lg font-semibold tracking-tight">
+            {t(dict, "feed.models")}
+            <span className="font-mono text-xs font-normal text-muted">{total}</span>
+          </h2>
           <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
-        </div>
+        </section>
       ) : (
-        <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          {models.map((model, index) => (
-            /* `min-w-0` is load-bearing: a grid item defaults to `min-width: auto`,
-               so one card with an unbreakable 45-character repo id sized the whole
-               track at 753 px and pushed the page 424 px wide on a 360 px phone
-               (measured; the container is 361 px). */
-            <div key={model.externalId} className="fade-up min-w-0" style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}>
-              <FeedCard model={model} locale={locale} maxDownloads={maxDownloads} />
-            </div>
-          ))}
-        </div>
+        <section className="mt-6" aria-labelledby="models-heading">
+          <h2 id="models-heading" className="mb-3 flex items-baseline gap-2 text-lg font-semibold tracking-tight">
+            {t(dict, "feed.models")}
+            <span className="font-mono text-xs font-normal text-muted">{total}</span>
+          </h2>
+          <div className="grid gap-3 lg:grid-cols-2">
+            {models.map((model, index) => (
+              /* `min-w-0` is load-bearing: a grid item defaults to `min-width: auto`,
+                 so one card with an unbreakable 45-character repo id sized the whole
+                 track at 753 px and pushed the page 424 px wide on a 360 px phone
+                 (measured; the container is 361 px). */
+              <div key={model.externalId} className="fade-up min-w-0" style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}>
+                <FeedCard model={model} locale={locale} maxDownloads={maxDownloads} />
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
-      <Pagination locale={locale} page={query.page} total={total} limit={query.limit} formValues={formValues} />
+      <Pagination locale={locale} page={page} total={total} limit={query.limit} formValues={formValues} />
     </>
   );
 }

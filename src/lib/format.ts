@@ -25,15 +25,17 @@ export function relativeTime(iso: string): string {
   return `${Math.round(hours / 24)}d`;
 }
 
-export function formatNumber(value: number | null): string {
-  if (value === null) return "0";
+export function formatNumber(value: number | null | undefined): string {
+  /* A snapshot field can be missing entirely; `String(undefined)` used to reach
+     the UI as the text "undefined". */
+  if (value === null || value === undefined || Number.isNaN(value)) return "0";
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
   return String(value);
 }
 
-export function formatBytes(bytes: number | null): string {
-  if (!bytes) return "—";
+export function formatBytes(bytes: number | null | undefined): string {
+  if (bytes === null || bytes === undefined || !Number.isFinite(bytes) || bytes <= 0) return "—";
   if (bytes >= 1_000_000_000) return `${(bytes / 1_000_000_000).toFixed(2)} GB`;
   if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
   return `${Math.round(bytes / 1000)} kB`;

@@ -14,21 +14,21 @@ export async function Footer({ locale }: { locale: Locale }) {
       <div className="mx-auto max-w-6xl px-4 py-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
         <span>
           {t(dict, "footer.source")} ·{" "}
-          <a href="https://huggingface.co/models" className="text-accent">
+          <a href="https://huggingface.co/models" className="inline-flex min-h-7 items-center text-accent">
             huggingface.co
           </a>
         </span>
         {generatedAt ? (
           <span className="font-mono">{t(dict, "footer.snapshot", { when: relativeTime(generatedAt) })}</span>
         ) : null}
-        <a href={`/feed.rss?lang=${locale}`} className="hover:text-text">
+        <a href={`/feed.rss?lang=${locale}`} className="inline-flex min-h-7 items-center hover:text-text">
           RSS
         </a>
-        <a href={`/${locale}/glossary`} className="hover:text-text">
+        <a href={`/${locale}/glossary`} className="inline-flex min-h-7 items-center hover:text-text">
           {t(dict, "nav.glossary")}
         </a>
         {repoUrl ? (
-          <a href={repoUrl} className="hover:text-text">
+          <a href={repoUrl} className="inline-flex min-h-7 items-center hover:text-text">
             {t(dict, "footer.docs")}
           </a>
         ) : null}

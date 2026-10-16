@@ -22,7 +22,13 @@ export default async function FeedPage({
   return (
     <>
       <TabBar locale={locale} filters={feedFiltersOf(query)} />
-      <h1 className="mb-3 text-2xl font-semibold tracking-tight">{t(dict, "nav.all")}</h1>
+      {/* The page used to open on `h1 "All"` — a heading that describes the tab,
+          not the site, and the only sentence explaining the product lived in the
+          header tagline, hidden below 768 px. */}
+      <div className="mb-4">
+        <h1 className="text-xl font-semibold tracking-tight text-balance sm:text-3xl">{t(dict, "feed.title")}</h1>
+        <p className="mt-2 max-w-3xl text-sm text-muted">{t(dict, "feed.lede")}</p>
+      </div>
       <FeedView locale={locale} query={query} raw={normalizeRaw(raw)} />
     </>
   );

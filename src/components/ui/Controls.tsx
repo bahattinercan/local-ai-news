@@ -19,7 +19,7 @@ export function Field({
       <select
         name={name}
         defaultValue={value}
-        className="rounded-md border border-border bg-raised px-2.5 py-1.5 text-sm text-text"
+        className="h-11 rounded-md border border-border bg-raised px-2.5 text-sm text-text"
       >
         {options.map(([optionValue, optionLabel]) => (
           <option key={optionValue} value={optionValue}>
@@ -35,7 +35,7 @@ export function SubmitButton({ label }: { label: string }) {
   return (
     <button
       type="submit"
-      className="shrink-0 whitespace-nowrap rounded-md border border-transparent bg-accent px-3.5 py-2 text-sm font-medium text-[#071014]"
+      className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-md border border-transparent bg-accent px-3.5 text-sm font-medium text-[#071014]"
     >
       {label}
     </button>
@@ -44,7 +44,7 @@ export function SubmitButton({ label }: { label: string }) {
 
 export function GhostLink({ href, label, className }: { href: string; label: string; className?: string }) {
   return (
-    <a href={href} className={cn("rounded-md border border-border px-3 py-1.5 text-sm text-muted", className)}>
+    <a href={href} className={cn("inline-flex h-11 items-center rounded-md border border-border px-3 text-sm text-muted", className)}>
       {label}
     </a>
   );

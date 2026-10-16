@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cleanSearch, parseFeedQuery, parseNewsQuery } from "../src/lib/query.ts";
+import { clampPage, cleanSearch, pageCount, parseFeedQuery, parseNewsQuery } from "../src/lib/query.ts";
 
 /**
  * Regression: a GET form submits every named control, so pressing "Apply" with
@@ -105,4 +105,23 @@ test("news filters read the same way", () => {
 test("cleanSearch keeps repeated params usable and drops the rest", () => {
   assert.deepEqual(cleanSearch({ q: ["qwen", "llama"], empty: "", missing: undefined }), { q: "qwen" });
   assert.deepEqual(cleanSearch({}), {});
+});
+
+/**
+ * Regression: `?page=999` on a 60-page result rendered an empty grid under the
+ * heading "Page 999", with a "previous" link to page 998 and no active number in
+ * the strip, because the parsed page was never clamped against the result count.
+ */
+test("a page beyond the last one is clamped to the last one", () => {
+  assert.equal(pageCount(0, 24), 1);
+  assert.equal(pageCount(24, 24), 1);
+  assert.equal(pageCount(25, 24), 2);
+  assert.equal(pageCount(449, 24), 19);
+
+  assert.equal(clampPage(999, 449, 24), 19);
+  assert.equal(clampPage(3, 449, 24), 3);
+  assert.equal(clampPage(0, 449, 24), 1);
+  assert.equal(clampPage(2, 0, 24), 1);
+  // A limit of 0 cannot be produced by the schema, but must not divide by zero.
+  assert.equal(pageCount(10, 0), 10);
 });

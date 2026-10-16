@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/format";
+import { pageCount } from "@/lib/query";
 import { dictionary, t, type Locale } from "@/i18n";
 
 export function Pagination({
@@ -16,7 +17,7 @@ export function Pagination({
   formValues: Record<string, string | undefined>;
 }) {
   const dict = dictionary(locale);
-  const pages = Math.max(1, Math.ceil(total / limit));
+  const pages = pageCount(total, limit);
   if (pages <= 1) return null;
 
   /* Blank and undefined values stay out of the URL: the filter form submits an
@@ -37,8 +38,8 @@ export function Pagination({
   return (
     <nav className="mt-4 flex flex-wrap items-center gap-2 text-sm" aria-label={t(dict, "common.page", { page })}>
       {page > 1 ? (
-        <a href={hrefForPage(page - 1)} className="rounded-md border border-border px-2.5 py-1.5 text-muted hover:text-text">
-          <ChevronLeft size={14} aria-hidden="true" />
+        <a href={hrefForPage(page - 1)} aria-label={t(dict, "common.prev")} className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-muted hover:text-text">
+          <ChevronLeft size={16} aria-hidden="true" />
         </a>
       ) : null}
 
@@ -46,8 +47,9 @@ export function Pagination({
         <a
           key={number}
           href={hrefForPage(number)}
+          aria-current={number === page ? "page" : undefined}
           className={cn(
-            "rounded-md border border-border px-2.5 py-1.5 font-mono",
+            "inline-flex h-11 min-w-11 items-center justify-center rounded-md border border-border px-2.5 font-mono",
             number === page ? "bg-raised text-accent border-accent/45" : "text-muted hover:text-text"
           )}
         >
@@ -56,8 +58,8 @@ export function Pagination({
       ))}
 
       {page < pages ? (
-        <a href={hrefForPage(page + 1)} className="rounded-md border border-border px-2.5 py-1.5 text-muted hover:text-text">
-          <ChevronRight size={14} aria-hidden="true" />
+        <a href={hrefForPage(page + 1)} aria-label={t(dict, "common.next")} className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-muted hover:text-text">
+          <ChevronRight size={16} aria-hidden="true" />
         </a>
       ) : null}
 

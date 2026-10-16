@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CATEGORY_RULES } from "./classify/rules.ts";
-import { NEWS_SCOPE_KINDS, normalizeFeedQuery, type FeedFilterInput } from "./query.ts";
+import { NEWS_SCOPE_KINDS, FEED_DEFAULTS, normalizeFeedQuery, type FeedFilterInput } from "./query.ts";
 import type { ClassifiedModel } from "./model.ts";
 
 export interface SnapshotNews {
@@ -148,7 +148,9 @@ function withinWindow(iso: string, days: number): boolean {
 }
 
 function normalizeNews(snapshot: Snapshot): SnapshotNews[] {
-  return snapshot.news.map((item) => ({
+  /* A snapshot written without the `news` key must degrade to "no news" instead
+     of throwing out of every news surface (`isUsable` only guards `models`). */
+  return (snapshot.news ?? []).map((item) => ({
     ...item,
     organization: typeof item.organization === "string" ? item.organization : null
   }));
@@ -235,13 +237,12 @@ export async function getPulse(days: number, category?: string): Promise<Pulse |
   };
 }
 
-export async function getDailySeries(days: number): Promise<Array<{ date: string; count: number }>> {
+export async function getDailySeries(days: number, options: StatsOptions = {}): Promise<Array<{ date: string; count: number }>> {
   const snapshot = await loadSnapshot();
   if (!snapshot) return [];
 
   const buckets = new Map<string, number>();
-  for (const model of snapshot.models) {
-    if (!withinWindow(model.firstSeenAt, days)) continue;
+  for (const model of filterModels(snapshot, statsQuery(days, options))) {
     const date = model.firstSeenAt.slice(0, 10);
     buckets.set(date, (buckets.get(date) ?? 0) + 1);
   }
@@ -313,16 +314,38 @@ export async function countNews(query: NewsQuery): Promise<number> {
   return filterNews(snapshot, query).length;
 }
 
-export async function getStats(days: number): Promise<Array<{ category: string; count: number }>> {
+export async function getStats(
+  days: number,
+  options: StatsOptions = {}
+): Promise<Array<{ category: string; count: number }>> {
   const snapshot = await loadSnapshot();
   if (!snapshot) return [];
 
+  /* Same filter definition as the feed (and the tab badges), so /stats cannot
+     print "Audio 244" next to a feed tab that says "Audio 17". Before this it
+     counted every tracked row, gate and gated repo included, while the feed
+     defaulted to gate-passed. */
+  const rows = filterModels(snapshot, statsQuery(days, options));
   const counts = new Map<string, number>();
-  for (const model of snapshot.models) {
-    if (!withinWindow(model.firstSeenAt, days)) continue;
-    counts.set(model.primaryCategory, (counts.get(model.primaryCategory) ?? 0) + 1);
-  }
+  for (const model of rows) counts.set(model.primaryCategory, (counts.get(model.primaryCategory) ?? 0) + 1);
   return [...counts.entries()].map(([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count);
+}
+
+/** The filter set the stats surfaces share with the feed. */
+export interface StatsOptions {
+  gate?: "passed" | "all";
+  excludeGated?: boolean;
+}
+
+function statsQuery(days: number, options: StatsOptions): FeedQuery {
+  return {
+    windowDays: days,
+    sort: "new",
+    gate: options.gate ?? FEED_DEFAULTS.gate,
+    excludeGated: options.excludeGated ?? true,
+    limit: 0,
+    page: 1
+  };
 }
 
 /**

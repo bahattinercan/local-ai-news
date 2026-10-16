@@ -53,8 +53,11 @@ export async function TabBar({
 
   return (
     <nav
-      className="flex flex-wrap gap-2 py-3 text-sm"
-      aria-label={t(dict, "brand")}
+      /* One scrollable row below `lg`: ten 44 px pills in a wrapping flex used
+      four rows on a phone (measured), which pushed the first model card off the
+      first screen. */
+      className="flex gap-2 overflow-x-auto py-3 text-sm lg:flex-wrap lg:overflow-visible"
+      aria-label={t(dict, "nav.primary")}
     >
       {tabs.map((tab) => {
         const href = `${hrefFor(locale, tab.key ? `/c/${tab.key}` : "/")}${suffix}`;
@@ -65,7 +68,7 @@ export async function TabBar({
             href={href}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "flex items-center gap-2 whitespace-nowrap rounded-md border border-border px-3 py-1.5",
+              "flex h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-border px-3",
               isActive ? "bg-raised text-accent border-accent/45" : "text-muted hover:text-text hover:border-raised"
             )}
           >

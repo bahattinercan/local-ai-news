@@ -68,7 +68,7 @@ export function FilterBar({
             name="q"
             defaultValue={String(query.q ?? "")}
             placeholder="model name…"
-            className="w-full rounded-md border border-border bg-raised px-2.5 py-1.5 text-sm text-text"
+            className="h-11 w-full rounded-md border border-border bg-raised px-2.5 text-sm text-text"
           />
         </label>
         <SubmitButton label={t(dict, "filters.apply")} />

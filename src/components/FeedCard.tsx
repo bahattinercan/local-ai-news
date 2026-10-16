@@ -92,7 +92,7 @@ export function FeedCard({
           <div className="mt-2 flex flex-wrap gap-2 text-xs">
             {model.license ? <Chip label={model.license} /> : null}
             {model.vramEstGb ? <Chip label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB`} tone="accent" /> : null}
-            <a href={hrefFor(locale, `/compare?ids=${model.slug}`)} className="flex items-center gap-1 text-accent">
+            <a href={hrefFor(locale, `/compare?ids=${model.slug}`)} className="inline-flex min-h-7 items-center gap-1 text-accent">
               <Scale size={12} aria-hidden="true" />
               {t(dict, "compare.add")}
             </a>

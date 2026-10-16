@@ -2,6 +2,7 @@
 
 > İngilizce kaynak: [docs/en/DESIGN.md](../en/DESIGN.md)
 > Durum: **uygulandı (Faz 0–7), 2026-10-14'te doğrulandı.** Aşağıdaki tüm sayılar 2026-10-14'te canlı dev sunucusu (`localhost:3101`) ve servis edilen snapshot (`data/feed.json`, 915 model / 104 haber) üzerinden ölçüldü.
+> ⚠️ **2026-10-16 düzeltmesi:** §6'daki "360/390'da yatay taşma 0 px" sonucu yanlış bir GEÇTİ'ydi — kontrol küçük genişlikleri `mobile: true` ile taklit ediyor, bu da yerleşim viewport'unu şişiriyor (`window.innerWidth` 769 px oluyor); `scrollWidth - innerWidth` tanım gereği 0 çıkıyordu. Gerçekte feed 390 px'lik telefonda **769 px** genişliğinde (kartlar 753 px). Bkz. [DESIGN-V2.md](DESIGN-V2.md) §2.3 ve §3 D1.
 
 ---
 

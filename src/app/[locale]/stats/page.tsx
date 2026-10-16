@@ -15,11 +15,16 @@ export default async function StatsPage({
 }) {
   const locale = pickLocale((await params).locale);
   const dict = dictionary(locale);
-  const rawDays = Number((await searchParams).days ?? 30);
+  const search = await searchParams;
+  const rawDays = Number(search.days ?? 30);
   const days = Number.isFinite(rawDays) && rawDays > 0 && rawDays <= 180 ? rawDays : 30;
+  /* Default to the feed's gate so the charts agree with the tab badges; "all"
+     stays available for the raw tracked volume (it is not a downloadable feed,
+     so decision 9's 30-day restriction does not apply here). */
+  const gate = search.gate === "all" ? "all" : "passed";
 
-  const stats = await getStats(days);
-  const series = await getDailySeries(days);
+  const stats = await getStats(days, { gate });
+  const series = await getDailySeries(days, { gate });
   const total = stats.reduce((sum, row) => sum + row.count, 0);
   const max = Math.max(1, ...stats.map((row) => row.count));
 
@@ -39,13 +44,23 @@ export default async function StatsPage({
           value={String(days)}
           options={[["7", "7d"], ["30", "30d"], ["90", "90d"], ["180", "180d"]]}
         />
+        <Field
+          name="gate"
+          label={t(dict, "filters.gate")}
+          value={gate}
+          options={[["passed", t(dict, "filters.passedOnly")], ["all", t(dict, "filters.showEverything")]]}
+        />
         <SubmitButton label={t(dict, "filters.apply")} />
-        <span className="font-mono text-xs text-muted">{total} models</span>
+        <span className="font-mono text-xs text-muted">
+          {total} {t(dict, "stats.models")}
+        </span>
       </form>
 
       <div className="stats-grid">
         <section className="card p-4">
-          <h2 className="text-sm uppercase tracking-wide text-muted mb-3">{t(dict, "stats.title")}</h2>
+          {/* Distinct from the h1 on purpose: two identical headings made the
+              page look like it had repeated itself. */}
+          <h2 className="text-sm uppercase tracking-wide text-muted mb-3">{t(dict, "stats.bars")}</h2>
           <BarChart rows={stats.map((row) => ({ label: categoryLabel(row.category), value: row.count }))} max={max} />
         </section>
 

@@ -76,6 +76,20 @@ export function normalizeFeedQuery(input: FeedQueryInput) {
   };
 }
 
+/** Total pages for a result count, never less than 1. */
+export function pageCount(total: number, limit: number): number {
+  return Math.max(1, Math.ceil(total / Math.max(1, limit)));
+}
+
+/**
+ * A page number that actually exists. `?page=999` used to render an empty list
+ * headed "Sayfa 999", with a "previous" link to page 998 and no active number in
+ * the strip, because nothing clamped the parsed page against the result count.
+ */
+export function clampPage(page: number, total: number, limit: number): number {
+  return Math.min(Math.max(1, page), pageCount(total, limit));
+}
+
 /** What a query nobody asked for means; also the last-resort fallback below. */
 const EMPTY_FEED_QUERY: FeedQueryInput = { ...FEED_DEFAULTS, limit: 24, page: 1 };
 

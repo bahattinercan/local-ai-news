@@ -23,18 +23,20 @@
 }
 
 :root {
-  /* dark — radar instrument */
-  --bg: #070a10;
-  --surface: #101623;
-  --raised: #16202f;
-  --text: #eef2f7;
-  --muted: #93a1b5;
-  --accent: #35d0ba;
-  --accent-2: #5b9dff;
-  --ok: #3fbf8f;
-  --warn: #e8b04b;
-  --danger: #e0655f;
-  --border: #2a3547;
+  /* dark — radar instrument. Every pair below was recomputed after the change:
+     surface/bg 1.30, raised/surface 1.24, border/surface 1.74, muted/bg 9.44,
+     muted/surface 7.72, accent/bg 10.85, text/bg 16.34 (docs/en/DESIGN-V2.md §6). */
+  --bg: #0a0e15;
+  --surface: #161f2e;
+  --raised: #212c40;
+  --text: #f2f5f9;
+  --muted: #a7b4c6;
+  --accent: #3ddbc4;
+  --accent-2: #6aa8ff;
+  --ok: #4ecfa0;
+  --warn: #f0bd5f;
+  --danger: #f07a72;
+  --border: #33415a;
 
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05), 0 14px 34px -22px rgba(0, 0, 0, 0.85);
   --shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.07), 0 22px 44px -26px rgba(0, 0, 0, 0.9);
@@ -42,27 +44,32 @@
 }
 
 [data-theme="light"] {
-  --bg: #f4f6f9;
+  /* The old light ramp failed AA for muted text (4.02:1 on bg, 4.30:1 inside a
+     card) and had almost no surface separation (1.07). Verified after the change:
+     muted/bg 4.72, muted/surface 5.00, accent/bg 5.90, border/surface 1.49. */
+  --bg: #eff2f7;
   --surface: #ffffff;
-  --raised: #eef1f6;
-  --text: #131b26;
-  --muted: #5d6a79;
-  --accent: #0b6a58;
-  --accent-2: #1f5fd0;
-  --ok: #177d53;
-  --warn: #8a6212;
-  --danger: #a3322c;
-  --border: #c9d2de;
+  --raised: #e7ecf4;
+  --text: #0f1620;
+  --muted: #525f6e;
+  --accent: #0a5b4c;
+  --accent-2: #1c56c4;
+  --ok: #0f6b47;
+  --warn: #7d5a10;
+  --danger: #9c2d27;
+  --border: #c3cddc;
 
-  --shadow-card: 0 1px 2px rgba(16, 24, 34, 0.06), 0 10px 24px -18px rgba(16, 24, 34, 0.25);
-  --shadow-lift: 0 2px 4px rgba(16, 24, 34, 0.08), 0 18px 36px -22px rgba(16, 24, 34, 0.3);
+  --shadow-card: 0 1px 2px rgba(16, 24, 34, 0.07), 0 10px 24px -18px rgba(16, 24, 34, 0.28);
+  --shadow-lift: 0 2px 4px rgba(16, 24, 34, 0.09), 0 18px 36px -22px rgba(16, 24, 34, 0.32);
   --hairline: rgba(19, 27, 38, 0.08);
 }
 
 body {
+  /* Accent-tinted washes read from the token, so the theme switch moves them
+     too (they were literal rgba(53,208,186,…) values pinned to the old accent). */
   background:
-    radial-gradient(1000px 520px at 10% -10%, rgba(53, 208, 186, 0.10), transparent 62%),
-    radial-gradient(760px 420px at 92% -6%, rgba(91, 157, 255, 0.08), transparent 60%),
+    radial-gradient(1000px 520px at 10% -10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 62%),
+    radial-gradient(760px 420px at 92% -6%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 60%),
     var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
@@ -82,7 +89,7 @@ a {
 }
 
 ::selection {
-  background: rgba(53, 208, 186, 0.28);
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 /* ---------- surfaces ---------- */
@@ -129,7 +136,7 @@ a {
   background: conic-gradient(
     from 0deg at 50% 50%,
     transparent 0deg,
-    rgba(53, 208, 186, 0.16) 34deg,
+    color-mix(in srgb, var(--accent) 16%, transparent) 34deg,
     transparent 78deg
   );
   filter: blur(24px);
@@ -198,6 +205,9 @@ details[open] > summary .chev {
   grid-template-columns: 1.25rem minmax(0, 1fr) 2.9rem 4.5rem;
   align-items: center;
   gap: 0.5rem;
+  /* A 20 px-tall link row is below the WCAG 2.2 target minimum; 28 px keeps the
+     list compact and the row clickable (measured 2026-10-16). */
+  min-height: 1.75rem;
 }
 
 @media (min-width: 640px) {
