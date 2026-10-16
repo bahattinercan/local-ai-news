@@ -95,12 +95,12 @@ Tipografi ölçeği: 12 / 14 / 16 / 20 / 26 / 34 px. Radius: 6 / 10 / 14. Spacin
 
 ### 5.1 Shell (`layout.tsx`) — Faz 1
 - Yapışkan header: brand mark (radar glyph) + tagline, ana nav (**Hepsi / kategoriler / Haber / İstatistik / Karşılaştır**), tema toggle, dil değişimi.
-- Kategori sekmeleri, kategori sayılarıyla (`getStats`) kaydırılabilir segmented control'e dönüşür.
+- Kategori sekmeleri, kategori sayılarıyla (`getCategoryCounts`, yani feed'in kendi filtreleri — bkz. DECISIONS.md "Filter query handling") kaydırılabilir segmented control'e dönüşür.
 - Footer: veri kaynağı atfı, RSS linki, docs linki, snapshot zamanı.
 - Gerçek ikonlar: `icon.svg` + `favicon.ico` + `apple-icon.png` (şu an `/favicon.ico` HTML dönüyor).
 
 ### 5.2 Feed (`/`, `/c/[category]`) — Faz 2
-- **Live pulse şeridi**: izlenen model · kapıyı geçen · önde çıkan kategori · son yenileme (gerçek periyodu yaz: ingest aralığı + 900s cache TTL — asla "real-time" deme).
+- **Live pulse şeridi**: izlenen model · kapıyı geçen · önde çıkan kategori · son yenileme (gerçek periyodu yaz: ingest aralığı + 900s cache TTL — asla "real-time" deme). `/c/[category]` sayfasında aktif kategoriye daraltılır ve "önde çıkan kategori" stat'ı kaldırılır, çünkü yalnızca başlığı tekrarlardı.
 - **Şu an sıcak**: aktif pencerede indirmeye göre top 5, mini bar ile rank'lı.
 - Filtre barı → kompakt chip sırası + aktif filtre özeti + "temizle"; aramada ikon.
 - Kart: başlık + kategori chip'i + metrik satırı (♥ ⬇ storage) + runner chip'leri + gate rozeti + karşılaştır butonu. Varsa 40px thumbnail, yoksa glyph.

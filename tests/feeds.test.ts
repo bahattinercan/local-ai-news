@@ -123,10 +123,12 @@ test("the news scope excludes papers and the research scope is papers only", () 
   assert.ok(NEWS_SCOPE_KINDS.news?.includes("community"));
 });
 
-test("the news scope is the default and an unknown scope is rejected", () => {
+test("the news scope is the default and an unknown scope falls back to it", () => {
   assert.equal(parseNewsQuery({}).scope, "news");
   assert.equal(parseNewsQuery({ scope: "research" }).scope, "research");
-  assert.throws(() => parseNewsQuery({ scope: "papers" }));
+  // Used to throw, which turned a hand-edited URL into a 500 page.
+  assert.equal(parseNewsQuery({ scope: "papers" }).scope, "news");
+  assert.equal(parseNewsQuery({ scope: "papers", window: "nope" }).windowDays, 7);
 });
 
 test("?page is carried through, it used to be dropped", () => {

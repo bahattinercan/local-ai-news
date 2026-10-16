@@ -23,18 +23,27 @@ export async function FeedView({
   const models = await getFeed(query);
   const total = await countFeed(query);
 
+  /* Built from the *parsed* query, not from the raw search params: the selects
+     and the active-filter summary must show what the server actually filtered
+     on, and a hand-edited `?window=abc` must not print a value that no option
+     holds. `gate: "all"` is kept when the user asked for it so the "show
+     everything was dialled back" notice stays visible. */
   const formValues: Record<string, string | undefined> = {
     ...raw,
-    window: raw.window ?? (query.windowDays === 1 ? "24h" : `${query.windowDays}d`),
-    sort: raw.sort ?? query.sort,
-    gate: raw.gate ?? query.gate
+    window: query.windowDays === 1 ? "24h" : `${query.windowDays}d`,
+    sort: query.sort,
+    gate: query.gateForced ? "all" : query.gate,
+    runner: query.runner ?? "",
+    maxParams: query.maxParams ? String(query.maxParams) : "",
+    license: query.license ?? "",
+    q: query.q ?? ""
   };
 
   const maxDownloads = models.reduce((max, model) => Math.max(max, model.downloads ?? 0), 0);
 
   return (
     <>
-      <PulseStrip locale={locale} days={query.windowDays} />
+      <PulseStrip locale={locale} days={query.windowDays} category={category} />
       <DataNotice locale={locale} />
       <FilterBar locale={locale} category={category} query={formValues} gateForced={query.gateForced} />
       <SavedFilters locale={locale} currentQuery={new URLSearchParams(Object.entries(raw).filter((entry): entry is [string, string] => entry[1] !== undefined)).toString()} />

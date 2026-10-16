@@ -209,18 +209,13 @@ export interface Pulse {
   hot: ClassifiedModel[];
 }
 
-export async function getPulse(days: number): Promise<Pulse | null> {
+export async function getPulse(days: number, category?: string): Promise<Pulse | null> {
   const snapshot = await loadSnapshot();
   if (!snapshot) return null;
 
-  const rows = filterModels(snapshot, {
-    windowDays: days,
-    sort: "new",
-    gate: "passed",
-    excludeGated: true,
-    limit: 100,
-    page: 1
-  });
+  const scope = { category, windowDays: days, sort: "new" as const, excludeGated: true, limit: 100, page: 1 };
+
+  const rows = filterModels(snapshot, { ...scope, gate: "passed" });
 
   const counts = new Map<string, number>();
   for (const model of rows) counts.set(model.primaryCategory, (counts.get(model.primaryCategory) ?? 0) + 1);
@@ -231,7 +226,7 @@ export async function getPulse(days: number): Promise<Pulse | null> {
     .slice(0, 5);
 
   return {
-    tracked: filterModels(snapshot, { windowDays: days, sort: "new", gate: "all", excludeGated: true, limit: 1, page: 1 }).length,
+    tracked: filterModels(snapshot, { ...scope, gate: "all", limit: 1 }).length,
     passed: rows.length,
     topCategory: top?.[0] ?? null,
     topCategoryCount: top?.[1] ?? 0,
@@ -328,6 +323,25 @@ export async function getStats(days: number): Promise<Array<{ category: string; 
     counts.set(model.primaryCategory, (counts.get(model.primaryCategory) ?? 0) + 1);
   }
   return [...counts.entries()].map(([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count);
+}
+
+/**
+ * Per-category counts for the tab bar. The tab is a link into a feed, so it has
+ * to count what that feed will show: the same window, the same quality gate and
+ * no gated repos. `getStats` counts every tracked model instead, which made the
+ * tab print "Multimodal 153" and then open a page with 33 cards.
+ *
+ * Reuses `filterModels` on purpose — one filter definition, no second opinion.
+ */
+export async function getCategoryCounts(days: number, gate: FeedQuery["gate"]): Promise<{ total: number; counts: Map<string, number> }> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return { total: 0, counts: new Map() };
+
+  const rows = filterModels(snapshot, { windowDays: days, sort: "new", gate, excludeGated: true, limit: 0, page: 1 });
+  const counts = new Map<string, number>();
+  for (const model of rows) counts.set(model.primaryCategory, (counts.get(model.primaryCategory) ?? 0) + 1);
+
+  return { total: rows.length, counts };
 }
 
 export async function getCategories(): Promise<Array<{ key: string; labelEn: string; labelTr: string; sortOrder: number }>> {

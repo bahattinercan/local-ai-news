@@ -29,6 +29,41 @@
 - **VRAM estimate:** weights + KV cache approximation (`BYTES_PER_PARAM` × params + 0.15 GB per billion params at 4096 tokens). Shown with `~` in the UI.
 - **Avatars:** `/api/users/{name}` and `/api/organizations/{name}` error without a token, so avatars come only from the trending response, with a monogram fallback.
 
+## Filter query handling (2026-10-16)
+
+Measured on the live tree, then fixed — all six points below were reproducing on
+`localhost:3000` before the change:
+
+- **A blank parameter means "not set".** A GET form submits *every* named control,
+  so pressing *Apply* with an untouched select or an empty search box produced
+  `?window=7d&runner=&maxParams=&license=&q=`; Zod's `.min(1)` / `.enum()` rejected
+  those values and `/`, `/c/[category]`, `/news` and `/research` answered **500**.
+  `cleanSearch()` now drops blank and whitespace-only values before validation and
+  every enum/number field falls back to its default (`.catch()`) instead of
+  throwing, so a hand-edited `?window=abc&page=0` degrades to the default view
+  rather than breaking the page. The API routes share the same parsers, so
+  `/api/feed?q=` no longer 500s either.
+- **`page` is read.** `parseFeedQuery` never handed `page` to the schema, so
+  `/c/[category]?page=2` rendered page 1 and the numbered pagination was a dead
+  end (`parseNewsQuery` had the same bug fixed earlier).
+- **Tab counts describe the feed they open.** `getCategoryCounts()` runs the same
+  `filterModels()` as the list (default 7-day window, quality gate applied, gated
+  repos hidden), so the tab and the page total agree — `getStats` counted every
+  tracked model and the tab printed "Multimodal 153" for a page with 33 cards.
+- **The pulse is scoped to the page.** `getPulse(days, category)` filters the
+  tracked/passed/hot numbers by category, so a category page no longer leads with
+  "top category: Embedding / RAG"; that stat is only rendered where it carries
+  information.
+- **The active-filter summary lists only what the user set.** The defaults
+  (window / sort / gate) used to be announced as active on every page, and the
+  summary printed raw enum values ("Quality gate: passed") instead of the words
+  the control shows ("Passed only"). Values now come from the control's own option
+  list, and *Clear* only appears when there is something to clear.
+- **Known limit:** the tab badge cannot follow the *active* query, because the tab
+  bar renders in the locale layout, which never receives `searchParams`. Narrowing
+  the window or the gate narrows the list (pagination total follows it); the badge
+  keeps reporting the default 7-day, gate-on view.
+
 ## Not implemented yet (F6 remainder)
 
 Admin override panel, email digest, local Ollama integration (`localhost:11434/api/tags`), external news sources (would break decision 3).

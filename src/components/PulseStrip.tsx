@@ -5,9 +5,9 @@ import { formatNumber, relativeTime } from "@/lib/format";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { Stat } from "./ui/Stat";
 
-export async function PulseStrip({ locale, days }: { locale: Locale; days: number }) {
+export async function PulseStrip({ locale, days, category }: { locale: Locale; days: number; category?: string }) {
   const dict = dictionary(locale);
-  const pulse = await getPulse(days);
+  const pulse = await getPulse(days, category);
   if (!pulse) return null;
 
   return (
@@ -18,11 +18,15 @@ export async function PulseStrip({ locale, days }: { locale: Locale; days: numbe
       <div className="relative flex flex-wrap gap-x-6 gap-y-4 mb-4">
         <Stat label={t(dict, "pulse.tracked")} value={pulse.tracked} tone="accent" />
         <Stat label={t(dict, "pulse.passed")} value={pulse.passed} tone="ok" />
-        <Stat
-          label={t(dict, "pulse.top")}
-          value={pulse.topCategory ? categoryLabel(pulse.topCategory) : "—"}
-          hint={`${pulse.topCategoryCount}`}
-        />
+        {/* Scoped to a category the "leading category" is the page itself, so it
+            is only shown where it carries information. */}
+        {category ? null : (
+          <Stat
+            label={t(dict, "pulse.top")}
+            value={pulse.topCategory ? categoryLabel(pulse.topCategory) : "—"}
+            hint={`${pulse.topCategoryCount}`}
+          />
+        )}
         <Stat
           label={t(dict, "pulse.updated")}
           value={pulse.generatedAt ? relativeTime(pulse.generatedAt) : "—"}

@@ -19,11 +19,17 @@ export function Pagination({
   const pages = Math.max(1, Math.ceil(total / limit));
   if (pages <= 1) return null;
 
-  const hrefForPage = (target: number) =>
-    `?${new URLSearchParams({
-      ...formValues,
-      page: String(target)
-    })}`;
+  /* Blank and undefined values stay out of the URL: the filter form submits an
+     empty string for every untouched select, and `?runner=&q=` links are noise
+     (and were what used to 500 the page). */
+  const hrefForPage = (target: number) => {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries({ ...formValues, page: String(target) })) {
+      if (value === undefined || value === "") continue;
+      params.set(key, value);
+    }
+    return `?${params.toString()}`;
+  };
 
   const windowStart = Math.max(1, Math.min(page - 2, pages - 4));
   const numbers = Array.from({ length: Math.min(5, pages) }, (_, index) => windowStart + index).filter((n) => n <= pages);

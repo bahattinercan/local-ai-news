@@ -1,21 +1,25 @@
 import { CATEGORY_RULES, categoryLabel } from "@/lib/classify/rules";
-import { getStats } from "@/lib/store";
+import { getCategoryCounts } from "@/lib/store";
+import { FEED_DEFAULTS, windowDays } from "@/lib/query";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { cn } from "@/lib/format";
 
+/**
+ * Counts describe the feed the tab opens (default window, quality gate applied,
+ * gated repos hidden), not the raw number of tracked models.
+ */
 export async function TabBar({ locale, active }: { locale: Locale; active?: string }) {
   const dict = dictionary(locale);
-  const counts = await getStats(30);
-  const countMap = new Map(counts.map((row) => [row.category, row.count]));
+  const { total, counts } = await getCategoryCounts(windowDays(FEED_DEFAULTS.window), FEED_DEFAULTS.gate);
 
   const tabs = [
-    { key: "", label: t(dict, "nav.all"), count: counts.reduce((sum, row) => sum + row.count, 0) },
+    { key: "", label: t(dict, "nav.all"), count: total },
     ...CATEGORY_RULES
       .filter((rule) => rule.key !== "news")
       .map((rule) => ({
         key: rule.key,
         label: categoryLabel(rule.key),
-        count: countMap.get(rule.key) ?? 0
+        count: counts.get(rule.key) ?? 0
       }))
   ];
 

@@ -95,12 +95,12 @@ Type scale: 12 / 14 / 16 / 20 / 26 / 34 px. Radii: 6 / 10 / 14. Spacing unit: 4p
 
 ### 5.1 Shell (`layout.tsx`) — Phase 1
 - Sticky header: brand mark (radar glyph) + tagline, primary nav (**Hepsi / categories / Haber / İstatistik / Karşılaştır**), theme toggle, language switch.
-- Category tabs become a scrollable segmented control with per-category counts (from `getStats`).
+- Category tabs become a scrollable segmented control with per-category counts (from `getCategoryCounts`, i.e. the feed's own filters — see DECISIONS.md, "Filter query handling").
 - Footer: data-source attribution, RSS link, docs link, snapshot timestamp.
 - Real icons: `icon.svg` + `favicon.ico` + `apple-icon.png` (currently `/favicon.ico` returns HTML).
 
 ### 5.2 Feed (`/`, `/c/[category]`) — Phase 2
-- **Live pulse strip**: models tracked · gate-passed · top category · last refresh (state the true cadence: ingest interval + 900s cache TTL — never "real-time").
+- **Live pulse strip**: models tracked · gate-passed · top category · last refresh (state the true cadence: ingest interval + 900s cache TTL — never "real-time"). Scoped to the active category on `/c/[category]`, where the "top category" stat is dropped because it would only repeat the heading.
 - **Hot now**: top 5 by downloads in the active window, ranked with a mini bar.
 - Filter bar → compact chip row with an active-filter summary and a clear-all; search input with icon.
 - Card: title + category chip + metric row (♥ ⬇ storage) + runner chips + gate badge + compare button. Thumbnail 40px when available, glyph otherwise.
