@@ -5,6 +5,15 @@ import { isRateLimited } from "@/lib/rateLimit";
 
 const EXCLUDED = ["/sitemap.xml", "/robots.txt", "/feed.rss", "/favicon.ico"];
 
+/**
+ * A root-level file is not a page, so it must never take a locale prefix.
+ * Measured 2026-10-16: `/icon.svg` and `/apple-icon.png` answered 307 to
+ * `/en/icon.svg`, which is a 404 — the layout advertises both links, so two of
+ * the three declared icons in the document head were dead. `/favicon.ico` only
+ * worked because it happened to be listed above.
+ */
+const STATIC_FILE = /^\/[^/]+\.[a-z0-9]+$/i;
+
 function detectLocale(request: NextRequest): Locale {
   const header = request.headers.get("accept-language") ?? "";
   for (const part of header.split(",")) {
@@ -25,7 +34,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (EXCLUDED.some((prefix) => path === prefix || path.startsWith(prefix))) {
+  if (EXCLUDED.some((prefix) => path === prefix || path.startsWith(prefix)) || STATIC_FILE.test(path)) {
     return NextResponse.next();
   }
 
