@@ -17,3 +17,5 @@ next-env.d.ts
 
 # local headless-chrome profile (must live outside the repo for Turbopack)
 .chrome-profile/
+
+.vercel
