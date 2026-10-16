@@ -1,4 +1,5 @@
-import { Filter, X } from "lucide-react";
+import { Filter, SlidersHorizontal, X } from "lucide-react";
+import type { ReactNode } from "react";
 import { RUNNERS } from "@/lib/runner/detect";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { FEED_DEFAULTS, SORTS, WINDOWS } from "@/lib/query";
@@ -10,12 +11,15 @@ export function FilterBar({
   locale,
   category,
   query,
-  gateForced
+  gateForced,
+  children
 }: {
   locale: Locale;
   category?: string;
   query: Record<string, unknown>;
   gateForced: boolean;
+  /** Saved filters, rendered inside the disclosure so they leave the first screen. */
+  children?: ReactNode;
 }) {
   const dict = dictionary(locale);
   const action = category ? hrefFor(locale, `/c/${category}`) : hrefFor(locale, "/");
@@ -38,28 +42,31 @@ export function FilterBar({
     { name: "license", label: t(dict, "filters.license"), defaultValue: "", options: [["", "—"], ["apache-2.0", "apache-2.0"], ["mit", "mit"], ["other", "other"]] }
   ];
 
+  /* Window and sort decide what the list *is*; the other four narrow it. Only
+     the first two (plus search and Apply) stay on the first screen — the rest
+     live in the disclosure with the saved-filter control. */
+  const primary = fields.slice(0, 2);
+  const secondary = fields.slice(2);
+
   /* Read the summary back off the select's own options, so it always prints the
      same words the control shows ("Sadece geçenler", not the raw "passed"). */
   function display(field: (typeof fields)[number], value: string): string {
     return field.options.find(([optionValue]) => optionValue === value)?.[1] ?? value;
   }
 
-  const active = fields
-    .filter((field) => {
-      const value = String(query[field.name] ?? "");
-      return value !== "" && value !== field.defaultValue;
-    })
-    .map((field) => `${field.label}: ${display(field, String(query[field.name]))}`);
+  const isSet = (field: (typeof fields)[number]) => {
+    const value = String(query[field.name] ?? "");
+    return value !== "" && value !== field.defaultValue;
+  };
+
+  const active = fields.filter(isSet).map((field) => `${field.label}: ${display(field, String(query[field.name]))}`);
   if (String(query.q ?? "") !== "") active.push(`${t(dict, "filters.search")}: ${String(query.q)}`);
+  const secondaryActive = secondary.filter(isSet).length;
 
   return (
-    /* One line at desktop widths: the fixed controls total ~903px (6 selects +
-       Apply + 7 x 8px gaps) and the search field is the only item with flex-1,
-       so it absorbs the slack instead of pushing Apply onto a second row.
-       Measured row width is 1094px at a 1440+ viewport. */
     <form method="get" action={action} className="card p-3 text-sm">
       <div className="flex flex-wrap items-end gap-2">
-        {fields.map((field) => (
+        {primary.map((field) => (
           <Field key={field.name} name={field.name} label={field.label} value={String(query[field.name] ?? "")} options={field.options} />
         ))}
         <label className="flex min-w-[140px] flex-1 flex-col gap-1 xl:min-w-[180px]">
@@ -72,6 +79,20 @@ export function FilterBar({
           />
         </label>
         <SubmitButton label={t(dict, "filters.apply")} />
+
+        <details className="w-full lg:w-auto">
+          <summary className="inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-md border border-border bg-raised px-3 text-muted hover:text-text">
+            <SlidersHorizontal size={14} aria-hidden="true" />
+            {t(dict, "filters.more")}
+            {secondaryActive > 0 ? <span className="font-mono text-xs text-accent">{secondaryActive}</span> : null}
+          </summary>
+          <div className="mt-2 flex flex-wrap items-end gap-2 rounded-md border border-border bg-raised/40 p-2">
+            {secondary.map((field) => (
+              <Field key={field.name} name={field.name} label={field.label} value={String(query[field.name] ?? "")} options={field.options} />
+            ))}
+            {children}
+          </div>
+        </details>
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted">

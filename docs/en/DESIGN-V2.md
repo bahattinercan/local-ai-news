@@ -34,6 +34,21 @@
 
 ---
 
+### 0.1 Phase 2 (clarity) — landed in the same session
+
+| Plan item | Result (measured @1440×900, and 390 where noted) |
+|---|---|
+| **C3** type scale | `text-xs` 12 → **13 px**, `text-sm` 14 → **15 px**, `text-2xl` 24 → **30**, `text-3xl` → **38** — one `@theme` block, so the whole UI moved up a step. Text in the 15–17 px band: **284/402 (71 %)**; ≤ 14 px: **466 (93 %) → 112 (28 %)**; those 112 are micro-labels, tab counts and chips |
+| **M3** card | Rows that could only ever print a placeholder are gone (params 6.5 % coverage, storage 29.8 %, runners 70.3 %, license 27.4 %, likes 38.3 %); `downloads` is now the one metric with weight (accent + first), the popularity bar has an accessible name instead of `role="presentation"`, and the avatar went 88 → **44 px** (56 px more width for the title) |
+| **M2** filters | Window + Sort + Search + Apply stay visible; Gate/Runner/Size/License and the saved-filters control moved into a `More filters` disclosure (with an active count) measured at **104 px** collapsed |
+| **M4/M6** shell | Category strip is one scrollable row at every width (**83 → 60 px**, hidden scrollbar) and the radar texture is clipped in its own layer so the hot-list panel can escape the card |
+| Hot list | Moved into a `<details>`: the pulse card went **287 → 148 px** and the panel opens as a 34 rem overlay (`elementFromPoint` confirms it is hit-testable, i.e. not clipped) |
+| **First screen** | firstCardY **882 → 585 px** at 1440×900 (was 756 before this whole pass, target 560) and **1562 → 949** at 390. The h1 dropped from 38 px to 30 px because the TR title wrapped to two lines at 38 |
+| Re-verified | 70 route×width combinations (320/360/390/430/768/1024/1440) → 0 overflow; 0 targets below 24×24 at 1440 and 390; npm test 73/73, lint, typecheck |
+| Still open | donut legend (D8), `/news` raw release text (D9), `next/link` (D10), the remaining 25 px of first-screen headroom |
+
+---
+
 ## 1. Answer to "bu ne böyle, ne olduğu belli değil"
 
 Three measured reasons, in the order a first-time visitor hits them.

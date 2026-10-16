@@ -53,10 +53,10 @@ export async function TabBar({
 
   return (
     <nav
-      /* One scrollable row below `lg`: ten 44 px pills in a wrapping flex used
-      four rows on a phone (measured), which pushed the first model card off the
-      first screen. */
-      className="flex gap-2 overflow-x-auto py-3 text-sm lg:flex-wrap lg:overflow-visible"
+      /* One scrollable row at every width: ten 44 px pills in a wrapping flex
+         took two rows at 1440 (120 px) and five on a phone, pushing the first
+         model card off the first screen. */
+      className="no-scrollbar flex gap-2 overflow-x-auto py-2 text-sm"
       aria-label={t(dict, "nav.primary")}
     >
       {tabs.map((tab) => {

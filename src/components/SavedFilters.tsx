@@ -37,7 +37,7 @@ export function SavedFilters({ locale, currentQuery }: { locale: Locale; current
       <button
         type="button"
         onClick={save}
-        className="flex h-11 items-center gap-1.5 rounded-md border border-border bg-raised px-3 text-muted hover:text-accent"
+        className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border bg-surface px-3 text-muted hover:text-accent"
       >
         <Bookmark size={13} aria-hidden="true" />
         {t(dict, "common.savedFilters")}

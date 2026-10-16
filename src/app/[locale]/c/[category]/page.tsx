@@ -27,7 +27,7 @@ export default async function CategoryPage({
       {/* Same shape as the feed page: a descriptive h1 plus a one-line statement,
           so the route explains itself on a phone where the header cannot. */}
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{categoryLabel(category)}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-2xl">{categoryLabel(category)}</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted">{t(dict, "feed.lede")}</p>
       </div>
       <FeedView locale={locale} category={category} query={query} raw={normalizeRaw(raw)} />

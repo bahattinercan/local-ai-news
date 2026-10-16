@@ -26,7 +26,7 @@ export default async function FeedPage({
           not the site, and the only sentence explaining the product lived in the
           header tagline, hidden below 768 px. */}
       <div className="mb-4">
-        <h1 className="text-xl font-semibold tracking-tight text-balance sm:text-3xl">{t(dict, "feed.title")}</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-balance sm:text-2xl">{t(dict, "feed.title")}</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted">{t(dict, "feed.lede")}</p>
       </div>
       <FeedView locale={locale} query={query} raw={normalizeRaw(raw)} />

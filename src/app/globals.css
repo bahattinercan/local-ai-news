@@ -22,10 +22,32 @@
   --radius-lg: 16px;
 }
 
+/* Type scale (docs/en/DESIGN-V2.md §4 C3): 13 / 15 / 16 / 20 / 24 / 30 / 38.
+   Measured before: 466 of 500 text elements were ≤14 px, the largest text on the
+   site was 24 px, and 12 px carried the card rows that matter. Shifting the
+   scale moves the whole UI up one step instead of touching every component. */
+@theme {
+  --text-xs: 0.8125rem; /* 13px */
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.9375rem; /* 15px */
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.25rem; /* 20px — section heading */
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.5rem; /* 24px */
+  --text-xl--line-height: 2rem;
+  --text-2xl: 1.875rem; /* 30px — page h1 */
+  --text-2xl--line-height: 2.25rem;
+  --text-3xl: 2.375rem; /* 38px — hero */
+  --text-3xl--line-height: 2.75rem;
+}
+
 :root {
   /* dark — radar instrument. Every pair below was recomputed after the change:
      surface/bg 1.30, raised/surface 1.24, border/surface 1.74, muted/bg 9.44,
-     muted/surface 7.72, accent/bg 10.85, text/bg 16.34 (docs/en/DESIGN-V2.md §6). */
+     muted/surface 7.27, accent/bg 10.85, text/bg 16.34
+     (docs/en/DESIGN-V2.md §6, read back from the live page). */
   --bg: #0a0e15;
   --surface: #161f2e;
   --raised: #212c40;
@@ -232,6 +254,17 @@ details[open] > summary .chev {
   .stats-grid {
     grid-template-columns: minmax(0, 1fr) auto;
   }
+}
+
+/* A hidden scrollbar costs nothing and gives 15 px back to the first screen; the
+   cut-off pill at the edge is the affordance that the strip scrolls. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 .skeleton {

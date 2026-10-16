@@ -34,6 +34,21 @@
 
 ---
 
+### 0.1 Faz 2 (anlaşılırlık) — aynı oturumda uygulandı
+
+| Plan maddesi | Sonuç (1440×900'de ölçüldü, 390 da belirtildiği yerde) |
+|---|---|
+| **C3** tipografi ölçeği | `text-xs` 12 → **13 px**, `text-sm` 14 → **15 px**, `text-2xl` 24 → **30**, `text-3xl` → **38** — tek bir `@theme` bloğu, yani tüm arayüz bir basamak yukarı çıktı. 15–17 px bandındaki metin: **284/402 (%71)**; ≤ 14 px: **466 (%93) → 112 (%28)**; kalan 112 mikro etiket, sekme sayacı ve çip |
+| **M3** kart | Yalnızca yer tutucu basabilen satırlar kaldırıldı (params %6.5 kapsama, depolama %29.8, runner %70.3, lisans %27.4, beğeni %38.3); `downloads` artık ağırlığı olan tek metrik (accent + ilk sırada), popülerlik çubuğunun `role="presentation"` yerine erişilebilir adı var ve avatar 88 → **44 px** (başlığa 56 px daha fazla genişlik) |
+| **M2** filtreler | Pencere + Sıralama + Arama + Uygula görünür kalıyor; Kalite kapısı/Runner/Boyut/Lisans ve kaydedilmiş filtreler "Diğer filtreler" açılımına taşındı (aktif sayacıyla), kapalı hâlde **104 px** |
+| **M4/M6** kabuk | Kategori şeridi her genişlikte tek kaydırılabilir sıra (**83 → 60 px**, scrollbar gizli) ve radar dokusu kendi kırpılmış katmanında, böylece sıcak liste paneli karttan taşabiliyor |
+| Sıcak liste | `<details>` içine alındı: pulse kartı **287 → 148 px** ve panel 34 rem'lik bir kaplama olarak açılıyor (`elementFromPoint` ile test edilebilir olduğu, yani kırpılmadığı doğrulandı) |
+| **İlk ekran** | firstCardY 1440×900'de **882 → 585 px** (tüm geçişten önce 756'ydı, hedef 560) ve 390'da **1562 → 949**. h1 38 px'ten 30 px'e indi çünkü TR başlığı 38 px'te iki satıra kayıyordu |
+| Yeniden doğrulandı | 70 rota×genişlik kombinasyonu (320/360/390/430/768/1024/1440) → 0 taşma; 1440 ve 390'da 24×24 altı 0 hedef; npm test 73/73, lint, typecheck |
+| Hâlâ açık | donut açıklaması (D8), `/news` ham release metni (D9), `next/link` (D10), ilk ekranın kalan 25 px'i |
+
+---
+
 ## 1. "Bu ne böyle, ne olduğu belli değil" sorusunun cevabı
 
 Ziyaretçinin karşılaşma sırasına göre üç ölçülmüş neden.

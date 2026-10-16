@@ -23,8 +23,7 @@ export async function FeedView({
   /* Count first, then clamp: `?page=999` on a 60-page result used to render an
      empty grid on a page number that does not exist. The clamped number is what
      the list, the strip and the "Page N" label all have to agree on. */
-  const total = await countFeed(query);
-  const page = clampPage(query.page, total, query.limit);
+  const total = await countFeed(query);  const page = clampPage(query.page, total, query.limit);
   const models = await getFeed({ ...query, page });
 
   /* Built from the *parsed* query, not from the raw search params: the selects
@@ -51,8 +50,12 @@ export async function FeedView({
       {/* No separate DataNotice here: the pulse card already states "last refresh"
           and the footer carries the source and the snapshot age. Rendering both
           cost 28 px of the first screen and repeated the same number. */}
-      <FilterBar locale={locale} category={category} query={formValues} gateForced={query.gateForced} />
-      <SavedFilters locale={locale} currentQuery={new URLSearchParams(Object.entries(raw).filter((entry): entry is [string, string] => entry[1] !== undefined)).toString()} />
+      <FilterBar locale={locale} category={category} query={formValues} gateForced={query.gateForced}>
+        <SavedFilters
+          locale={locale}
+          currentQuery={new URLSearchParams(Object.entries(raw).filter((entry): entry is [string, string] => entry[1] !== undefined)).toString()}
+        />
+      </FilterBar>
 
       {models.length === 0 ? (
         <section className="mt-6" aria-labelledby="models-heading">
