@@ -1,7 +1,12 @@
 node_modules/
 .next/
+
+# Ortam dosyaları: .env, .env.local, .env.production, .env.*.local ...
+# Yalnızca şablon dosyası izlenir.
 .env
-.env.local
+.env.*
+!.env.example
+
 *.tsbuildinfo
 next-env.d.ts
 
