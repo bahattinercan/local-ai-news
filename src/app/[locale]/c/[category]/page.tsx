@@ -1,5 +1,6 @@
 import { FeedView } from "@/components/FeedView";
-import { parseFeedQuery } from "@/lib/query";
+import { TabBar } from "@/components/TabBar";
+import { feedFiltersOf, parseFeedQuery } from "@/lib/query";
 import { categoryLabel } from "@/lib/classify/rules";
 import { pickLocale } from "@/i18n";
 
@@ -21,6 +22,7 @@ export default async function CategoryPage({
 
   return (
     <>
+      <TabBar locale={locale} active={category} filters={feedFiltersOf(query)} />
       <h1 className="mb-3 text-xl font-semibold">{categoryLabel(category)}</h1>
       <FeedView locale={locale} category={category} query={query} raw={normalizeRaw(raw)} />
     </>

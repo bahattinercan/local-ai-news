@@ -1,5 +1,6 @@
 import { FeedView } from "@/components/FeedView";
-import { parseFeedQuery } from "@/lib/query";
+import { TabBar } from "@/components/TabBar";
+import { feedFiltersOf, parseFeedQuery } from "@/lib/query";
 import { dictionary, pickLocale, t } from "@/i18n";
 
 function normalizeRaw(raw: Record<string, string | string[] | undefined>): Record<string, string | undefined> {
@@ -20,6 +21,7 @@ export default async function FeedPage({
 
   return (
     <>
+      <TabBar locale={locale} filters={feedFiltersOf(query)} />
       <h1 className="mb-3 text-2xl font-semibold tracking-tight">{t(dict, "nav.all")}</h1>
       <FeedView locale={locale} query={query} raw={normalizeRaw(raw)} />
     </>

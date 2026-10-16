@@ -4,6 +4,7 @@ import { categoryLabel } from "@/lib/classify/rules";
 import { formatNumber } from "@/lib/format";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
+import { TabBar } from "@/components/TabBar";
 import type { ClassifiedModel } from "@/lib/model";
 
 type Direction = "max" | "min" | null;
@@ -28,7 +29,12 @@ export default async function ComparePage({
   const slugs = String(raw).split(",").map((slug) => slug.trim()).filter(Boolean).slice(0, 6);
 
   if (slugs.length === 0) {
-    return <EmptyState locale={locale} message={t(dict, "compare.title")} />;
+    return (
+      <>
+        <TabBar locale={locale} />
+        <EmptyState locale={locale} message={t(dict, "compare.title")} />
+      </>
+    );
   }
 
   const models = (await Promise.all(slugs.map((slug) => getModel(slug)))).filter(
@@ -36,7 +42,12 @@ export default async function ComparePage({
   );
 
   if (models.length === 0) {
-    return <EmptyState locale={locale} message={t(dict, "empty.noModels")} />;
+    return (
+      <>
+        <TabBar locale={locale} />
+        <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
+      </>
+    );
   }
 
   const rows: Row[] = [
@@ -80,6 +91,7 @@ export default async function ComparePage({
 
   return (
     <>
+      <TabBar locale={locale} />
       <h1 className="mb-3 text-2xl font-semibold tracking-tight">{t(dict, "compare.title")}</h1>
 
       <div className="card overflow-x-auto">

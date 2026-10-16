@@ -5,6 +5,7 @@ import { formatNumber, relativeTime } from "@/lib/format";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
+import { TabBar } from "@/components/TabBar";
 import { FeedCard } from "@/components/FeedCard";
 
 const KIND_CLASS: Record<string, string> = {
@@ -31,7 +32,12 @@ export default async function NewsItemPage({
   const item = await getNewsItemByParam(id);
 
   if (!item) {
-    return <EmptyState locale={locale} message={t(dict, "empty.noModels")} />;
+    return (
+      <>
+        <TabBar locale={locale} />
+        <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
+      </>
+    );
   }
 
   // Gate G3: the related-model block appears only when the link resolved.
@@ -39,6 +45,7 @@ export default async function NewsItemPage({
 
   return (
     <>
+      <TabBar locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",

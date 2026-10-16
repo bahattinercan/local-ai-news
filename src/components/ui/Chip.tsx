@@ -13,14 +13,16 @@ const TONE_CLASS: Record<Tone, string> = {
 export function Chip({
   label,
   tone = "neutral",
-  icon
+  icon,
+  className
 }: {
   label: string;
   tone?: Tone;
   icon?: string;
+  className?: string;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs", TONE_CLASS[tone])}>
+    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs", TONE_CLASS[tone], className)}>
       {icon ? <span aria-hidden="true">{icon}</span> : null}
       {label}
     </span>

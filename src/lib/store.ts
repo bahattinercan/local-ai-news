@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CATEGORY_RULES } from "./classify/rules.ts";
-import { NEWS_SCOPE_KINDS } from "./query.ts";
+import { NEWS_SCOPE_KINDS, normalizeFeedQuery, type FeedFilterInput } from "./query.ts";
 import type { ClassifiedModel } from "./model.ts";
 
 export interface SnapshotNews {
@@ -326,22 +326,45 @@ export async function getStats(days: number): Promise<Array<{ category: string; 
 }
 
 /**
- * Per-category counts for the tab bar. The tab is a link into a feed, so it has
- * to count what that feed will show: the same window, the same quality gate and
- * no gated repos. `getStats` counts every tracked model instead, which made the
- * tab print "Multimodal 153" and then open a page with 33 cards.
+ * Counts for the category strip. A tab is a link into a feed, so its badge has
+ * to be the number of cards that link will show: the same window, gate, runner,
+ * size, license and search, with the category swapped per tab. Counting every
+ * tracked model instead printed "Multimodal 153" for a page with 33 cards.
  *
- * Reuses `filterModels` on purpose — one filter definition, no second opinion.
+ * Reuses `filterModels` on purpose — one filter definition, no second opinion —
+ * and one snapshot read for the whole strip.
  */
-export async function getCategoryCounts(days: number, gate: FeedQuery["gate"]): Promise<{ total: number; counts: Map<string, number> }> {
+export async function getCategoryCounts(input: FeedFilterInput): Promise<{ total: number; counts: Map<string, number> }> {
   const snapshot = await loadSnapshot();
   if (!snapshot) return { total: 0, counts: new Map() };
 
-  const rows = filterModels(snapshot, { windowDays: days, sort: "new", gate, excludeGated: true, limit: 0, page: 1 });
+  const keys = ["", ...CATEGORY_RULES.filter((rule) => rule.key !== "news").map((rule) => rule.key)];
   const counts = new Map<string, number>();
-  for (const model of rows) counts.set(model.primaryCategory, (counts.get(model.primaryCategory) ?? 0) + 1);
+  let total = 0;
 
-  return { total: rows.length, counts };
+  for (const key of keys) {
+    // Decision 9 ("show everything" only inside a category and <=30d) lives in
+    // normalizeFeedQuery, so ask it per tab rather than re-deriving the gate.
+    const query = normalizeFeedQuery({ ...input, category: key || undefined, limit: 0, page: 1 });
+    const count = filterModels(snapshot, {
+      category: query.category,
+      windowDays: query.windowDays,
+      sort: query.sort,
+      gate: query.gate,
+      runner: query.runner,
+      maxParams: query.maxParams,
+      license: query.license,
+      excludeGated: query.excludeGated,
+      q: query.q,
+      limit: 0,
+      page: 1
+    }).length;
+
+    if (key === "") total = count;
+    else counts.set(key, count);
+  }
+
+  return { total, counts };
 }
 
 export async function getCategories(): Promise<Array<{ key: string; labelEn: string; labelTr: string; sortOrder: number }>> {

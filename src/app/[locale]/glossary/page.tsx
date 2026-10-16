@@ -1,6 +1,7 @@
 import { GLOSSARY, GLOSSARY_CATEGORIES, glossaryByCategory, glossaryText } from "@/lib/glossary";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
+import { TabBar } from "@/components/TabBar";
 
 export default async function GlossaryPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = pickLocale((await params).locale);
@@ -9,6 +10,7 @@ export default async function GlossaryPage({ params }: { params: Promise<{ local
 
   return (
     <>
+      <TabBar locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",

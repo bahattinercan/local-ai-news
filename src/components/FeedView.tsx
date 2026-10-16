@@ -55,7 +55,11 @@ export async function FeedView({
       ) : (
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
           {models.map((model, index) => (
-            <div key={model.externalId} className="fade-up" style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}>
+            /* `min-w-0` is load-bearing: a grid item defaults to `min-width: auto`,
+               so one card with an unbreakable 45-character repo id sized the whole
+               track at 753 px and pushed the page 424 px wide on a 360 px phone
+               (measured; the container is 361 px). */
+            <div key={model.externalId} className="fade-up min-w-0" style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}>
               <FeedCard model={model} locale={locale} maxDownloads={maxDownloads} />
             </div>
           ))}

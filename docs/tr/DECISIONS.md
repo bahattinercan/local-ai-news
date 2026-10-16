@@ -59,10 +59,30 @@ duyuruluyordu ve özet ham enum değerlerini yazıyordu ("Kalite kapısı: passe
 kontrolün gösterdiği kelimeleri değil ("Sadece geçenler"). Değerler artık kontrolün
 kendi option listesinden geliyor ve *Temizle* yalnızca temizlenecek bir şey varsa
 görünüyor.
-- **Bilinen sınır:** sekme sayısı *aktif* sorguyu takip edemez, çünkü sekme çubuğu
-locale layout'unda render ediliyor ve layout `searchParams` almıyor. Pencereyi ya
-da kapıyı daraltmak listeyi daraltır (sayfalama toplamı takip eder); sekme
-varsayılan 7 günlük, kapı açık görünümü raporlamaya devam eder.
+- **Kategori şeridi layout'a değil sayfalara ait.** Layout ne route parametrelerini
+ne de `searchParams` alıyor; bu yüzden eski `TabBar` aktif sekmeyi işaretleyemiyordu
+(her kategori sayfası "Hepsi"'yi vurguluyordu) ve filtrelenmiş görünümü
+sayamıyordu. Şerit artık her sayfada: feed sayfaları parse edilmiş filtrelerini
+veriyor, rozet `getCategoryCounts(filters)` — okuyanın pencere, kapı, runner,
+boyut, lisans ve arama filtreleri her kategoriye uygulanmış hali — linkler bu
+filtreleri taşıyor (kategori değiştirmek görünümü sessizce sıfırlamıyor) ve aktif
+sekme `aria-current="page"` alıyor. Filtre kurulmamışsa sayılar varsayılan 7
+günlük, kapı açık görünüm; yani rozet her zaman açtığı sayfanın sayfalama
+toplamına eşit (altı kategoride, filtreli ve filtresiz doğrulandı).
+- **Mobildeki yatay taşma gerçekti ve düzeltildi.** Masaüstü metrikleriyle ölçüm:
+360 px'de feed dokümanı 769 px genişliğindeydi, çünkü grid item'ın varsayılanı
+`min-width: auto` ve 45 karakterlik kırılamaz repo id'si taşıyan tek bir kart tüm
+track'i şişiriyordu. Grid item'da `min-w-0`, kart başlığında `break-words` yerine
+`min-w-0 line-clamp-2` (`overflow-wrap: break-word` min-content'i düşürmüyor) ve
+gate chip'inde `shrink-0` ile her route 360/390/430/768/1024/1440'da 0 taşmaya
+indi — 360 px'de doküman 345 px. İlk ölçüm için bkz. docs/tr/DESIGN-V2.md §3 D1.
+- **`scripts/check-overflow.ts` artık başarısız olabiliyor.** Küçük genişlikleri
+`mobile: true` ile taklit ediyordu; bu yerleşim viewport'unu içerik genişliğine
+şişiriyor ve `scrollWidth - innerWidth` tanım gereği 0 çıkıyordu (DESIGN.md
+§6'daki yanlış GEÇTİ). Artık masaüstü metrikleri kullanıyor, emüle edilen
+genliğin yerleşim genişliği olmasını bekliyor, kırpılan süsleri yok sayıyor ve
+taşmada non-zero ile çıkıyor — 900 px'lik bir fixture ile kanıtlandı (+540 px,
+exit 1).
 
 ## Henüz yapılmadı (F6 kalanı)
 

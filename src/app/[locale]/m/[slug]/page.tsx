@@ -8,6 +8,7 @@ import { formatParams } from "@/lib/runner/vram";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { EmptyState, DataNotice } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
+import { TabBar } from "@/components/TabBar";
 import { FeedCard } from "@/components/FeedCard";
 import { Chip } from "@/components/ui/Chip";
 import { CopyCommand } from "@/components/CopyCommand";
@@ -26,6 +27,7 @@ export default async function ModelPage({
   if (!model) {
     return (
       <>
+        <TabBar locale={locale} />
         <DataNotice locale={locale} />
         <EmptyState locale={locale} message={t(dict, "empty.noModels")} />
       </>
@@ -61,6 +63,7 @@ export default async function ModelPage({
 
   return (
     <>
+      <TabBar locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",

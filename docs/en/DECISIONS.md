@@ -59,10 +59,31 @@ Measured on the live tree, then fixed — all six points below were reproducing 
   summary printed raw enum values ("Quality gate: passed") instead of the words
   the control shows ("Passed only"). Values now come from the control's own option
   list, and *Clear* only appears when there is something to clear.
-- **Known limit:** the tab badge cannot follow the *active* query, because the tab
-  bar renders in the locale layout, which never receives `searchParams`. Narrowing
-  the window or the gate narrows the list (pagination total follows it); the badge
-  keeps reporting the default 7-day, gate-on view.
+- **The category strip belongs to the pages, not the layout.** A layout receives
+  neither the route params nor `searchParams`, so the old `TabBar` could not mark
+  the active tab (every category page highlighted "All") and could not count the
+  filtered view. It now renders inside each page: the feed pages pass their parsed
+  filters, the badge is `getCategoryCounts(filters)` — the reader's window, gate,
+  runner, size, license and search applied to each category — the links carry
+  those filters, so switching category keeps the view instead of silently
+  resetting it, and the active tab gets `aria-current="page"`. With no filters set
+  the numbers are the default 7-day, gate-on view, so a badge always equals the
+  pagination total of the page it opens (checked on six categories, with and
+  without filters).
+- **The mobile overflow was real and is fixed.** Measured with desktop metrics: at
+  360 px the feed document was 769 px wide, because a grid item defaults to
+  `min-width: auto` and one card with a 45-character unbreakable repo id sized the
+  whole track. `min-w-0` on the grid item, `min-w-0 line-clamp-2` instead of
+  `break-words` on the card title (`overflow-wrap: break-word` does not lower
+  min-content) and `shrink-0` on the gate chip bring every route to 0 overflow at
+  360/390/430/768/1024/1440 — the 360 px document is 345 px. See
+  docs/en/DESIGN-V2.md §3 D1 for the initial measurement.
+- **`scripts/check-overflow.ts` can fail now.** It emulated small widths with
+  `mobile: true`, which inflates the layout viewport to the content width, so
+  `scrollWidth - innerWidth` was 0 by construction (the false pass in
+  DESIGN.md §6). It now uses desktop metrics, waits until the emulated width is
+  the layout width, ignores clipped decorations, and exits non-zero on overflow —
+  proved with a 900 px fixture (+540 px, exit 1).
 
 ## Not implemented yet (F6 remainder)
 

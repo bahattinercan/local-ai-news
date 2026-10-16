@@ -86,6 +86,26 @@ export function parseFeedQuery(search: Record<string, string | string[] | undefi
   return normalizeFeedQuery(parsed.success ? parsed.data : EMPTY_FEED_QUERY);
 }
 
+/** The filter state as a query *input* — what the tab bar counts and links from. */
+export type FeedFilterInput = Pick<FeedQueryInput, "window" | "sort" | "gate" | "runner" | "maxParams" | "license" | "q">;
+
+/**
+ * Reverses `normalizeFeedQuery` for the tab bar. The counts and the links have
+ * to describe the same filters the list is rendering, so `gate: "all"` is kept
+ * when the reader asked for it even if the current page dialled it back.
+ */
+export function feedFiltersOf(query: ReturnType<typeof normalizeFeedQuery>): FeedFilterInput {
+  return {
+    window: query.windowDays === 1 ? "24h" : (`${query.windowDays}d` as FeedFilterInput["window"]),
+    sort: query.sort,
+    gate: query.gateForced ? "all" : query.gate,
+    runner: query.runner,
+    maxParams: query.maxParams,
+    license: query.license,
+    q: query.q
+  };
+}
+
 /**
  * Which kinds a surface owns. `scope` is the surface's default and `kind`
  * narrows it further, so /news can never accidentally show a paper.

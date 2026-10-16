@@ -1,6 +1,7 @@
 import { getNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 import { NewsList } from "@/components/NewsList";
+import { TabBar } from "@/components/TabBar";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
 
@@ -19,6 +20,7 @@ export default async function NewsPage({
 
   return (
     <>
+      <TabBar locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",

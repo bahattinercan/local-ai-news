@@ -1,16 +1,31 @@
 import { CATEGORY_RULES, categoryLabel } from "@/lib/classify/rules";
 import { getCategoryCounts } from "@/lib/store";
-import { FEED_DEFAULTS, windowDays } from "@/lib/query";
+import { FEED_DEFAULTS, type FeedFilterInput } from "@/lib/query";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { cn } from "@/lib/format";
 
 /**
- * Counts describe the feed the tab opens (default window, quality gate applied,
- * gated repos hidden), not the raw number of tracked models.
+ * Category strip. The badge counts what the tab opens — the reader's current
+ * filters applied to that category — so the number here always equals the total
+ * the destination page prints. `active` is passed by the page that owns the
+ * category, because a layout never receives the route params.
  */
-export async function TabBar({ locale, active }: { locale: Locale; active?: string }) {
+export async function TabBar({
+  locale,
+  active,
+  filters
+}: {
+  locale: Locale;
+  active?: string;
+  filters?: FeedFilterInput;
+}) {
   const dict = dictionary(locale);
-  const { total, counts } = await getCategoryCounts(windowDays(FEED_DEFAULTS.window), FEED_DEFAULTS.gate);
+  const input: FeedFilterInput = filters ?? {
+    window: FEED_DEFAULTS.window,
+    sort: FEED_DEFAULTS.sort,
+    gate: FEED_DEFAULTS.gate
+  };
+  const { total, counts } = await getCategoryCounts(input);
 
   const tabs = [
     { key: "", label: t(dict, "nav.all"), count: total },
@@ -23,18 +38,32 @@ export async function TabBar({ locale, active }: { locale: Locale; active?: stri
       }))
   ];
 
+  /* Switching category keeps the active filters; without this the destination
+     would silently reset to the default view and every badge but the default
+     one would be wrong. Default values stay out of the URL. */
+  const params = new URLSearchParams();
+  if (input.window !== FEED_DEFAULTS.window) params.set("window", input.window);
+  if (input.sort !== FEED_DEFAULTS.sort) params.set("sort", input.sort);
+  if (input.gate !== FEED_DEFAULTS.gate) params.set("gate", input.gate);
+  if (input.runner) params.set("runner", input.runner);
+  if (input.maxParams) params.set("maxParams", String(input.maxParams));
+  if (input.license) params.set("license", input.license);
+  if (input.q) params.set("q", input.q);
+  const suffix = params.size > 0 ? `?${params.toString()}` : "";
+
   return (
     <nav
       className="flex flex-wrap gap-2 py-3 text-sm"
       aria-label={t(dict, "brand")}
     >
       {tabs.map((tab) => {
-        const href = tab.key ? hrefFor(locale, `/c/${tab.key}`) : hrefFor(locale, "/");
+        const href = `${hrefFor(locale, tab.key ? `/c/${tab.key}` : "/")}${suffix}`;
         const isActive = tab.key === (active ?? "");
         return (
           <a
             key={tab.key || "all"}
             href={href}
+            aria-current={isActive ? "page" : undefined}
             className={cn(
               "flex items-center gap-2 whitespace-nowrap rounded-md border border-border px-3 py-1.5",
               isActive ? "bg-raised text-accent border-accent/45" : "text-muted hover:text-text hover:border-raised"

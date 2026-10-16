@@ -95,7 +95,7 @@ Tipografi ölçeği: 12 / 14 / 16 / 20 / 26 / 34 px. Radius: 6 / 10 / 14. Spacin
 
 ### 5.1 Shell (`layout.tsx`) — Faz 1
 - Yapışkan header: brand mark (radar glyph) + tagline, ana nav (**Hepsi / kategoriler / Haber / İstatistik / Karşılaştır**), tema toggle, dil değişimi.
-- Kategori sekmeleri, kategori sayılarıyla (`getCategoryCounts`, yani feed'in kendi filtreleri — bkz. DECISIONS.md "Filter query handling") kaydırılabilir segmented control'e dönüşür.
+- Kategori şeridi (layout'ta değil, feed sayfalarında — layout route ya da search parametrelerini almaz, bkz. DECISIONS.md) her kategori için sayıları `getCategoryCounts`'tan gösterir, yani okuyanın kendi filtreleri kategorilere uygulanmış halde.
 - Footer: veri kaynağı atfı, RSS linki, docs linki, snapshot zamanı.
 - Gerçek ikonlar: `icon.svg` + `favicon.ico` + `apple-icon.png` (şu an `/favicon.ico` HTML dönüyor).
 

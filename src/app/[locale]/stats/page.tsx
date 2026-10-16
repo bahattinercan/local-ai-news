@@ -1,6 +1,7 @@
 import { getStats, getDailySeries } from "@/lib/store";
 import { categoryLabel } from "@/lib/classify/rules";
 import { DataNotice } from "@/components/EmptyState";
+import { TabBar } from "@/components/TabBar";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { BarChart, Donut, TrendChart } from "@/components/ui/Charts";
 import { Field, SubmitButton } from "@/components/ui/Controls";
@@ -24,6 +25,7 @@ export default async function StatsPage({
 
   return (
     <>
+      <TabBar locale={locale} />
       <DataNotice locale={locale} />
 
       <h1 className="mb-3 text-2xl font-semibold tracking-tight">

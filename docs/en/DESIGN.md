@@ -95,7 +95,7 @@ Type scale: 12 / 14 / 16 / 20 / 26 / 34 px. Radii: 6 / 10 / 14. Spacing unit: 4p
 
 ### 5.1 Shell (`layout.tsx`) — Phase 1
 - Sticky header: brand mark (radar glyph) + tagline, primary nav (**Hepsi / categories / Haber / İstatistik / Karşılaştır**), theme toggle, language switch.
-- Category tabs become a scrollable segmented control with per-category counts (from `getCategoryCounts`, i.e. the feed's own filters — see DECISIONS.md, "Filter query handling").
+- Category strip (rendered by the feed pages, not the layout — a layout never receives the route or search params, see DECISIONS.md) shows per-category counts from `getCategoryCounts`, i.e. the reader's own filters applied to each category.
 - Footer: data-source attribution, RSS link, docs link, snapshot timestamp.
 - Real icons: `icon.svg` + `favicon.ico` + `apple-icon.png` (currently `/favicon.ico` returns HTML).
 

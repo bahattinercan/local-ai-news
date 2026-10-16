@@ -42,12 +42,17 @@ export function FeedCard({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <a href={hrefFor(locale, `/m/${model.slug}`)} className="font-medium break-words hover:text-accent">
+            {/* `min-w-0` + `line-clamp-2` instead of `break-words`: `overflow-wrap:
+                break-word` does not lower min-content, so the id still set the
+                track width. The chip keeps `shrink-0` so the badge never gets
+                squeezed by a long id. */}
+            <a href={hrefFor(locale, `/m/${model.slug}`)} className="min-w-0 line-clamp-2 font-medium hover:text-accent">
               {model.externalId}
             </a>
             <Chip
               label={model.qualityPassed ? t(dict, "card.gatePassed") : t(dict, "card.gateFailed")}
               tone={model.qualityPassed ? "ok" : "warn"}
+              className="shrink-0"
             />
           </div>
 

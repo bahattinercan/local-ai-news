@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { TabBar } from "@/components/TabBar";
 import { grotesk, mono } from "../fonts";
 import "../globals.css";
 
@@ -38,7 +37,9 @@ export default async function Layout({
         <Header locale={locale} />
 
         <div className="mx-auto max-w-6xl px-4">
-          <TabBar locale={locale} />
+          {/* The category strip lives in each page, not here: a layout never
+              receives the route params or the search params, so it could not
+              mark the active tab or count the filtered view. */}
           <main className="py-6">{children}</main>
         </div>
 

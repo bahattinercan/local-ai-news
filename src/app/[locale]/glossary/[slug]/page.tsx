@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { GLOSSARY, GLOSSARY_CATEGORIES, getGlossaryEntry, glossaryText } from "@/lib/glossary";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
+import { TabBar } from "@/components/TabBar";
 
 /** Derived, never hand-listed: a new entry is prerendered automatically. */
 export function generateStaticParams() {
@@ -27,6 +28,7 @@ export default async function GlossaryEntryPage({
 
   return (
     <>
+      <TabBar locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
