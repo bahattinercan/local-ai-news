@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { getNews, countNews } from "@/lib/store";
 import { CATEGORY_RULES } from "@/lib/classify/rules";
+import { clampPage } from "@/lib/query";
 import { dictionary, t, type Locale } from "@/i18n";
 import { EmptyState, DataNotice } from "./EmptyState";
 import { NewsCard } from "./NewsCard";
@@ -27,8 +28,11 @@ export type NewsListQuery = NewsQuery & { scope: NewsScope; page: number };
  */
 export async function NewsList({ locale, query }: { locale: Locale; query: NewsListQuery }) {
   const dict = dictionary(locale);
-  const items = await getNews(query);
+  /* Same clamp as the feed: `?page=999` used to render an empty page under a
+     "Page 999" heading instead of the last page that exists. */
   const total = await countNews(query);
+  const page = clampPage(query.page, total, query.limit);
+  const items = await getNews({ ...query, page });
 
   const groups = new Map<string, typeof items>();
   for (const item of items) {
@@ -104,7 +108,7 @@ export async function NewsList({ locale, query }: { locale: Locale; query: NewsL
 
       <Pagination
         locale={locale}
-        page={query.page}
+        page={page}
         total={total}
         limit={query.limit}
         formValues={formValues}
