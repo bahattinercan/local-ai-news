@@ -28,6 +28,9 @@
 | **D8** donut legend, chart height | open | the trend chart now renders 3 points (3 distinct `firstSeenAt` days) and the ≥3-day gate works; the donut still has no legend |
 | **D9** `/news` raw release text | open | live snapshot: 209 items (community 25, runtime 30, paper 150, release 4), 151 with a thumbnail |
 | **D10** no client-side navigation | open | still 21 plain `<a href>` internal links |
+| `/icon.svg`, `/apple-icon.png` | **fixed** | the locale redirect turned both into 307 → `/en/icon.svg` → **404** while the layout advertised them (both now answer `200` with `image/svg+xml` / `image/png`) |
+| News pagination beyond the last page | **fixed** | same class as the feed bug: `/tr/news?page=999` → empty page 999 → clamps to page 2 (23 items), `/tr/research?page=999` → page 3 |
+| **Ingest merge base** | **fixed** | the ingest job merged into the repo copy (`actions/checkout`'s `data/feed.json`) instead of the published snapshot, and then overwrote the Blob — so every run rebuilt "repo baseline + this run's newest pages" and dropped what earlier runs had found once it left the listing window. The served snapshot contains models first seen on **13/14/16 October and none on the 15th**, although the job ran that day. `mergeSnapshotBases()` now unions the published snapshot with the repo copy (earliest `firstSeenAt` wins, a newer record fills fields the older one lacks) and degrades to the old behaviour when the store is unreachable. Current bases happen to agree (repo 915 ⊆ published 1284), so nothing lost was recoverable |
 
 ---
 

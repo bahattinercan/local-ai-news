@@ -1,9 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { normalizeModel } from "../src/lib/runner/normalize.ts";
-import { paperToNews, releaseToNews, shouldCreateRelease } from "../src/lib/ingest.ts";
+import { mergeSnapshotBases, paperToNews, releaseToNews, shouldCreateRelease } from "../src/lib/ingest.ts";
 import { detectQuantizations, detectRunners } from "../src/lib/runner/detect.ts";
-import type { RawModel } from "../src/lib/model.ts";
+import type { ClassifiedModel, RawModel } from "../src/lib/model.ts";
 
 const base: RawModel = {
   id: "unsloth/LTX-2.5-FP8",
@@ -239,4 +239,51 @@ test("a rate-limit error stops the backfill instead of hammering the api", async
 
   assert.equal(await backfillDetails(limited, models, 3), 0);
   assert.equal(calls, 1, "it kept calling after the budget ran out");
+});
+
+/**
+ * Regression: the ingest merged into the repo copy of the snapshot while the
+ * site served the published Blob one, so a model discovered by an earlier run
+ * disappeared again as soon as it left the listing window (measured: the served
+ * snapshot had no model first seen on 2026-10-15 although the job ran that day).
+ */
+test("mergeSnapshotBases keeps every model from both bases", () => {
+  const older: ClassifiedModel = {
+    ...normalizeModel(base, { firstSeenAt: "2026-10-14T00:00:00.000Z" }),
+    externalId: "someone/shared",
+    files: [{ name: "model.safetensors", bytes: 10 }]
+  };
+  const repo = { generatedAt: "2026-10-14T00:00:00.000Z", models: [older], news: [] };
+  const published = {
+    generatedAt: "2026-10-16T00:00:00.000Z",
+    models: [
+      // Same model, seen later by the published run and missing `files`.
+      { ...older, firstSeenAt: "2026-10-16T00:00:00.000Z", files: null },
+      { ...older, externalId: "someone/only-published", firstSeenAt: "2026-10-16T00:00:00.000Z" }
+    ],
+    news: []
+  };
+
+  const merged = mergeSnapshotBases(published, repo);
+  assert.ok(merged);
+  assert.equal(merged.models.length, 2);
+
+  const shared = merged.models.find((model) => model.externalId === "someone/shared");
+  // The earlier first sighting wins, and the newer record cannot blank a field.
+  assert.equal(shared?.firstSeenAt, "2026-10-14T00:00:00.000Z");
+  assert.equal(shared?.files?.length, 1);
+  assert.ok(merged.models.some((model) => model.externalId === "someone/only-published"));
+});
+
+test("mergeSnapshotBases dedupes news by id and survives a missing side", () => {
+  const item = { externalId: "paper:1", kind: "paper" as const, title: "old", url: "u", publishedAt: "2026-10-14T00:00:00.000Z" };
+  const merged = mergeSnapshotBases(
+    { generatedAt: "2026-10-16T00:00:00.000Z", models: [], news: [{ ...item, upvotes: 9 }] },
+    { generatedAt: "2026-10-14T00:00:00.000Z", models: [], news: [item] }
+  );
+  assert.equal(merged?.news.length, 1);
+  assert.equal(merged?.news[0]?.upvotes, 9);
+
+  assert.equal(mergeSnapshotBases(null, null), null);
+  assert.equal(mergeSnapshotBases(null, { generatedAt: "x", models: [], news: [] })?.generatedAt, "x");
 });

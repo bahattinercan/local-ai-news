@@ -7,6 +7,7 @@ import { HfClient, type RawPaper } from "./sources/hf.ts";
 import { fetchFeed, type FeedItem } from "./sources/feeds.ts";
 import { newsSources, type SourceDefinition } from "./sources/registry.ts";
 import type { ClassifiedModel } from "./model.ts";
+import { loadSnapshot } from "./store.ts";
 import type { Snapshot, SnapshotNews } from "./store.ts";
 
 export interface IngestOptions {
@@ -202,10 +203,73 @@ function loadExistingSnapshot(): Snapshot | null {
   return JSON.parse(readFileSync(path, "utf-8")) as Snapshot;
 }
 
+/** An `undefined`, `null` or empty array never beats a value the other side has. */
+function isEmpty(value: unknown): boolean {
+  return value === null || value === undefined || (Array.isArray(value) && value.length === 0);
+}
+
+function mergeRecord<T extends object>(older: T, newer: T): T {
+  const merged = { ...(older as Record<string, unknown>) };
+  for (const [key, value] of Object.entries(newer)) {
+    if (!isEmpty(value) || isEmpty(merged[key])) merged[key] = value;
+  }
+  return merged as T;
+}
+
+/**
+ * The site serves whatever `npm run publish` uploaded last, but the ingest job
+ * merged into the copy `actions/checkout` put on disk — a file nobody ever
+ * re-commits. So every run rebuilt "repo baseline + this run's newest pages" and
+ * silently dropped whatever earlier runs had discovered once it fell out of the
+ * listing window.
+ *
+ * Measured 2026-10-16: the served snapshot held models first seen on 13, 14 and
+ * 16 October and **none** on 15 October, although the job ran that day.
+ *
+ * Union the published snapshot with the repo copy, keep the earliest
+ * `firstSeenAt` per model, and let the newer record fill fields the older one is
+ * missing — history accumulates instead of regressing.
+ */
+export function mergeSnapshotBases(published: Snapshot | null, repo: Snapshot | null): Snapshot | null {
+  if (!published && !repo) return null;
+
+  const models = new Map<string, ClassifiedModel>();
+  for (const list of [repo?.models, published?.models]) {
+    for (const model of list ?? []) {
+      const existing = models.get(model.externalId);
+      if (!existing) {
+        models.set(model.externalId, model);
+        continue;
+      }
+      const firstSeenAt =
+        new Date(existing.firstSeenAt).getTime() <= new Date(model.firstSeenAt).getTime()
+          ? existing.firstSeenAt
+          : model.firstSeenAt;
+      models.set(model.externalId, { ...mergeRecord(existing, model), firstSeenAt });
+    }
+  }
+
+  const news = new Map<string, SnapshotNews>();
+  for (const item of [...(repo?.news ?? []), ...(published?.news ?? [])]) {
+    const existing = news.get(item.externalId);
+    news.set(item.externalId, existing ? mergeRecord(existing, item) : item);
+  }
+
+  return {
+    generatedAt: published?.generatedAt ?? repo?.generatedAt ?? new Date().toISOString(),
+    models: [...models.values()],
+    news: [...news.values()]
+  };
+}
+
 export async function runIngest(options: IngestOptions): Promise<IngestResult> {
   const client = new HfClient({ token: options.token, maxRequestsPerWindow: options.maxRequests });
   const now = new Date().toISOString();
-  const existing = loadExistingSnapshot();
+  /* The published snapshot is the site's truth; the repo copy is only a fallback.
+     `loadSnapshot()` prefers the Blob on its own and falls back to the repo file,
+     so a missing token or an unreachable store degrades to the old behaviour. */
+  const published = await loadSnapshot().catch(() => null);
+  const existing = mergeSnapshotBases(published, loadExistingSnapshot());
   const seen = new Set(existing?.models.map((m) => m.externalId) ?? []);
 
   const models: ClassifiedModel[] = existing?.models ?? [];

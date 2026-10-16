@@ -28,6 +28,9 @@
 | **D8** donut açıklaması, grafik yüksekliği | açık | trend grafiği artık 3 nokta çiziyor (3 farklı `firstSeenAt` günü) ve ≥3 gün eşiği çalışıyor; donut'un hâlâ açıklaması yok |
 | **D9** `/news` ham release metni | açık | canlı snapshot: 209 öğe (community 25, runtime 30, paper 150, release 4), 151'inde thumbnail var |
 | **D10** istemci tarafı gezinme yok | açık | hâlâ 21 düz `<a href>` iç bağlantı |
+| `/icon.svg`, `/apple-icon.png` | **düzeltildi** | dil yönlendirmesi ikisini de 307 → `/en/icon.svg` → **404** yapıyordu, oysa layout ikisini de duyuruyordu (ikisi de artık `200` ve `image/svg+xml` / `image/png` dönüyor) |
+| Son sayfanın ötesinde haber sayfası | **düzeltildi** | feed'dekiyle aynı sınif: `/tr/news?page=999` → boş sayfa 999 → 2. sayfaya kilitleniyor (23 öğe), `/tr/research?page=999` → sayfa 3 |
+| **Ingest birleştirme tabanı** | **düzeltildi** | ingest işi yayınlanan snapshot yerine repo kopyasıyla (`actions/checkout`'un getirdiği `data/feed.json`) birleştiriyor, sonra Blob'un üzerine yazıyordu — yani her koşu "repo tabanı + bu koşunun en yeni sayfaları"nı yeniden kuruyor ve önceki koşuların bulduğu modelleri listeden çıkınca düşürüyordu. Servis edilen snapshot'ta ilk görülme tarihi **13/14/16 Ekim olan modeller var, 15 Ekim'den hiç yok**, oysa iş o gün çalıştı. `mergeSnapshotBases()` artık yayınlanan snapshot ile repo kopyasını birleştiriyor (en erken `firstSeenAt` kazanır, yeni kayıt eskinin eksik alanlarını doldurur) ve store erişilemezse eski davranışa düşüyor. Şu andaki tabanlar zaten örtüşüyor (repo 915 ⊆ yayınlanan 1284), yani kayıp varsa geri kurtarılamaz |
 
 ---
 
