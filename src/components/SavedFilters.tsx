@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Bookmark } from "lucide-react";
 import { dictionary, t, type Locale } from "@/i18n";
 
@@ -43,13 +44,13 @@ export function SavedFilters({ locale, currentQuery }: { locale: Locale; current
         {t(dict, "common.savedFilters")}
       </button>
       {presets.map((preset) => (
-        <a
+        <Link
           key={preset.name}
           href={`?${preset.query}`}
           className="rounded-md border border-border px-3 py-1.5 text-muted hover:text-text hover:border-accent/40"
         >
           {preset.name}
-        </a>
+        </Link>
       ))}
     </div>
   );

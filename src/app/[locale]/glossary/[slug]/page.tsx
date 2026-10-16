@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GLOSSARY, GLOSSARY_CATEGORIES, getGlossaryEntry, glossaryText } from "@/lib/glossary";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
@@ -41,9 +42,9 @@ export default async function GlossaryEntryPage({
       />
 
       <p className="mb-3 text-sm">
-        <a href={hrefFor(locale, "/glossary")} className="text-muted hover:text-text">
+        <Link href={hrefFor(locale, "/glossary")} className="text-muted hover:text-text">
           ← {t(dict, "glossary.title")}
-        </a>
+        </Link>
       </p>
 
       <article className="card p-5">
@@ -69,13 +70,13 @@ export default async function GlossaryEntryPage({
             {related.map((relatedEntry) => {
               const relatedText = glossaryText(relatedEntry, locale);
               return (
-                <a
+                <Link
                   key={relatedEntry.slug}
                   href={hrefFor(locale, `/glossary/${relatedEntry.slug}`)}
                   className="rounded-md border border-border px-3 py-1.5 text-sm text-muted hover:text-accent hover:border-accent/40"
                 >
                   {relatedText.term}
-                </a>
+                </Link>
               );
             })}
           </div>

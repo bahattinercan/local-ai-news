@@ -111,7 +111,13 @@ export async function NewsList({ locale, query }: { locale: Locale; query: NewsL
         page={page}
         total={total}
         limit={query.limit}
-        formValues={formValues}
+        /* Same rule as the feed: defaults stay out of the link. */
+        formValues={{
+          window: formValues.window === "7d" ? undefined : formValues.window,
+          scope: formValues.scope,
+          kind: formValues.kind || undefined,
+          category: formValues.category || undefined
+        }}
       />
     </>
   );

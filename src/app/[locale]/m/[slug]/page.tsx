@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Activity, Box, Clock, Cpu, Database, Globe, HardDrive, Heart, Layers, Link as LinkIcon, ShieldCheck, Zap } from "lucide-react";
 import { getModel, getFeed } from "@/lib/store";
 import { runCommand } from "@/lib/runner/command";
@@ -127,9 +128,9 @@ export default async function ModelPage({
               <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted whitespace-nowrap">
                 <Icon size={13} aria-hidden="true" />
                 {spec.glossary ? (
-                  <a href={hrefFor(locale, `/glossary/${spec.glossary}`)} className="hover:text-accent">
+                  <Link href={hrefFor(locale, `/glossary/${spec.glossary}`)} className="hover:text-accent">
                     {spec.label}
-                  </a>
+                  </Link>
                 ) : (
                   spec.label
                 )}
@@ -200,9 +201,9 @@ export default async function ModelPage({
       </section>
 
       <p className="mt-6 text-sm">
-        <a href={hrefFor(locale, `/c/${model.primaryCategory}`)} className="text-muted hover:text-text">
+        <Link href={hrefFor(locale, `/c/${model.primaryCategory}`)} className="text-muted hover:text-text">
           {t(dict, "common.home")}
-        </a>
+        </Link>
       </p>
     </>
   );

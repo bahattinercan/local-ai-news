@@ -49,6 +49,17 @@
 
 ---
 
+### 0.2 Faz 3 (D8, D9, D10) — aynı oturumda uygulandı
+
+| Madde | Sonuç (servis edilen snapshot üzerinde ölçüldü) |
+|---|---|
+| **D8** `/stats` donut açıklaması | Donut artık halkanın yanında açıklama çiziyor — renk kutusu, kategori adı, sayı ve pay; yay ile aynı palet indeksini kullanıyor (`Coding 98 · %23`, 9 satır). Trend grafiğinin viewBox'ı 640×160 → 1200×200 oldu, böylece 275 px yüksekliğe gerilmiyor: 1440'lık kartta ölçülen **140 px**, boş alan yerine bir açıklama satıryla (`2026-10-13 – 2026-10-16 · 3 gün · 426 model`). ≥3 gün eşiği zaten doğruydu |
+| **D9** `/news` ham release metni | `src/lib/news-text.ts` + 9 birim testi. Her `runtime` satırının saklanan başlığı bir build etiketi (`b11699`, `b11700`), bu yüzden başlık gövdedeki konudan türetiliyor: sayfa artık **"common: honor HTTP_PROXY/HTTPS_PROXY env vars in http client"** gösteriyor, `b11699` mono etiket olarak duruyor; gövde konuyu tekrarlamıyor (200 karakter içinde iki kez tekrarlıyordu), URL taşımıyor, silinen linkten kalan "See" kalıntısını atıyor ve üç satıra kırılıyor (detay sayfası 4 000 karakter tutuyor). Medya yuvası yalnızca `thumbnail` varsa çiziliyor — ekrandaki 30 öğenin tamamında yer tutucuydu. `upvotes: null` artık "0" yazmıyor |
+| **D10** istemci tarafı gezinme | `next/link`: Header, TabBar, Pagination, FeedCard, PulseStrip, NewsCard, Footer (sözlük bağlantısı), Controls, SavedFilters, LangSwitch, compare, glossary (ikisi), `m/[slug]` ve `n/[id]`. `<a>` yalnızca dış adresler ve `/feed.rss` (sayfa değil, route handler) için kaldı. Pencere işaretiyle doğrulandı: karta tıklamak `/tr/m/Abiray-MOSS-Image-SFT-INT8-convrot`'a gidiyor ve `window.__marker` yaşıyor; 2. sayfa da aynı şekilde `?page=2`'ye gidiyor. Bağlantı adresleri artık varsayılan değerlere URL alanı harcamıyor (`?window=7d&sort=new&gate=passed` gitti) |
+| Yeniden doğrulandı | 63 rota×genişlik kombinasyonu (320/360/390/430/768/1024/1440) → 0 taşma; `npm test` **82/82**; lint, typecheck, i18n parite (iki dilde 118 anahtar) |
+
+---
+
 ## 1. "Bu ne böyle, ne olduğu belli değil" sorusunun cevabı
 
 Ziyaretçinin karşılaşma sırasına göre üç ölçülmüş neden.

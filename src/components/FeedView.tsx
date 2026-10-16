@@ -6,7 +6,7 @@ import { Pagination } from "./Pagination";
 import { PulseStrip } from "./PulseStrip";
 import { getFeed, countFeed } from "@/lib/store";
 import { dictionary, t, type Locale } from "@/i18n";
-import { clampPage, type normalizeFeedQuery } from "@/lib/query";
+import { FEED_DEFAULTS, clampPage, type normalizeFeedQuery } from "@/lib/query";
 
 export async function FeedView({
   locale,
@@ -40,6 +40,18 @@ export async function FeedView({
     maxParams: query.maxParams ? String(query.maxParams) : "",
     license: query.license ?? "",
     q: query.q ?? ""
+  };
+
+  /* Link targets, not form values: a link must not spend URL space on the values
+     the page already defaults to (`?window=7d&sort=new&gate=passed&page=2`). */
+  const linkValues: Record<string, string | undefined> = {
+    window: formValues.window === FEED_DEFAULTS.window ? undefined : formValues.window,
+    sort: formValues.sort === FEED_DEFAULTS.sort ? undefined : formValues.sort,
+    gate: formValues.gate === FEED_DEFAULTS.gate ? undefined : formValues.gate,
+    runner: query.runner,
+    maxParams: query.maxParams ? String(query.maxParams) : undefined,
+    license: query.license,
+    q: query.q
   };
 
   const maxDownloads = models.reduce((max, model) => Math.max(max, model.downloads ?? 0), 0);
@@ -85,7 +97,7 @@ export async function FeedView({
         </section>
       )}
 
-      <Pagination locale={locale} page={page} total={total} limit={query.limit} formValues={formValues} />
+      <Pagination locale={locale} page={page} total={total} limit={query.limit} formValues={linkValues} />
     </>
   );
 }

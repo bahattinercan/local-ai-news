@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CATEGORY_RULES, categoryLabel } from "@/lib/classify/rules";
 import { getCategoryCounts } from "@/lib/store";
 import { FEED_DEFAULTS, type FeedFilterInput } from "@/lib/query";
@@ -63,7 +64,7 @@ export async function TabBar({
         const href = `${hrefFor(locale, tab.key ? `/c/${tab.key}` : "/")}${suffix}`;
         const isActive = tab.key === (active ?? "");
         return (
-          <a
+          <Link
             key={tab.key || "all"}
             href={href}
             aria-current={isActive ? "page" : undefined}
@@ -74,7 +75,7 @@ export async function TabBar({
           >
             {tab.label}
             <span className={cn("font-mono text-xs", isActive ? "text-accent" : "text-muted")}>{tab.count}</span>
-          </a>
+          </Link>
         );
       })}
     </nav>

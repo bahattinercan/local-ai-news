@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Activity, Clock, TrendingUp } from "lucide-react";
 import { getPulse } from "@/lib/store";
 import { categoryLabel } from "@/lib/classify/rules";
@@ -67,9 +68,9 @@ export async function PulseStrip({ locale, days, category }: { locale: Locale; d
               {pulse.hot.map((model, index) => (
                 <li key={model.externalId} className="hot-row text-sm">
                   <span className="font-mono text-xs text-muted">{index + 1}</span>
-                  <a href={hrefFor(locale, `/m/${model.slug}`)} className="flex min-h-7 min-w-0 items-center hover:text-accent">
+                  <Link href={hrefFor(locale, `/m/${model.slug}`)} className="flex min-h-7 min-w-0 items-center hover:text-accent">
                     <span className="truncate">{model.externalId}</span>
-                  </a>
+                  </Link>
                   <span className="flex items-center justify-end gap-1 font-mono text-xs text-muted">
                     <Clock size={12} aria-hidden="true" /> {relativeTime(model.firstSeenAt)}
                   </span>

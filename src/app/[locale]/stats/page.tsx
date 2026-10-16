@@ -66,14 +66,26 @@ export default async function StatsPage({
 
         <section className="card p-4 flex flex-col gap-3">
           <h2 className="text-sm uppercase tracking-wide text-muted">{t(dict, "stats.share")}</h2>
-          <Donut slices={stats.map((row) => ({ label: row.category, value: row.count }))} />
+          <Donut
+            label={t(dict, "stats.share")}
+            mutedLabel={t(dict, "stats.noHistory")}
+            slices={stats.map((row) => ({ label: categoryLabel(row.category), value: row.count }))}
+          />
         </section>
       </div>
 
       <section className="card p-4 mt-3">
         <h2 className="text-sm uppercase tracking-wide text-muted mb-3">{t(dict, "stats.trend")}</h2>
         {series.length >= 3 ? (
-          <TrendChart points={series} />
+          <TrendChart
+            points={series}
+            caption={t(dict, "stats.trendCaption", {
+              from: series[0]?.date ?? "",
+              to: series[series.length - 1]?.date ?? "",
+              days: series.length,
+              total: series.reduce((sum, point) => sum + point.count, 0)
+            })}
+          />
         ) : (
           <p className="text-sm text-muted">{t(dict, "stats.noHistory")}</p>
         )}

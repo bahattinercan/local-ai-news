@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LOCALES, type Locale } from "@/i18n";
 import { cn } from "@/lib/format";
@@ -20,7 +21,7 @@ export function LangSwitch({ locale, label }: { locale: Locale; label: string })
   return (
     <div className="flex h-11 items-center gap-0.5 rounded-md border border-border bg-raised px-1" aria-label={label}>
       {LOCALES.map((option) => (
-        <a
+        <Link
           key={option}
           href={`/${option}${rest}`}
           hrefLang={option}
@@ -31,7 +32,7 @@ export function LangSwitch({ locale, label }: { locale: Locale; label: string })
           )}
         >
           {option.toUpperCase()}
-        </a>
+        </Link>
       ))}
     </div>
   );

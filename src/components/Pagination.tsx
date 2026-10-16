@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/format";
 import { pageCount } from "@/lib/query";
@@ -38,13 +39,13 @@ export function Pagination({
   return (
     <nav className="mt-4 flex flex-wrap items-center gap-2 text-sm" aria-label={t(dict, "common.page", { page })}>
       {page > 1 ? (
-        <a href={hrefForPage(page - 1)} aria-label={t(dict, "common.prev")} className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-muted hover:text-text">
+        <Link href={hrefForPage(page - 1)} aria-label={t(dict, "common.prev")} className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-muted hover:text-text">
           <ChevronLeft size={16} aria-hidden="true" />
-        </a>
+        </Link>
       ) : null}
 
       {numbers.map((number) => (
-        <a
+        <Link
           key={number}
           href={hrefForPage(number)}
           aria-current={number === page ? "page" : undefined}
@@ -54,13 +55,13 @@ export function Pagination({
           )}
         >
           {number}
-        </a>
+        </Link>
       ))}
 
       {page < pages ? (
-        <a href={hrefForPage(page + 1)} aria-label={t(dict, "common.next")} className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-muted hover:text-text">
+        <Link href={hrefForPage(page + 1)} aria-label={t(dict, "common.next")} className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-muted hover:text-text">
           <ChevronRight size={16} aria-hidden="true" />
-        </a>
+        </Link>
       ) : null}
 
       <span className="text-muted font-mono text-xs">

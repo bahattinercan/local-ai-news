@@ -4,6 +4,7 @@ import { categoryLabel } from "@/lib/classify/rules";
 import { formatNumber } from "@/lib/format";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
+import Link from "next/link";
 import { TabBar } from "@/components/TabBar";
 import type { ClassifiedModel } from "@/lib/model";
 
@@ -101,9 +102,9 @@ export default async function ComparePage({
               <th className="py-3 pr-3 text-xs uppercase tracking-wide text-muted">{t(dict, "common.viewModel")}</th>
               {models.map((model) => (
                 <th key={model.slug} className="py-3 pr-3 font-medium">
-                  <a href={`/m/${model.slug}`} className="hover:text-accent">
+                  <Link href={`/m/${model.slug}`} className="hover:text-accent">
                     {model.externalId}
-                  </a>
+                  </Link>
                 </th>
               ))}
             </tr>

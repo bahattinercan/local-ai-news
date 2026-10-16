@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getGeneratedAt } from "@/lib/store";
 import { relativeTime } from "@/lib/format";
 import { dictionary, t, type Locale } from "@/i18n";
@@ -24,9 +25,9 @@ export async function Footer({ locale }: { locale: Locale }) {
         <a href={`/feed.rss?lang=${locale}`} className="inline-flex min-h-7 items-center hover:text-text">
           RSS
         </a>
-        <a href={`/${locale}/glossary`} className="inline-flex min-h-7 items-center hover:text-text">
+        <Link href={`/${locale}/glossary`} className="inline-flex min-h-7 items-center hover:text-text">
           {t(dict, "nav.glossary")}
-        </a>
+        </Link>
         {repoUrl ? (
           <a href={repoUrl} className="inline-flex min-h-7 items-center hover:text-text">
             {t(dict, "footer.docs")}

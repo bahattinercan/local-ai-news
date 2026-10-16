@@ -1,19 +1,22 @@
+import Link from "next/link";
 import { ArrowUp, Clock, ExternalLink } from "lucide-react";
 import { getNewsItemByParam, getModel } from "@/lib/store";
 import { categoryLabel } from "@/lib/classify/rules";
 import { formatNumber, relativeTime } from "@/lib/format";
+import { newsText } from "@/lib/news-text";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
 import { TabBar } from "@/components/TabBar";
 import { FeedCard } from "@/components/FeedCard";
+import { Chip } from "@/components/ui/Chip";
 
-const KIND_CLASS: Record<string, string> = {
-  paper: "text-accent",
-  release: "text-ok",
-  announcement: "text-warn",
-  runtime: "text-danger",
-  community: "text-warn"
+const KIND_TONE: Record<string, "accent" | "ok" | "warn" | "danger"> = {
+  paper: "accent",
+  release: "ok",
+  announcement: "warn",
+  runtime: "warn",
+  community: "accent"
 };
 
 /**
@@ -42,6 +45,10 @@ export default async function NewsItemPage({
 
   // Gate G3: the related-model block appears only when the link resolved.
   const model = item.modelSlug ? await getModel(item.modelSlug) : null;
+  /* The same cleanup as the list: the stored title is a build tag for every
+     runtime item, and the body carries URLs and a doubled subject. The detail
+     page gets the longer budget (the list clamps to three lines). */
+  const { title, body, buildTag } = newsText(item, { bodyMax: 4000 });
 
   return (
     <>
@@ -50,7 +57,7 @@ export default async function NewsItemPage({
         data={{
           "@context": "https://schema.org",
           "@type": "NewsArticle",
-          headline: item.title,
+          headline: title || item.title,
           datePublished: item.publishedAt,
           url: item.url,
           publisher: item.organization ? { "@type": "Organization", name: item.organization } : undefined,
@@ -59,36 +66,42 @@ export default async function NewsItemPage({
       />
 
       <p className="mb-3 text-sm">
-        <a href={hrefFor(locale, "/news")} className="text-muted hover:text-text">
+        <Link href={hrefFor(locale, "/news")} className="text-muted hover:text-text">
           ← {t(dict, "news.title")}
-        </a>
+        </Link>
       </p>
 
       <article className="card p-5">
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className={KIND_CLASS[item.kind] ?? "text-accent"}>{t(dict, `news.${item.kind}`)}</span>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+          <Chip label={t(dict, `news.${item.kind}`)} tone={KIND_TONE[item.kind] ?? "accent"} />
           {item.categoryKey ? <span className="text-muted">{categoryLabel(item.categoryKey)}</span> : null}
           <span className="flex items-center gap-1 font-mono text-muted">
             <Clock size={11} aria-hidden="true" /> {relativeTime(item.publishedAt)}
           </span>
-          <span className="flex items-center gap-1 font-mono text-muted">
-            <ArrowUp size={11} aria-hidden="true" /> {formatNumber(item.upvotes ?? 0)}
-          </span>
+          {item.upvotes ? (
+            <span className="flex items-center gap-1 font-mono text-muted">
+              <ArrowUp size={11} aria-hidden="true" /> {formatNumber(item.upvotes)}
+            </span>
+          ) : null}
           {item.organization ? <span className="text-muted">{item.organization}</span> : null}
         </div>
 
-        <h1 className="mt-3 text-2xl font-semibold leading-snug tracking-tight break-words">{item.title}</h1>
+        <h1 className="mt-3 text-2xl font-semibold leading-snug tracking-tight break-words">
+          {title || t(dict, "news.untitled")}
+        </h1>
 
-        {item.summary ? (
-          <p className="mt-4 text-sm leading-relaxed text-muted whitespace-pre-line break-words">{item.summary}</p>
-        ) : null}
+        {/* The build tag stays as a secondary label, because it is the item's own
+            identity even when it cannot serve as a headline. */}
+        {buildTag ? <p className="mt-1 font-mono text-xs text-muted">{buildTag}</p> : null}
+
+        {body ? <p className="mt-4 text-sm leading-relaxed text-muted break-words">{body}</p> : null}
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <a
             href={item.url}
             rel="noopener noreferrer nofollow"
             target="_blank"
-            className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm text-accent"
+            className="flex h-11 items-center gap-1.5 rounded-md border border-border px-3 text-sm text-accent"
           >
             <ExternalLink size={13} aria-hidden="true" />
             {t(dict, "news.source")}

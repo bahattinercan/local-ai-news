@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cn } from "@/lib/format";
 
 type Option = [string, string] | string[];
@@ -44,8 +45,8 @@ export function SubmitButton({ label }: { label: string }) {
 
 export function GhostLink({ href, label, className }: { href: string; label: string; className?: string }) {
   return (
-    <a href={href} className={cn("inline-flex h-11 items-center rounded-md border border-border px-3 text-sm text-muted", className)}>
+    <Link href={href} className={cn("inline-flex h-11 items-center rounded-md border border-border px-3 text-sm text-muted", className)}>
       {label}
-    </a>
+    </Link>
   );
 }

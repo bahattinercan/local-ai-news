@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Filter, SlidersHorizontal, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { RUNNERS } from "@/lib/runner/detect";
@@ -102,10 +103,10 @@ export function FilterBar({
               <Filter size={12} aria-hidden="true" />
               {t(dict, "filters.active")}: {active.join(" · ")}
             </span>
-            <a href={action} className="flex items-center gap-1 hover:text-text">
+            <Link href={action} className="flex items-center gap-1 hover:text-text">
               <X size={12} aria-hidden="true" />
               {t(dict, "filters.clear")}
-            </a>
+            </Link>
           </>
         ) : null}
         {gateForced ? <span className="text-warn">{t(dict, "filters.showEverything")} ≤ 30d + category</span> : null}

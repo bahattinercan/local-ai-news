@@ -49,6 +49,17 @@
 
 ---
 
+### 0.2 Phase 3 (D8, D9, D10) — landed in the same session
+
+| Item | Result (measured on the served snapshot) |
+|---|---|
+| **D8** `/stats` donut legend | The donut now renders a legend beside the ring — swatch, category name, count and share, using the same palette index as the arc (`Coding 98 · 23%`, 9 rows). The trend chart's viewBox went 640×160 → 1200×200 so it stops being stretched to a 275 px-high card: measured **140 px** on a 1440 card, with a caption (`2026-10-13 – 2026-10-16 · 3 gün · 426 model`) instead of empty space. The ≥3-day gate was already correct |
+| **D9** `/news` raw release text | `src/lib/news-text.ts` + 9 unit tests. The stored title of every `runtime` row is a build tag (`b11699`, `b11700`), so the headline is derived from the subject inside the body: the page now shows **"common: honor HTTP_PROXY/HTTPS_PROXY env vars in http client"** with `b11699` as a mono label, and the body no longer repeats the subject (it did twice inside 200 chars), carries no URLs, drops the dangling "See" left by a removed link, and is clamped to three lines (the detail page keeps 4 000 chars). The media slot only exists when `thumbnail` is present — it was a placeholder for all 30 items on screen. `upvotes: null` no longer prints "0" |
+| **D10** client-side navigation | `next/link` in Header, TabBar, Pagination, FeedCard, PulseStrip, NewsCard, Footer (glossary link), Controls, SavedFilters, LangSwitch, compare, glossary (both), `m/[slug]` and `n/[id]`; `<a>` is kept only for external hosts and for `/feed.rss` (a route handler, not a page). Verified with a window marker: clicking a card reaches `/tr/m/Abiray-MOSS-Image-SFT-INT8-convrot` with `window.__marker` intact, and page 2 navigates to `?page=2` the same way. Link targets no longer spend URL space on defaults (`?window=7d&sort=new&gate=passed` is gone) |
+| Re-verified | 63 route×width combinations (320/360/390/430/768/1024/1440) → 0 overflow; npm test **82/82**; lint, typecheck, i18n parity (118 keys both languages) |
+
+---
+
 ## 1. Answer to "bu ne böyle, ne olduğu belli değil"
 
 Three measured reasons, in the order a first-time visitor hits them.

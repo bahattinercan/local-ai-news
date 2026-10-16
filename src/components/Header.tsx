@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BarChart3, BookOpen, FlaskConical, Menu, Newspaper, Radar, Scale } from "lucide-react";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { LangSwitch } from "./LangSwitch";
@@ -29,18 +30,18 @@ export function Header({ locale }: { locale: Locale }) {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:h-16">
-        <a href={hrefFor(locale, "/")} className="flex h-11 min-w-0 items-center gap-2">
+        <Link href={hrefFor(locale, "/")} className="flex h-11 min-w-0 items-center gap-2">
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-border bg-raised" aria-hidden="true">
             <Radar size={16} className="text-accent" />
           </span>
           <span className="truncate font-semibold tracking-tight">{t(dict, "brand")}</span>
-        </a>
+        </Link>
 
         <nav className="ml-auto hidden items-center gap-1 sm:flex" aria-label={t(dict, "nav.primary")}>
           {links.slice(0, 4).map((link) => {
             const Icon = link.icon;
             return (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 aria-label={link.label}
@@ -48,7 +49,7 @@ export function Header({ locale }: { locale: Locale }) {
               >
                 <Icon size={16} aria-hidden="true" />
                 <span className="hidden lg:inline">{link.label}</span>
-              </a>
+              </Link>
             );
           })}
           <span className="mx-1 h-6 w-px bg-border" aria-hidden="true" />
@@ -68,14 +69,14 @@ export function Header({ locale }: { locale: Locale }) {
               {links.map((link) => {
                 const Icon = link.icon;
                 return (
-                  <a
+                  <Link
                     key={link.href}
                     href={link.href}
                     className="flex h-11 items-center gap-2 rounded-md px-3 text-sm text-muted hover:bg-raised hover:text-accent"
                   >
                     <Icon size={16} aria-hidden="true" />
                     {link.label}
-                  </a>
+                  </Link>
                 );
               })}
               <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2 pl-3">

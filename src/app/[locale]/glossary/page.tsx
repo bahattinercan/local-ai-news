@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { GLOSSARY, GLOSSARY_CATEGORIES, glossaryByCategory, glossaryText } from "@/lib/glossary";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
@@ -41,7 +42,7 @@ export default async function GlossaryPage({ params }: { params: Promise<{ local
               {group.entries.map((entry) => {
                 const text = glossaryText(entry, locale);
                 return (
-                  <a
+                  <Link
                     key={entry.slug}
                     href={hrefFor(locale, `/glossary/${entry.slug}`)}
                     className="card p-4 block hover:border-accent/40"
@@ -51,7 +52,7 @@ export default async function GlossaryPage({ params }: { params: Promise<{ local
                     <span className="mt-2 block font-mono text-xs text-accent">
                       {text.body.length} §
                     </span>
-                  </a>
+                  </Link>
                 );
               })}
             </div>

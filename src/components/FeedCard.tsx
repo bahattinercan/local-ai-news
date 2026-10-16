@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Download, HardDrive, Heart, Scale } from "lucide-react";
 import { cn, daysSince, formatBytes, formatNumber } from "@/lib/format";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
@@ -59,9 +60,9 @@ export function FeedCard({
                 break-word` does not lower min-content, so a 45-character repo id
                 still set the grid track width. The chip keeps `shrink-0` so the
                 badge is never squeezed by a long id. */}
-            <a href={hrefFor(locale, `/m/${model.slug}`)} className="min-w-0 line-clamp-2 font-medium hover:text-accent">
+            <Link href={hrefFor(locale, `/m/${model.slug}`)} className="min-w-0 line-clamp-2 font-medium hover:text-accent">
               {model.externalId}
-            </a>
+            </Link>
             {model.qualityPassed ? null : <Chip label={t(dict, "card.gateFailed")} tone="warn" className="shrink-0" />}
           </div>
 
@@ -116,10 +117,10 @@ export function FeedCard({
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
             {model.license ? <Chip label={model.license} /> : null}
             {model.vramEstGb ? <Chip label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB`} tone="accent" /> : null}
-            <a href={hrefFor(locale, `/compare?ids=${model.slug}`)} className="inline-flex min-h-7 items-center gap-1 text-accent">
+            <Link href={hrefFor(locale, `/compare?ids=${model.slug}`)} className="inline-flex min-h-7 items-center gap-1 text-accent">
               <Scale size={12} aria-hidden="true" />
               {t(dict, "compare.add")}
-            </a>
+            </Link>
           </div>
         </div>
       </div>
