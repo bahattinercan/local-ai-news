@@ -40,3 +40,30 @@ export function formatBytes(bytes: number | null | undefined): string {
   if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
   return `${Math.round(bytes / 1000)} kB`;
 }
+
+/**
+ * "18 October 2026" / "18 Ekim 2026" — the dateline under the nameplate.
+ *
+ * The date comes from the snapshot's `generatedAt`, never from `Date.now()`: the
+ * masthead has to be the same string on the server and after hydration, and the
+ * edition is the snapshot, not the request.
+ */
+export function formatEditionDate(iso: string | null | undefined, locale: "en" | "tr"): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(date);
+}
+
+/** "09:09 UTC" — the clock in the masthead's snapshot block. */
+export function formatClock(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${date.toISOString().slice(11, 16)} UTC`;
+}

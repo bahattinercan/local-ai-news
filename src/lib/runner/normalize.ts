@@ -83,6 +83,9 @@ export function normalizeModel(model: RawModel, options: NormalizeOptions): Clas
     updatedAt: model.lastModified,
     firstSeenAt: options.firstSeenAt,
     downloads: model.downloads,
+    /* Set by the ingest on the first sighting only; `null` means "unknown", which
+       is the norm for every model discovered before the field existed. */
+    downloadsAtFirstSeen: null,
     likes: model.likes,
     trendingScore: model.trendingScore ?? null,
     gated: model.gated,

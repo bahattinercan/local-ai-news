@@ -39,6 +39,12 @@ export interface ClassifiedModel {
   updatedAt: string;
   firstSeenAt: string;
   downloads: number;
+  /**
+   * The download count on the run that first saw this model, so a delta measures
+   * real in-window growth (`lib/heat.ts`). Null for every model discovered before
+   * the field existed, and that is the common case — never treat it as zero.
+   */
+  downloadsAtFirstSeen?: number | null;
   likes: number;
   trendingScore: number | null;
   gated: boolean;

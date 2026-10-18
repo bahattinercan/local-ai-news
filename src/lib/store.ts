@@ -2,6 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CATEGORY_RULES } from "./classify/rules.ts";
 import { NEWS_SCOPE_KINDS, FEED_DEFAULTS, normalizeFeedQuery, type FeedFilterInput } from "./query.ts";
+import { hasGrowthSignal } from "./heat.ts";
+import { cleanLabel } from "./text-guard.ts";
 import type { ClassifiedModel } from "./model.ts";
 
 export interface SnapshotNews {
@@ -147,12 +149,25 @@ function withinWindow(iso: string, days: number): boolean {
   return Date.now() - then <= days * 86_400_000;
 }
 
-function normalizeNews(snapshot: Snapshot): SnapshotNews[] {
-  /* A snapshot written without the `news` key must degrade to "no news" instead
-     of throwing out of every news surface (`isUsable` only guards `models`). */
+/**
+ * A snapshot written without the `news` key must degrade to "no news" instead of
+ * throwing out of every news surface (`isUsable` only guards `models`).
+ *
+ * Every display string goes through `cleanLabel`: the served snapshot contains
+ * `organization: "[object Object]"` on 40 of its 185 items (measured 2026-10-18),
+ * and a byline is allowed to be absent but never to be a stringified object. The
+ * ingest merge now overwrites poisoned values, so new snapshots heal — this keeps
+ * the *current* one from printing them until then.
+ *
+ * Exported for the unit test: it is a pure function over a snapshot.
+ */
+export function normalizeNews(snapshot: Snapshot): SnapshotNews[] {
   return (snapshot.news ?? []).map((item) => ({
     ...item,
-    organization: typeof item.organization === "string" ? item.organization : null
+    /* A blank or poisoned title becomes an empty string, not the original junk:
+       `NewsCard` renders its own "Update" label when there is no title. */
+    title: cleanLabel(item.title) ?? "",
+    organization: cleanLabel(item.organization)
   }));
 }
 
@@ -249,6 +264,98 @@ export async function getDailySeries(days: number, options: StatsOptions = {}): 
   return [...buckets.entries()]
     .map(([date, count]) => ({ date, count }))
     .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/**
+ * The front page's band: "most downloaded inside the window".
+ *
+ * Ordering is by `downloads`, which is the one metric present on 86 % of rows
+ * (measured 2026-10-18: 1 408/1 633 > 0, p50 22, p90 299, max 119 265). The
+ * printed figure is the same number that sorted the list, so the band can never
+ * look unsorted — a documented blend of likes and downloads (which is what the
+ * `trending` sort uses, because HF's own `trendingScore` is null on every model)
+ * would have to be printed to justify its order, and a blended score printed as a
+ * fact is exactly the unverifiable claim this project keeps removing.
+ */
+export async function getMostDownloaded(
+  days: number,
+  options: { category?: string; limit?: number; gate?: "passed" | "all" } = {}
+): Promise<ClassifiedModel[]> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return [];
+
+  const rows = filterModels(snapshot, {
+    category: options.category,
+    windowDays: days,
+    sort: "downloads",
+    gate: options.gate ?? FEED_DEFAULTS.gate,
+    excludeGated: true,
+    limit: 0,
+    page: 1
+  });
+
+  return rows
+    .filter((model) => model.downloads > 0)
+    .sort((a, b) => b.downloads - a.downloads || b.likes - a.likes)
+    .slice(0, options.limit ?? 12);
+}
+
+/**
+ * Everything the broadsheet front page needs, from one cached snapshot read:
+ * the edition figures, the ranked band, the stories and the wire.
+ *
+ * The hero is the newest paper that actually has a thumbnail, because the design's
+ * lead slot is a printed plate and 151 of 185 news items carry one (measured
+ * 2026-10-18) — picking `stories[0]` blindly would leave the biggest slot on the
+ * page empty on 18 % of editions.
+ */
+export interface FrontPage {
+  generatedAt: string | null;
+  tracked: number;
+  passed: number;
+  topCategory: string | null;
+  hot: ClassifiedModel[];
+  /** True when enough of `hot` carries a first-sighting baseline to print a delta. */
+  showsGrowth: boolean;
+  hero: SnapshotNews | null;
+  stories: SnapshotNews[];
+  wire: SnapshotNews[];
+  newsCount: number;
+}
+
+export async function getFrontPage(days: number): Promise<FrontPage | null> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return null;
+
+  const scope = { windowDays: days, sort: "new" as const, excludeGated: true, limit: 0, page: 1 };
+  const passedRows = filterModels(snapshot, { ...scope, gate: "passed" });
+
+  const counts = new Map<string, number>();
+  for (const model of passedRows) counts.set(model.primaryCategory, (counts.get(model.primaryCategory) ?? 0) + 1);
+  const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
+
+  const hot = await getMostDownloaded(days, { limit: 8 });
+
+  const papers = filterNews(snapshot, { windowDays: days, scope: "research", limit: 0 })
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  const wire = filterNews(snapshot, { windowDays: days, scope: "news", limit: 0 })
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+
+  const hero = papers.find((item) => item.thumbnail) ?? papers[0] ?? wire[0] ?? null;
+  const stories = papers.filter((item) => item.externalId !== hero?.externalId);
+
+  return {
+    generatedAt: snapshot.generatedAt,
+    tracked: filterModels(snapshot, { ...scope, gate: "all" }).length,
+    passed: passedRows.length,
+    topCategory: top?.[0] ?? null,
+    hot,
+    showsGrowth: hasGrowthSignal(hot),
+    hero,
+    stories,
+    wire,
+    newsCount: wire.length
+  };
 }
 
 export async function getModel(slug: string): Promise<ClassifiedModel | null> {

@@ -3,8 +3,12 @@ const BASE = process.argv[2] ?? "http://localhost:3101";
 const WIDTHS = [360, 390, 768, 1280, 1440];
 
 const PAGES_ALL = [
-  { path: "/en", label: "feed-en" },
-  { path: "/tr", label: "feed-tr" },
+  { path: "/en", label: "front-en" },
+  { path: "/tr", label: "front-tr" },
+  /* The index moved here (docs/en/DESIGN-V3.md D3) and is the only route that
+     serves the feed's query surface, so it has to be in the sweep. */
+  { path: "/en/models", label: "models-en" },
+  { path: "/tr/models", label: "models-tr" },
   { path: "/en/c/image", label: "category-image" },
   { path: "/en/c/coding", label: "category-coding" },
   { path: "/en/c/llm", label: "category-llm" },

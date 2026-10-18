@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import { normalizeModel } from "../src/lib/runner/normalize.ts";
 import { mergeSnapshotBases, paperToNews, releaseToNews, shouldCreateRelease } from "../src/lib/ingest.ts";
 import { detectQuantizations, detectRunners } from "../src/lib/runner/detect.ts";
+import { growthOf } from "../src/lib/heat.ts";
 import type { ClassifiedModel, RawModel } from "../src/lib/model.ts";
+import type { SnapshotNews } from "../src/lib/store.ts";
 
 const base: RawModel = {
   id: "unsloth/LTX-2.5-FP8",
@@ -93,7 +95,6 @@ test("dedupe keeps one row per external id", () => {
 
 import { feedToNews, ingestFeeds } from "../src/lib/ingest.ts";
 import { getSource } from "../src/lib/sources/registry.ts";
-import type { SnapshotNews } from "../src/lib/store.ts";
 import type { FeedItem } from "../src/lib/sources/feeds.ts";
 
 const feedItem: FeedItem = {
@@ -247,8 +248,7 @@ test("a rate-limit error stops the backfill instead of hammering the api", async
  * disappeared again as soon as it left the listing window (measured: the served
  * snapshot had no model first seen on 2026-10-15 although the job ran that day).
  */
-test("mergeSnapshotBases keeps every model from both bases", () => {
-  const older: ClassifiedModel = {
+test("mergeSnapshotBases keeps every model from both bases", () => {  const older: ClassifiedModel = {
     ...normalizeModel(base, { firstSeenAt: "2026-10-14T00:00:00.000Z" }),
     externalId: "someone/shared",
     files: [{ name: "model.safetensors", bytes: 10 }]
@@ -273,6 +273,44 @@ test("mergeSnapshotBases keeps every model from both bases", () => {
   assert.equal(shared?.firstSeenAt, "2026-10-14T00:00:00.000Z");
   assert.equal(shared?.files?.length, 1);
   assert.ok(merged.models.some((model) => model.externalId === "someone/only-published"));
+});
+
+/**
+ * The merge fills only the fields the older record *lacks*, so a poisoned string
+ * was permanent: 40 of the 185 news items in the served snapshot carry
+ * `organization: "[object Object]"` (measured 2026-10-18) and every later ingest
+ * wrote a correct value next to it without ever replacing it.
+ */
+test("mergeSnapshotBases lets a real value replace a poisoned one", () => {
+  const poisoned: SnapshotNews = {
+    externalId: "2610.13527",
+    kind: "paper",
+    title: "S-Space",
+    url: "https://huggingface.co/papers/2610.13527",
+    publishedAt: "2026-10-16T00:00:00.000Z",
+    organization: "[object Object]"
+  };
+  const repo = { generatedAt: "2026-10-16T00:00:00.000Z", models: [], news: [poisoned] };
+  const published = {
+    generatedAt: "2026-10-18T00:00:00.000Z",
+    models: [],
+    news: [{ ...poisoned, organization: "Peking University" }]
+  };
+
+  const merged = mergeSnapshotBases(published, repo);
+  assert.equal(merged?.news[0].organization, "Peking University");
+
+  // …and the poisoned value never travels the other way either.
+  const reversed = mergeSnapshotBases(repo, published);
+  assert.equal(reversed?.news[0].organization, "Peking University");
+});
+
+/** A model first seen by this run records the baseline the delta needs. */
+test("a first sighting carries the download baseline", () => {
+  const fresh = normalizeModel(base, { firstSeenAt: "2026-10-18T00:00:00.000Z" });
+  assert.equal(fresh.downloadsAtFirstSeen, null);
+  assert.equal(growthOf({ ...fresh, downloadsAtFirstSeen: fresh.downloads }), 0);
+  assert.equal(growthOf({ ...fresh, downloads: fresh.downloads + 900, downloadsAtFirstSeen: fresh.downloads }), 900);
 });
 
 test("mergeSnapshotBases dedupes news by id and survives a missing side", () => {

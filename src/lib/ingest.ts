@@ -6,6 +6,7 @@ import { normalizeModel } from "./runner/normalize.ts";
 import { HfClient, type RawPaper } from "./sources/hf.ts";
 import { fetchFeed, type FeedItem } from "./sources/feeds.ts";
 import { newsSources, type SourceDefinition } from "./sources/registry.ts";
+import { isPoisonedText } from "./text-guard.ts";
 import type { ClassifiedModel } from "./model.ts";
 import { loadSnapshot } from "./store.ts";
 import type { Snapshot, SnapshotNews } from "./store.ts";
@@ -203,9 +204,23 @@ function loadExistingSnapshot(): Snapshot | null {
   return JSON.parse(readFileSync(path, "utf-8")) as Snapshot;
 }
 
-/** An `undefined`, `null` or empty array never beats a value the other side has. */
+/**
+ * An `undefined`, `null`, empty array or **poisoned string** never beats a value
+ * the other side has.
+ *
+ * The poisoned case is not hypothetical: 40 of the 185 news items in the served
+ * snapshot carry `"[object Object]"` as `organization`. Because the merge only
+ * fills what the older record *lacks*, that string would otherwise survive every
+ * future ingest — a wrong value is worse than a missing one, so it counts as
+ * missing here.
+ */
 function isEmpty(value: unknown): boolean {
-  return value === null || value === undefined || (Array.isArray(value) && value.length === 0);
+  return (
+    value === null ||
+    value === undefined ||
+    (Array.isArray(value) && value.length === 0) ||
+    isPoisonedText(value)
+  );
 }
 
 function mergeRecord<T extends object>(older: T, newer: T): T {
@@ -333,6 +348,9 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
 
         if (seen.has(normalized.externalId)) continue;
         seen.add(normalized.externalId);
+        /* This run is the first sighting, so this download count is the baseline
+           that makes an in-window delta measurable later (`lib/heat.ts`). */
+        normalized.downloadsAtFirstSeen = normalized.downloads;
         models.push(normalized);
         newCount += 1;
         distribution[rule.key] = (distribution[rule.key] ?? 0) + 1;
