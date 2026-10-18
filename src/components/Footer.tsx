@@ -12,7 +12,7 @@ export async function Footer({ locale }: { locale: Locale }) {
 
   return (
     <footer className="mt-8 border-t border-border">
-      <div className="mx-auto max-w-6xl px-4 py-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
+      <div className="shell flex flex-wrap gap-x-6 gap-y-2 py-6 text-sm text-muted">
         <span>
           {t(dict, "footer.source")} ·{" "}
           <a href="https://huggingface.co/models" className="inline-flex min-h-7 items-center text-accent">

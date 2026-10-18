@@ -19,7 +19,7 @@ export function Stat({
   const sizeClass = size === "lg" ? "text-2xl sm:text-3xl" : "text-lg";
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-xs uppercase tracking-wide text-muted">{label}</span>
+      <span className="label text-muted">{label}</span>
       <span className={cn("font-mono leading-none", sizeClass, toneClass)}>{value}</span>
       {hint ? <span className="text-xs text-muted">{hint}</span> : null}
     </div>
@@ -43,11 +43,11 @@ export function Meter({
   const barClass = { accent: "bg-accent", ok: "bg-ok", muted: "bg-muted" }[tone];
   return (
     <div
-      className="h-1.5 w-full rounded-full bg-raised overflow-hidden"
+      className="h-1 w-full overflow-hidden bg-raised"
       role="img"
       aria-label={label ?? `${value} / ${max}`}
     >
-      <div className={cn("h-full rounded-full", barClass)} style={{ width: `${pct}%` }} />
+      <div className={cn("h-full", barClass)} style={{ width: `${pct}%` }} />
     </div>
   );
 }

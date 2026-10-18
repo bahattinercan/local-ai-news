@@ -22,8 +22,8 @@ export function Field({
   locale?: Locale;
 }) {
   return (
-    <label className="flex flex-col gap-1 min-w-[110px]">
-      <span className="text-xs uppercase tracking-wide text-muted">
+    <label className="flex min-w-[110px] flex-col gap-1">
+      <span className="label text-muted">
         {termSlug && locale ? (
           <Term slug={termSlug} locale={locale}>
             {label}
@@ -35,7 +35,7 @@ export function Field({
       <select
         name={name}
         defaultValue={value}
-        className="h-11 rounded-md border border-border bg-raised px-2.5 text-sm text-text"
+        className="h-11 border border-control bg-surface px-2.5 text-sm text-text"
       >
         {options.map(([optionValue, optionLabel]) => (
           <option key={optionValue} value={optionValue}>
@@ -51,7 +51,7 @@ export function SubmitButton({ label }: { label: string }) {
   return (
     <button
       type="submit"
-      className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-md border border-transparent bg-accent px-3.5 text-sm font-medium text-[#071014]"
+      className="inline-flex h-11 shrink-0 items-center whitespace-nowrap border border-transparent bg-accent px-3.5 text-sm font-medium text-bg"
     >
       {label}
     </button>
@@ -60,7 +60,7 @@ export function SubmitButton({ label }: { label: string }) {
 
 export function GhostLink({ href, label, className }: { href: string; label: string; className?: string }) {
   return (
-    <Link href={href} className={cn("inline-flex h-11 items-center rounded-md border border-border px-3 text-sm text-muted", className)}>
+    <Link href={href} className={cn("inline-flex h-11 items-center border border-rule px-3 text-sm text-muted hover:border-rule-strong hover:text-text", className)}>
       {label}
     </Link>
   );

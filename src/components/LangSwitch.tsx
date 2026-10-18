@@ -19,7 +19,7 @@ export function LangSwitch({ locale, label }: { locale: Locale; label: string })
   const rest = pathname.replace(/^\/(en|tr)(?=\/|$)/, "");
 
   return (
-    <div className="flex h-11 items-center gap-0.5 rounded-md border border-border bg-raised px-1" aria-label={label}>
+    <div className="flex h-11 shrink-0 items-center gap-0.5 border border-rule bg-surface px-1" aria-label={label}>
       {LOCALES.map((option) => (
         <Link
           key={option}
@@ -27,8 +27,8 @@ export function LangSwitch({ locale, label }: { locale: Locale; label: string })
           hrefLang={option}
           aria-current={option === locale ? "true" : undefined}
           className={cn(
-            "flex h-8 w-7 items-center justify-center rounded font-mono text-xs",
-            option === locale ? "bg-surface text-accent" : "text-muted hover:text-text"
+            "flex h-8 w-7 items-center justify-center font-mono text-xs",
+            option === locale ? "bg-raised text-accent" : "text-muted hover:text-text"
           )}
         >
           {option.toUpperCase()}

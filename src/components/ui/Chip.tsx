@@ -22,7 +22,7 @@ export function Chip({
   className?: string;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs", TONE_CLASS[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap border border-rule px-2 py-1 text-xs", TONE_CLASS[tone], className)}>
       {icon ? <span aria-hidden="true">{icon}</span> : null}
       {label}
     </span>
