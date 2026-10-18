@@ -5,7 +5,8 @@ import { formatNumber } from "@/lib/format";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
 import Link from "next/link";
-import { TabBar } from "@/components/TabBar";
+import { DeskNav } from "@/components/shell/DeskNav";
+import { PageHeader } from "@/components/shell/PageHeader";
 import type { ClassifiedModel } from "@/lib/model";
 
 type Direction = "max" | "min" | null;
@@ -32,12 +33,12 @@ export default async function ComparePage({
   if (slugs.length === 0) {
     return (
       <>
-        <TabBar locale={locale} />
+        <DeskNav locale={locale} />
         <EmptyState
           locale={locale}
           message={t(dict, "compare.title")}
           hint={t(dict, "empty.compareHint")}
-          action={{ href: hrefFor(locale, "/"), label: t(dict, "empty.backToFeed") }}
+          action={{ href: hrefFor(locale, "/models"), label: t(dict, "empty.backToFeed") }}
         />
       </>
     );
@@ -50,12 +51,12 @@ export default async function ComparePage({
   if (models.length === 0) {
     return (
       <>
-        <TabBar locale={locale} />
+        <DeskNav locale={locale} />
         <EmptyState
           locale={locale}
           message={t(dict, "empty.noModels")}
           hint={t(dict, "empty.compareHint")}
-          action={{ href: hrefFor(locale, "/"), label: t(dict, "empty.backToFeed") }}
+          action={{ href: hrefFor(locale, "/models"), label: t(dict, "empty.backToFeed") }}
         />
       </>
     );
@@ -102,14 +103,14 @@ export default async function ComparePage({
 
   return (
     <>
-      <TabBar locale={locale} />
-      <h1 className="mb-3 text-2xl font-semibold tracking-tight">{t(dict, "compare.title")}</h1>
+      <DeskNav locale={locale} />
+      <PageHeader title={t(dict, "compare.title")} kicker={t(dict, "nav.compare")} />
 
       <div className="card overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead className="sticky top-0">
             <tr className="border-b border-border text-left">
-              <th className="py-3 pr-3 text-xs uppercase tracking-wide text-muted">{t(dict, "common.viewModel")}</th>
+              <th className="label py-3 pr-3 text-muted">{t(dict, "common.viewModel")}</th>
               {models.map((model) => (
                 <th key={model.slug} className="py-3 pr-3 font-medium">
                   <Link href={`/m/${model.slug}`} className="hover:text-accent">
@@ -124,7 +125,7 @@ export default async function ComparePage({
               const best = bestIndex(row);
               return (
                 <tr key={row.label} className="border-b border-border">
-                  <td className="py-2.5 pr-3 text-xs uppercase tracking-wide text-muted">{row.label}</td>
+                  <td className="label py-2.5 pr-3 font-normal tracking-normal text-muted normal-case">{row.label}</td>
                   {models.map((model, index) => (
                     <td
                       key={model.slug}

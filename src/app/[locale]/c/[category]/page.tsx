@@ -1,5 +1,6 @@
 import { FeedView } from "@/components/FeedView";
-import { TabBar } from "@/components/TabBar";
+import { DeskNav } from "@/components/shell/DeskNav";
+import { PageHeader } from "@/components/shell/PageHeader";
 import { feedFiltersOf, parseFeedQuery } from "@/lib/query";
 import { categoryLabel } from "@/lib/classify/rules";
 import { dictionary, pickLocale, t } from "@/i18n";
@@ -23,13 +24,14 @@ export default async function CategoryPage({
 
   return (
     <>
-      <TabBar locale={locale} active={category} filters={feedFiltersOf(query)} />
-      {/* Same shape as the feed page: a descriptive h1 plus a one-line statement,
-          so the route explains itself on a phone where the header cannot. */}
-      <div className="mb-4">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-2xl">{categoryLabel(category)}</h1>
-        <p className="mt-2 max-w-4xl text-sm text-muted">{t(dict, "feed.lede")}</p>
-      </div>
+      <DeskNav locale={locale} active={category} filters={feedFiltersOf(query)} />
+      {/* Same shape as the index: a descriptive h1 plus a one-line statement, so
+          the route explains itself on a phone where the masthead cannot. */}
+      <PageHeader
+        title={categoryLabel(category)}
+        kicker={t(dict, "desk.title", { label: categoryLabel(category) })}
+        lede={t(dict, "desk.lede", { label: categoryLabel(category).toLowerCase() })}
+      />
       <FeedView locale={locale} category={category} query={query} raw={normalizeRaw(raw)} />
     </>
   );

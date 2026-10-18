@@ -14,6 +14,9 @@ const EXCLUDED = ["/sitemap.xml", "/robots.txt", "/feed.rss", "/favicon.ico"];
  */
 const STATIC_FILE = /^\/[^/]+\.[a-z0-9]+$/i;
 
+/** Query parameters that only ever described the model index (see `lib/query.ts`). */
+export const FEED_PARAMS = ["window", "sort", "gate", "runner", "maxParams", "license", "q", "page"] as const;
+
 function detectLocale(request: NextRequest): Locale {
   const header = request.headers.get("accept-language") ?? "";
   for (const part of header.split(",")) {
@@ -46,6 +49,19 @@ export function middleware(request: NextRequest) {
 
   if (!isLocale(segments[0])) {
     return NextResponse.redirect(new URL(`/${detectLocale(request)}${path}`, request.url));
+  }
+
+  /* The index moved from `/` to `/models` (docs/en/DESIGN-V3.md D3). A URL that
+     carries feed filters is a query against the index, not a request for the
+     front page, so it is redirected permanently (`/` itself is left alone — the
+     front page reads no search params). */
+  if (segments.length === 1) {
+    const url = new URL(request.url);
+    if (FEED_PARAMS.some((param) => url.searchParams.has(param))) {
+      const target = new URL(`/${segments[0]}/models`, request.url);
+      target.search = url.search;
+      return NextResponse.redirect(target, 308);
+    }
   }
 
   return NextResponse.next();

@@ -8,13 +8,13 @@ import { Stat } from "./ui/Stat";
 import { Term } from "./ui/Term";
 
 /**
- * Window summary.
+ * The window summary band on the index (docs/en/DESIGN-V3.md §1 rule 2).
  *
- * The card used to be 287 px tall: four equal-weight 24 px stats plus an
- * always-open five-row list, which pushed the first model card to y=882 on a
- * 1440x900 screen. One metric now leads (`tracked`, 30 px), the rest are
- * secondary, and the hot list is a disclosure — the same information, one click
- * away, in ~135 px.
+ * It used to be a 287 px card with a grid texture, a rotating radar sweep and
+ * four equal-weight 24 px stats. The card is gone: it is a ruled band now, the
+ * decorative layers are gone with it (nothing moves inside the reading area), one
+ * metric still leads, and the hot list stays a disclosure — one click away and
+ * outside the first screen's budget.
  */
 export async function PulseStrip({ locale, days, category }: { locale: Locale; days: number; category?: string }) {
   const dict = dictionary(locale);
@@ -24,22 +24,12 @@ export async function PulseStrip({ locale, days, category }: { locale: Locale; d
   const window = days === 1 ? t(dict, "pulse.windowDay") : t(dict, "pulse.windowDays", { days });
 
   return (
-    <section className="card relative p-4 mb-4" aria-labelledby="pulse-summary">
-      {/* The texture is clipped in its own layer instead of clipping the whole card:
-          `overflow-hidden` on the card cut off the hot-list panel that opens from
-          the disclosure below (the panel is absolutely positioned on `lg`). */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]" aria-hidden="true">
-        <div className="grid-bg absolute inset-0 opacity-40" />
-        <div className="sweep absolute inset-0 opacity-30" />
-      </div>
-
-      {/* A real heading: the feed had exactly one heading in total, so assistive
-          tech and the document outline saw none of this structure. */}
-      <h2 id="pulse-summary" className="relative mb-2 text-xs uppercase tracking-wide text-muted">
+    <section className="rule-bottom mb-4 pb-3" aria-labelledby="pulse-summary">
+      <h2 id="pulse-summary" className="label mb-2 text-muted">
         {t(dict, "pulse.summary")}
       </h2>
 
-      <div className="relative flex flex-wrap items-end gap-x-6 gap-y-3">
+      <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
         <Stat label={t(dict, "pulse.tracked")} value={pulse.tracked} tone="accent" size="lg" hint={window} />
         <Stat
           label={
@@ -73,11 +63,11 @@ export async function PulseStrip({ locale, days, category }: { locale: Locale; d
             </summary>
             {/* Each row is its own grid with an identical template, so the time and
                 download columns line up across rows. */}
-            <ol className="grid gap-1 pt-1 lg:absolute lg:right-0 lg:z-20 lg:mt-1 lg:w-[34rem] lg:gap-2 lg:rounded-md lg:border lg:border-border lg:bg-surface lg:p-3 lg:shadow-[var(--shadow-lift)]">
+            <ol className="grid grid-cols-1 gap-1 pt-1 lg:absolute lg:right-0 lg:z-20 lg:mt-1 lg:w-[34rem] lg:gap-2 lg:border lg:border-rule-strong lg:bg-surface lg:p-3 lg:shadow-[var(--shadow-lift)]">
               {pulse.hot.map((model, index) => (
                 <li key={model.externalId} className="hot-row text-sm">
                   <span className="font-mono text-xs text-muted">{index + 1}</span>
-                  <Link href={hrefFor(locale, `/m/${model.slug}`)} className="flex min-h-7 min-w-0 items-center hover:text-accent">
+                  <Link href={hrefFor(locale, `/m/${model.slug}`)} className="flex min-h-7 min-w-0 items-center hover:underline">
                     <span className="truncate">{model.externalId}</span>
                   </Link>
                   <span className="flex items-center justify-end gap-1 font-mono text-xs text-muted">

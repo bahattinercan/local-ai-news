@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { GLOSSARY, GLOSSARY_CATEGORIES, getGlossaryEntry, glossaryText } from "@/lib/glossary";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
-import { TabBar } from "@/components/TabBar";
+import { DeskNav } from "@/components/shell/DeskNav";
 
 /** Derived, never hand-listed: a new entry is prerendered automatically. */
 export function generateStaticParams() {
@@ -29,7 +29,7 @@ export default async function GlossaryEntryPage({
 
   return (
     <>
-      <TabBar locale={locale} />
+      <DeskNav locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -47,11 +47,9 @@ export default async function GlossaryEntryPage({
         </Link>
       </p>
 
-      <article className="card p-5">
-        <span className="text-xs uppercase tracking-wide text-muted">
-          {GLOSSARY_CATEGORIES[entry.category][locale]}
-        </span>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">{text.term}</h1>
+      <article className="rule-strong pt-2">
+        <span className="label text-accent">{GLOSSARY_CATEGORIES[entry.category][locale]}</span>
+        <h1 className="mt-1 font-display text-2xl font-bold tracking-tight">{text.term}</h1>
         <p className="mt-2 text-sm text-accent">{text.summary}</p>
 
         <div className="mt-4 grid gap-3">

@@ -1,7 +1,8 @@
 import { getNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 import { NewsList } from "@/components/NewsList";
-import { TabBar } from "@/components/TabBar";
+import { DeskNav } from "@/components/shell/DeskNav";
+import { PageHeader } from "@/components/shell/PageHeader";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
 
@@ -20,7 +21,7 @@ export default async function NewsPage({
 
   return (
     <>
-      <TabBar locale={locale} />
+      <DeskNav locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -35,10 +36,7 @@ export default async function NewsPage({
         }}
       />
 
-      <header className="mb-3">
-        <h1 className="text-2xl font-semibold tracking-tight">{t(dict, "news.title")}</h1>
-        <p className="mt-1 text-sm text-muted">{t(dict, "news.subtitle")}</p>
-      </header>
+      <PageHeader title={t(dict, "news.title")} lede={t(dict, "news.subtitle")} />
 
       <NewsList locale={locale} query={{ ...query, scope: "news" }} />
     </>

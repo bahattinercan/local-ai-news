@@ -11,7 +11,7 @@ export function BarChart({
   max: number;
 }) {
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       {rows.map((row) => (
         <div key={row.label} className="bar-row items-center">
           <div className="min-w-0">
@@ -66,7 +66,21 @@ export function TrendChart({ points, caption }: { points: Array<{ date: string; 
   );
 }
 
-const DONUT_PALETTE = ["var(--accent)", "var(--accent-2)", "var(--ok)", "var(--warn)", "var(--danger)", "var(--muted)", "var(--border)"];
+/**
+ * Categorical fills, ordered so the biggest slice is the accent and the second is
+ * ink — the printed page's two real colours (docs/en/DESIGN-V3.md D8). The rest
+ * are the status tokens, which `scripts/contrast.ts` keeps verifiable rather than
+ * hand-picked per chart.
+ */
+const DONUT_PALETTE = [
+  "var(--accent)",
+  "var(--rule-strong)",
+  "var(--accent-2)",
+  "var(--muted)",
+  "var(--warn)",
+  "var(--ok)",
+  "var(--danger)"
+];
 
 /**
  * Share donut with a legend.

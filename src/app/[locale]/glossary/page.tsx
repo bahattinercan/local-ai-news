@@ -2,7 +2,8 @@ import Link from "next/link";
 import { GLOSSARY, GLOSSARY_CATEGORIES, glossaryByCategory, glossaryText } from "@/lib/glossary";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
-import { TabBar } from "@/components/TabBar";
+import { DeskNav } from "@/components/shell/DeskNav";
+import { PageHeader } from "@/components/shell/PageHeader";
 
 export default async function GlossaryPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = pickLocale((await params).locale);
@@ -11,7 +12,7 @@ export default async function GlossaryPage({ params }: { params: Promise<{ local
 
   return (
     <>
-      <TabBar locale={locale} />
+      <DeskNav locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -27,18 +28,15 @@ export default async function GlossaryPage({ params }: { params: Promise<{ local
         }}
       />
 
-      <header className="mb-5">
-        <h1 className="text-2xl font-semibold tracking-tight">{t(dict, "glossary.title")}</h1>
-        <p className="mt-1 text-sm text-muted">{t(dict, "glossary.subtitle")}</p>
-      </header>
+      <PageHeader title={t(dict, "glossary.title")} kicker={t(dict, "nav.glossary")} lede={t(dict, "glossary.subtitle")} />
 
       <div className="grid gap-5">
         {groups.map((group) => (
           <section key={group.category}>
-            <h2 className="mb-2 text-xs uppercase tracking-wide text-muted">
+            <h2 className="section-title mb-2">
               {GLOSSARY_CATEGORIES[group.category][locale]}
             </h2>
-            <div className="grid gap-3 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {group.entries.map((entry) => {
                 const text = glossaryText(entry, locale);
                 return (

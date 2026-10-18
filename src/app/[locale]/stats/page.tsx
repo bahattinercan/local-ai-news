@@ -1,7 +1,8 @@
 import { getStats, getDailySeries } from "@/lib/store";
 import { categoryLabel } from "@/lib/classify/rules";
 import { DataNotice } from "@/components/EmptyState";
-import { TabBar } from "@/components/TabBar";
+import { DeskNav } from "@/components/shell/DeskNav";
+import { PageHeader } from "@/components/shell/PageHeader";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { BarChart, Donut, TrendChart } from "@/components/ui/Charts";
 import { Field, SubmitButton } from "@/components/ui/Controls";
@@ -30,14 +31,16 @@ export default async function StatsPage({
 
   return (
     <>
-      <TabBar locale={locale} />
+      <DeskNav locale={locale} />
       <DataNotice locale={locale} />
 
-      <h1 className="mb-3 text-2xl font-semibold tracking-tight">
-        {t(dict, "stats.title")} <span className="font-mono text-muted">({days}d)</span>
-      </h1>
+      <PageHeader
+        title={t(dict, "stats.title")}
+        kicker={t(dict, "nav.stats")}
+        aside={<span className="font-mono text-sm text-muted">{days}d · {total} {t(dict, "stats.models")}</span>}
+      />
 
-      <form method="get" className="card p-3 mb-4 flex flex-wrap items-end gap-3 text-sm">
+      <form method="get" className="rule-strong rule-bottom mb-4 flex flex-wrap items-end gap-3 pb-3 text-sm">
         <Field
           name="days"
           label={t(dict, "filters.window")}
@@ -53,21 +56,18 @@ export default async function StatsPage({
           options={[["passed", t(dict, "filters.passedOnly")], ["all", t(dict, "filters.showEverything")]]}
         />
         <SubmitButton label={t(dict, "filters.apply")} />
-        <span className="font-mono text-xs text-muted">
-          {total} {t(dict, "stats.models")}
-        </span>
       </form>
 
       <div className="stats-grid">
-        <section className="card p-4">
+        <section className="rule-bottom pb-4">
           {/* Distinct from the h1 on purpose: two identical headings made the
               page look like it had repeated itself. */}
-          <h2 className="text-sm uppercase tracking-wide text-muted mb-3">{t(dict, "stats.bars")}</h2>
+          <h2 className="section-title mb-3">{t(dict, "stats.bars")}</h2>
           <BarChart rows={stats.map((row) => ({ label: categoryLabel(row.category), value: row.count }))} max={max} />
         </section>
 
-        <section className="card p-4 flex flex-col gap-3">
-          <h2 className="text-sm uppercase tracking-wide text-muted">{t(dict, "stats.share")}</h2>
+        <section className="rule-bottom flex flex-col gap-3 pb-4">
+          <h2 className="section-title">{t(dict, "stats.share")}</h2>
           <Donut
             label={t(dict, "stats.share")}
             mutedLabel={t(dict, "stats.noHistory")}
@@ -76,8 +76,8 @@ export default async function StatsPage({
         </section>
       </div>
 
-      <section className="card p-4 mt-3">
-        <h2 className="text-sm uppercase tracking-wide text-muted mb-3">{t(dict, "stats.trend")}</h2>
+      <section className="rule-bottom mt-3 pb-4">
+        <h2 className="section-title mb-3">{t(dict, "stats.trend")}</h2>
         {series.length >= 3 ? (
           <TrendChart
             points={series}

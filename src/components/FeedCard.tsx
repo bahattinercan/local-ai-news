@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Download, HardDrive, Heart, Scale } from "lucide-react";
 import { cn, daysSince, formatBytes, formatNumber } from "@/lib/format";
@@ -8,20 +7,23 @@ import { formatParams } from "@/lib/runner/vram";
 import type { ClassifiedModel } from "@/lib/model";
 import { getGlossaryEntry, glossaryText } from "@/lib/glossary";
 import { Chip } from "./ui/Chip";
+import { PressPlate } from "./ui/PressPlate";
 import { Term } from "./ui/Term";
 import { Meter } from "./ui/Stat";
 
 /**
- * Data-first card.
+ * A ruled index row (docs/en/DESIGN-V3.md §1 rule 2, §7.2 `ModelRow`).
  *
- * The gates in docs/en/DESIGN-V2.md §7 are the reason for every conditional
- * below: on the served snapshot `paramsTotal` exists on 6.5 % of models, `vramEstGb`
- * on 6.5 %, `license` on 27.4 %, `storageBytes` on 29.8 %, `runners` on 70.3 % and
- * `sampleImages` on 1.0 %. The old card printed a row for each of them anyway, so
- * four of its six rows read "params unknown" / "—" on a median card and a card
- * with no data looked exactly like a card full of data. A row now renders only
- * when it has something to say, the avatar shrank from 88 px to 44 px (56 px more
- * width for the title), and `downloads` is the one metric that gets weight.
+ * The card wrapper is gone: a border, a radius, a shadow and 16 px of padding on
+ * all four sides wrapped the same two lines of text, and the gap between cards
+ * added the rest. A 1 px rule and 12 px of padding separate rows just as clearly
+ * and cost roughly 40 % less height per row.
+ *
+ * Every data rule from DESIGN-V2 §7 is kept, because they were earned by
+ * measurement on the served snapshot: a row renders a field only when it exists
+ * (`paramsTotal` 6.2 %, `vramEstGb` 6.2 %, `license` 24.5 %, `storageBytes` 26.1 %,
+ * `runners` 100 %), `downloads` carries the weight, and the avatar is a 52 px
+ * plate instead of an 88 px monogram.
  */
 export function FeedCard({
   model,
@@ -38,26 +40,14 @@ export function FeedCard({
   /* The chip links its own definition; VRAM is the most misread metric here. */
   const vramEntry = getGlossaryEntry("vram");
   const vramSummary = vramEntry ? glossaryText(vramEntry, locale).summary : "";
+  const href = hrefFor(locale, `/m/${model.slug}`);
 
   return (
-    <article className="card p-4 overflow-hidden">
-      <div className="flex gap-3">
-        {model.sampleImages[0] ? (
-          <Image
-            src={model.sampleImages[0]}
-            alt={model.name}
-            width={44}
-            height={44}
-            className="h-11 w-11 shrink-0 rounded-md object-cover border border-border"
-          />
-        ) : (
-          <div
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-md border border-border bg-raised font-mono text-xs text-muted"
-            aria-hidden="true"
-          >
-            {(model.author || model.name).slice(0, 2).toUpperCase()}
-          </div>
-        )}
+    <article className="rule-bottom overflow-hidden">
+      <div className="flex gap-3 py-3">
+        <Link href={href} tabIndex={-1} className="shrink-0" aria-hidden="true">
+          <PressPlate slug={model.slug} name={model.name} className="h-12 w-12 border border-rule" />
+        </Link>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
@@ -65,13 +55,13 @@ export function FeedCard({
                 break-word` does not lower min-content, so a 45-character repo id
                 still set the grid track width. The chip keeps `shrink-0` so the
                 badge is never squeezed by a long id. */}
-            <Link href={hrefFor(locale, `/m/${model.slug}`)} className="min-w-0 line-clamp-2 font-medium hover:text-accent">
+            <Link href={href} className="min-h-6 min-w-0 line-clamp-2 text-row font-semibold hover:underline">
               {model.externalId}
             </Link>
             {model.qualityPassed ? null : <Chip label={t(dict, "card.gateFailed")} tone="warn" className="shrink-0" />}
           </div>
 
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted">
             <span>{categoryLabel(model.primaryCategory)}</span>
             {model.libraryName ? (
               <>
@@ -93,7 +83,7 @@ export function FeedCard({
             </span>
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-sm">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-sm">
             <span className="flex items-center gap-1 font-medium text-accent">
               <Download size={13} aria-hidden="true" /> {formatNumber(model.downloads)}
             </span>
@@ -132,7 +122,10 @@ export function FeedCard({
                 <Chip label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB`} tone="accent" />
               </Link>
             ) : null}
-            <Link href={hrefFor(locale, `/compare?ids=${model.slug}`)} className="inline-flex min-h-7 items-center gap-1 text-accent">
+            <Link
+              href={hrefFor(locale, `/compare?ids=${model.slug}`)}
+              className="inline-flex min-h-6 items-center gap-1 text-accent"
+            >
               <Scale size={12} aria-hidden="true" />
               {t(dict, "compare.add")}
             </Link>

@@ -91,7 +91,7 @@ export async function NewsList({ locale, query }: { locale: Locale; query: NewsL
           action={{ href: `?window=30d&scope=${query.scope}`, label: t(dict, "empty.widen30") }}
         />
       ) : (
-        <div className="grid gap-3">
+        <div className="grid grid-cols-1 gap-3">
           {[...groups.entries()].map(([day, dayItems], index) => (
             <details key={day} className="card p-4" open={index === 0}>
               <summary className="flex cursor-pointer items-center justify-between gap-2 text-xs text-muted font-mono">
@@ -101,7 +101,7 @@ export async function NewsList({ locale, query }: { locale: Locale; query: NewsL
                 </span>
                 <span>{dayItems.length}</span>
               </summary>
-              <div className="mt-3 grid gap-3">
+              <div className="mt-3 grid grid-cols-1 gap-3">
                 {dayItems.map((item) => (
                   <NewsCard key={item.externalId} item={item} locale={locale} />
                 ))}

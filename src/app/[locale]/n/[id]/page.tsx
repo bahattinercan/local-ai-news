@@ -7,7 +7,7 @@ import { newsText } from "@/lib/news-text";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
-import { TabBar } from "@/components/TabBar";
+import { DeskNav } from "@/components/shell/DeskNav";
 import { FeedCard } from "@/components/FeedCard";
 import { Chip } from "@/components/ui/Chip";
 
@@ -37,7 +37,7 @@ export default async function NewsItemPage({
   if (!item) {
     return (
       <>
-        <TabBar locale={locale} />
+        <DeskNav locale={locale} />
         <EmptyState
           locale={locale}
           message={t(dict, "empty.noModels")}
@@ -57,7 +57,7 @@ export default async function NewsItemPage({
 
   return (
     <>
-      <TabBar locale={locale} />
+      <DeskNav locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -91,7 +91,7 @@ export default async function NewsItemPage({
           {item.organization ? <span className="text-muted">{item.organization}</span> : null}
         </div>
 
-        <h1 className="mt-3 text-2xl font-semibold leading-snug tracking-tight break-words">
+        <h1 className="headline mt-3 font-display text-2xl leading-snug tracking-tight break-words sm:text-3xl">
           {title || t(dict, "news.untitled")}
         </h1>
 
@@ -106,7 +106,7 @@ export default async function NewsItemPage({
             href={item.url}
             rel="noopener noreferrer nofollow"
             target="_blank"
-            className="flex h-11 items-center gap-1.5 rounded-md border border-border px-3 text-sm text-accent"
+            className="flex h-11 items-center gap-1.5 border border-rule-strong bg-text px-3 text-sm text-bg"
           >
             <ExternalLink size={13} aria-hidden="true" />
             {t(dict, "news.source")}
@@ -117,8 +117,8 @@ export default async function NewsItemPage({
 
       {model ? (
         <section className="mt-4">
-          <h2 className="mb-3 text-lg font-semibold">{t(dict, "detail.related")}</h2>
-          <div className="grid gap-3 lg:grid-cols-2">
+          <h2 className="section-title mb-3">{t(dict, "detail.related")}</h2>
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
             <FeedCard model={model} locale={locale} />
           </div>
         </section>

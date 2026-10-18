@@ -35,9 +35,37 @@ test("a page without a locale is redirected using Accept-Language", () => {
 });
 
 test("an already-localised path passes through untouched", () => {
-  for (const path of ["/tr", "/en/news", "/tr/c/multimodal", "/en/m/some-model"]) {
+  for (const path of ["/tr", "/en/news", "/tr/c/multimodal", "/en/m/some-model", "/tr/models"]) {
     assert.equal(passesThrough(middleware(request(path))), true, path);
   }
+});
+
+/**
+ * The index moved from `/` to `/models` (docs/en/DESIGN-V3.md D3). A URL that
+ * carries feed filters is a query against the index, not a request for the front
+ * page, so it is redirected — permanently, because it is a move, not a rewrite.
+ * The front page itself reads no search params and must keep answering 200.
+ */
+test("a feed query on the root moves to the index", () => {
+  const cases: Array<[string, string]> = [
+    ["/tr?window=30d", "/tr/models"],
+    ["/tr?sort=downloads&gate=all", "/tr/models"],
+    ["/en?q=qwen", "/en/models"],
+    ["/tr?page=3", "/tr/models"]
+  ];
+
+  for (const [path, target] of cases) {
+    const response = middleware(request(path));
+    assert.equal(redirectedTo(response), target, path);
+    assert.equal(response.status, 308, `${path} was not a permanent redirect`);
+    const location = new URL(response.headers.get("location") ?? "");
+    assert.equal(location.search, new URL(path, "http://localhost:3000").search, `${path} lost its query string`);
+  }
+
+  // The front page and its locale redirects are untouched.
+  assert.equal(passesThrough(middleware(request("/tr"))), true);
+  assert.equal(passesThrough(middleware(request("/en"))), true);
+  assert.equal(redirectedTo(middleware(request("/"))), "/en");
 });
 
 test("api requests are rate limited per ip and recover after the window", () => {

@@ -1,7 +1,8 @@
 import { getNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 import { NewsList } from "@/components/NewsList";
-import { TabBar } from "@/components/TabBar";
+import { DeskNav } from "@/components/shell/DeskNav";
+import { PageHeader } from "@/components/shell/PageHeader";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
 
@@ -26,7 +27,7 @@ export default async function ResearchPage({
 
   return (
     <>
-      <TabBar locale={locale} />
+      <DeskNav locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -41,10 +42,7 @@ export default async function ResearchPage({
         }}
       />
 
-      <header className="mb-3">
-        <h1 className="text-2xl font-semibold tracking-tight">{t(dict, "research.title")}</h1>
-        <p className="mt-1 text-sm text-muted">{t(dict, "research.subtitle")}</p>
-      </header>
+      <PageHeader title={t(dict, "research.title")} lede={t(dict, "research.subtitle")} />
 
       <NewsList locale={locale} query={{ ...query, scope: "research" }} />
     </>

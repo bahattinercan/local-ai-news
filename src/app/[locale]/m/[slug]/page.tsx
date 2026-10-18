@@ -9,7 +9,8 @@ import { formatParams } from "@/lib/runner/vram";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { EmptyState, DataNotice } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
-import { TabBar } from "@/components/TabBar";
+import { DeskNav } from "@/components/shell/DeskNav";
+import { PressPlate } from "@/components/ui/PressPlate";
 import { FeedCard } from "@/components/FeedCard";
 import { Chip } from "@/components/ui/Chip";
 import { CopyCommand } from "@/components/CopyCommand";
@@ -28,13 +29,13 @@ export default async function ModelPage({
   if (!model) {
     return (
       <>
-        <TabBar locale={locale} />
+        <DeskNav locale={locale} />
         <DataNotice locale={locale} />
         <EmptyState
           locale={locale}
           message={t(dict, "empty.noModels")}
           hint={t(dict, "empty.notFoundHint")}
-          action={{ href: hrefFor(locale, "/"), label: t(dict, "empty.backToFeed") }}
+          action={{ href: hrefFor(locale, "/models"), label: t(dict, "empty.backToFeed") }}
         />
       </>
     );
@@ -69,7 +70,7 @@ export default async function ModelPage({
 
   return (
     <>
-      <TabBar locale={locale} />
+      <DeskNav locale={locale} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -87,25 +88,28 @@ export default async function ModelPage({
 
       <section className="card p-5">
         <div className="flex flex-wrap gap-4">
+          {/* `sampleImages` exists on 1.5 % of models, so the slot is the generated
+              plate first and the real sample second — the reverse of `PlateImage`,
+              because a model page is the one place a real sample is worth the space. */}
           {model.sampleImages[0] ? (
             <Image
               src={model.sampleImages[0]}
               alt={model.name}
               width={220}
               height={220}
-              className="h-[180px] w-[180px] rounded-md border border-border object-cover"
+              className="halftone h-[180px] w-[180px] border border-rule object-cover"
             />
           ) : (
-            <div
-              className="h-[180px] w-[180px] rounded-md border border-dashed border-border bg-raised grid place-items-center font-mono text-lg text-muted"
-              aria-hidden="true"
-            >
-              {(model.author || model.name).slice(0, 2).toUpperCase()}
-            </div>
+            <PressPlate
+              slug={model.slug}
+              name={model.name}
+              label={model.externalId}
+              className="h-[180px] w-[180px] border border-rule"
+            />
           )}
 
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight">{model.externalId}</h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight break-words">{model.externalId}</h1>
             <p className="mt-1 text-sm text-muted">
               {categoryLabel(model.primaryCategory)} · {model.libraryName ?? "—"} ·{" "}
               {model.paramsTotal ? `${formatParams(model.paramsTotal)} ${t(dict, "card.params")}` : t(dict, "card.paramsUnknown")}
@@ -116,7 +120,7 @@ export default async function ModelPage({
                 tone={model.qualityPassed ? "ok" : "warn"}
               />
               <Chip label={`${t(dict, "card.new")} ${daysSince(model.firstSeenAt)}d`} tone="accent" />
-              <a href={model.url} className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-sm text-accent">
+              <a href={model.url} className="flex min-h-6 items-center gap-1.5 border border-rule px-2.5 py-1 text-sm text-accent">
                 <Activity size={13} aria-hidden="true" />
                 {model.externalId}
               </a>
@@ -125,7 +129,7 @@ export default async function ModelPage({
         </div>
       </section>
 
-      <section className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {specs.map((spec) => {
           const Icon = spec.icon;
           return (
@@ -195,7 +199,7 @@ export default async function ModelPage({
 
       <section className="mt-6">
         <h2 className="text-lg font-semibold mb-3">{t(dict, "detail.related")}</h2>
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {related
             .filter((row) => row.externalId !== model.externalId)
             .slice(0, 4)

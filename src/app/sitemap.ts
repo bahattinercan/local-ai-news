@@ -19,6 +19,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "hourly"
     });
 
+    /* `/models` is the index that used to answer at `/`. The front page links to it
+       as the place the whole snapshot is browsable, so it is canonical and must be
+       advertised (docs/en/DESIGN-V3.md §7.1). */
+    entries.push({
+      url: `${BASE}/${locale}/models`,
+      alternates: { languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE}/${l}/models`])) },
+      changeFrequency: "hourly"
+    });
+
     // `news` is a rule key but not a user-facing category: getCategories()
     // already filters it out, so the sitemap must not advertise /c/news.
     for (const rule of CATEGORY_RULES.filter((r) => r.key !== "news")) {

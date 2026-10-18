@@ -23,7 +23,7 @@ export function FilterBar({
   children?: ReactNode;
 }) {
   const dict = dictionary(locale);
-  const action = category ? hrefFor(locale, `/c/${category}`) : hrefFor(locale, "/");
+  const action = category ? hrefFor(locale, `/c/${category}`) : hrefFor(locale, "/models");
 
   /* `defaultValue` is what the select is pre-set to, so the summary below can
      tell "this filter is on" apart from "this is just the default". Before,
@@ -66,7 +66,7 @@ export function FilterBar({
   const secondaryActive = secondary.filter(isSet).length;
 
   return (
-    <form method="get" action={action} className="card p-3 text-sm">
+    <form method="get" action={action} className="rule-strong rule-bottom mb-4 pb-3 text-sm">
       <div className="flex flex-wrap items-end gap-2">
         {primary.map((field) => (
           <Field
@@ -80,23 +80,23 @@ export function FilterBar({
           />
         ))}
         <label className="flex min-w-[140px] flex-1 flex-col gap-1 xl:min-w-[180px]">
-          <span className="text-xs uppercase tracking-wide text-muted whitespace-nowrap">{t(dict, "filters.search")}</span>
+          <span className="label whitespace-nowrap text-muted">{t(dict, "filters.search")}</span>
           <input
             name="q"
             defaultValue={String(query.q ?? "")}
             placeholder="model name…"
-            className="h-11 w-full rounded-md border border-border bg-raised px-2.5 text-sm text-text"
+            className="h-11 w-full border border-control bg-surface px-2.5 text-sm text-text"
           />
         </label>
         <SubmitButton label={t(dict, "filters.apply")} />
 
         <details className="w-full lg:w-auto">
-          <summary className="inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-md border border-border bg-raised px-3 text-muted hover:text-text">
+          <summary className="inline-flex h-11 cursor-pointer items-center gap-1.5 border border-rule px-3 text-muted hover:border-rule-strong hover:text-text">
             <SlidersHorizontal size={14} aria-hidden="true" />
             {t(dict, "filters.more")}
             {secondaryActive > 0 ? <span className="font-mono text-xs text-accent">{secondaryActive}</span> : null}
           </summary>
-          <div className="mt-2 flex flex-wrap items-end gap-2 rounded-md border border-border bg-raised/40 p-2">
+          <div className="mt-2 flex flex-wrap items-end gap-2 border border-rule bg-surface p-2">
             {secondary.map((field) => (
               <Field
                 key={field.name}

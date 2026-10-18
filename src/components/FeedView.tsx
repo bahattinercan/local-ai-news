@@ -79,7 +79,7 @@ export async function FeedView({
             locale={locale}
             message={t(dict, "empty.noModels")}
             hint={t(dict, "empty.hintFilters")}
-            action={{ href: category ? hrefFor(locale, `/c/${category}`) : hrefFor(locale, "/"), label: t(dict, "filters.clear") }}
+            action={{ href: category ? hrefFor(locale, `/c/${category}`) : hrefFor(locale, "/models"), label: t(dict, "filters.clear") }}
           />
         </section>
       ) : (
@@ -88,7 +88,7 @@ export async function FeedView({
             {t(dict, "feed.models")}
             <span className="font-mono text-xs font-normal text-muted">{total}</span>
           </h2>
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
             {models.map((model, index) => (
               /* `min-w-0` is load-bearing: a grid item defaults to `min-width: auto`,
                  so one card with an unbreakable 45-character repo id sized the whole
