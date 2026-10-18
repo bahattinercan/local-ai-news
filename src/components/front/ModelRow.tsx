@@ -50,19 +50,24 @@ export function ModelRow({
           >
             {model.name}
           </Link>
-          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
-            <span>{categoryLabel(model.primaryCategory)}</span>
+          {/* One line, truncated: the band prints two columns inside a ~570px
+              track, so a wrapping meta line made every row a different height and
+              the rules came out ragged (measured 2026-10-18). The age moved to the
+              figure column, where it stacks under the download count. */}
+          <p className="mt-0.5 flex items-center gap-x-2 overflow-hidden text-xs text-muted whitespace-nowrap">
+            <span className="shrink-0">{categoryLabel(model.primaryCategory)}</span>
+            {/* One runner plus a count, not a list: the column is ~150px and two
+                joined names truncated to `Ila…`, i.e. the useful half of the
+                sentence was the part that got cut. */}
             {model.runners.length > 0 ? (
               <>
                 <span aria-hidden="true">·</span>
-                <span className="truncate">{model.runners.slice(0, 2).join(", ")}</span>
+                <span className="truncate">
+                  {model.runners[0]}
+                  {model.runners.length > 1 ? ` +${model.runners.length - 1}` : ""}
+                </span>
               </>
             ) : null}
-            <span aria-hidden="true">·</span>
-            <span className={cn("flex items-center gap-1", age <= 1 ? "text-ok" : undefined)}>
-              <Clock size={10} aria-hidden="true" />
-              {t(dict, "card.new")} ({age}d)
-            </span>
           </p>
         </div>
 
@@ -72,7 +77,12 @@ export function ModelRow({
             <p className="font-mono text-[11px] text-ok" title={t(dict, "front.growth")}>
               {formatGrowth(growth)}
             </p>
-          ) : null}
+          ) : (
+            <p className={cn("font-mono text-[11px]", age <= 1 ? "text-ok" : "text-muted")} title={t(dict, "card.new")}>
+              <Clock size={9} aria-hidden="true" className="mr-0.5 inline" />
+              {age}d
+            </p>
+          )}
         </div>
       </div>
     </li>

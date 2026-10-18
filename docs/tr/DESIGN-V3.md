@@ -42,6 +42,9 @@
 3. **Halftone katmanı gece baskısında görünmezdi.** Açık mürekkepli `mix-blend-mode: multiply` bir fotoğraf üzerinde hiçbir şey yapmaz; bu yüzden `--screen-ink` artık iki temada da koyu mürekkep.
 4. **`.byline` kendi saatini büyük harfe çeviriyordu** (`3d` → `3D`, `56m` → `56M`); büyük harf artık yalnızca kurum etiketinde.
 5. **Kahraman klişesi kendi kolonundan taşıyordu.** `PlateImage` piksel boyutunu satır içi stille taşıyordu; bu stil `w-full`'u ezip 720 px'lik görseli 600 px'lik izden raya taşırdı.
+6. **Bağlantılardaki (anchor) her `text-*` rengi sessizce ölüydü.** `globals.css` içinde `a { color: inherit }` kuralı hiçbir katmanın dışında duruyordu ve katmansız CSS, cascade'de katmanlı her kuralı yendiği için sitedeki **her `<a>` üzerinde** Tailwind'in tüm renk yardımcılarını (bütün `hover:text-accent`'ler dahil) eziyordu. RSS çağrı düğmesinde ölçüldü: açık mürekkep açık blok üstünde, yani görünmez düğme (hesaplanan rengi `--text` iken arka planı koyu mürekkep olmalıydı). Temel kurallar artık yerleşmesi gereken yer olan `@layer base` içinde ve tasarımın vurgu katmanı (ok bağlantıları, üst başlıklar, tanıtım çağrısı) gerçekten basılıyor.
+7. **Masa navigasyonu bir taksonomi terimini ortadan kesiyordu.** Şerit 1 280 px'lik konteynerde ~1 375 px yer istiyordu, bu yüzden `EMBEDDING / RAG` ekranda `EMI` olarak geliyordu. Navigasyon artık terimlerin kısa biçimlerini kullanıyor (hâlâ İngilizce taksonomi: LLM, Image, …, Embedding, Vision, Robotics) ve her iki kayar şerit sağ kenarda soluyor, böylece kesilen terim "devamı var" diye okunuyor.
+8. **Ön sayfada `BAŞ HABER` iki kez basılıyordu** — bir kez sayfa üst başlığı, bir kez kahraman manşetinin üstünde. Sayfa üst başlığı artık pencereyi söylüyor; baş haber kendi etiketini koruyor.
 
 ---
 

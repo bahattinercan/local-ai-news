@@ -42,6 +42,9 @@
 3. **The halftone screen was invisible in the night edition.** `mix-blend-mode: multiply` with light ink is a no-op over a photograph, so `--screen-ink` is now a dark ink in both themes.
 4. **`.byline` uppercased its own timestamps** (`3d` → `3D`, `56m` → `56M`); the uppercase moved onto the organisation label only.
 5. **The hero plate broke out of its column.** `PlateImage` carried the pixel size in an inline style, which overrode `w-full` and pushed a 720 px image out of its 600 px track and over the rail.
+6. **Every `text-*` colour on an anchor was silently dead.** `globals.css` carried a bare `a { color: inherit }` *outside* any layer, and unlayered CSS outranks every layered rule in the cascade — so it beat each Tailwind colour utility on every `<a>` on the site, including all the `hover:text-accent`. Measured on the RSS call to action: light ink on a light block, i.e. an invisible button (and its computed colour was `var(--text)` while `--bg` was dark ink). The base rules now live in `@layer base`, where a default belongs, and the accent layer of the design (arrow links, kickers, the promo CTA) actually renders.
+7. **The desk nav hard-cut a taxonomy term.** The strip needed ~1 375 px inside a 1 280 px container, so `EMBEDDING / RAG` arrived as `EMI` with the rest scrolled out of sight. The nav uses the terms' short forms now (still English taxonomy: LLM, Image, …, Embedding, Vision, Robotics), and both scrollable strips fade at the right edge so a cut term reads as "there is more".
+8. **`BAŞ HABER` printed twice** on the front page — once as the page kicker, once above the hero headline. The page kicker names the window; the lead story keeps its own label.
 
 ---
 
