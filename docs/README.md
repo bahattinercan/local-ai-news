@@ -14,6 +14,7 @@ Her doküman iki dilde eşleşir. **EN kaynaktır, TR eşdeğerdir.** Bir dilde 
 | Decisions log | [en/DECISIONS.md](en/DECISIONS.md) | [tr/DECISIONS.md](tr/DECISIONS.md) |
 | Design system & redesign plan | [en/DESIGN.md](en/DESIGN.md) | [tr/DESIGN.md](tr/DESIGN.md) |
 | Design v2 — clarity + modernisation plan (measured audit, 2026-10-16) | [en/DESIGN-V2.md](en/DESIGN-V2.md) | [tr/DESIGN-V2.md](tr/DESIGN-V2.md) |
+| Design v3 — "Basın Baskısı": retro broadsheet front page (implemented, measured 2026-10-18) | [en/DESIGN-V3.md](en/DESIGN-V3.md) | [tr/DESIGN-V3.md](tr/DESIGN-V3.md) |
 | News & AI-detail expansion plan | [en/NEWS-PLAN.md](en/NEWS-PLAN.md) | [tr/NEWS-PLAN.md](tr/NEWS-PLAN.md) |
 | Data storage (no Neon) | [en/DATA-STORAGE.md](en/DATA-STORAGE.md) | [tr/DATA-STORAGE.md](tr/DATA-STORAGE.md) |
 
