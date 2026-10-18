@@ -56,29 +56,38 @@ export function StoryRow({
       <div className="flex gap-3">
         {art === "image" ? (
           <Link href={href} tabIndex={-1} className="shrink-0">
+            {/* 3:2 and 72 px wide, not 96: the rail column is ~296 px, and a 96 px
+                plate left 188 px for text — enough to break the kicker
+                (`RELEASE · LANGUAGE / LLM`) onto two lines and the byline too. */}
             <PlateImage
               src={item.thumbnail}
               alt={headline}
               slug={item.externalId}
               name={headline}
               width={480}
-              height={259}
-              sizes="96px"
-              className="h-16 w-24 border border-rule"
+              height={320}
+              sizes="72px"
+              className="h-12 w-[72px] border border-rule"
             />
           </Link>
         ) : null}
 
         {art === "plate" ? (
           <Link href={href} tabIndex={-1} className="shrink-0">
-            <PressPlate slug={item.externalId} name={headline} className="h-16 w-16 border border-rule" />
+            {/* Smaller between `lg` and `xl`: at 1 024 px the left column is only
+                ~240 px wide, and a 64 px plate pushed the headline to three lines. */}
+            <PressPlate
+              slug={item.externalId}
+              name={headline}
+              className="h-12 w-12 border border-rule xl:h-16 xl:w-16"
+            />
           </Link>
         ) : null}
 
         <div className="min-w-0 flex-1">
-          <p className="label flex flex-wrap items-center gap-x-2 text-accent">
+          <p className="label flex flex-wrap items-center gap-x-2 whitespace-nowrap text-accent">
             {kindLabel}
-            {item.categoryKey ? <span className="text-muted">{categoryLabel(item.categoryKey)}</span> : null}
+            {item.categoryKey && !large ? <span className="text-muted">{categoryLabel(item.categoryKey)}</span> : null}
           </p>
 
           <h3 className={large ? "mt-1.5" : "mt-1"}>

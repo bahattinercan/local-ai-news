@@ -29,34 +29,42 @@ export async function Ribbon({ locale }: { locale: Locale }) {
   return (
     <section className="ribbon border-b border-rule no-print" aria-label={t(dict, "ribbon.title", { days })}>
       <div className="shell">
-        <div
-          className="no-scrollbar flex items-center gap-3 overflow-x-auto py-1.5"
-          tabIndex={0}
-          role="group"
-          aria-label={t(dict, "ribbon.title", { days })}
-        >
-          <span className="label shrink-0 border-r border-rule-strong/25 pr-3">
-            {t(dict, "ribbon.title", { days })}
-          </span>
-          <ol className="flex shrink-0 items-baseline gap-3">
-            {rows.map((model, index) => (
-              <li key={model.externalId} className="flex shrink-0 items-baseline gap-1">
-                <Link
-                  href={hrefFor(locale, `/m/${model.slug}`)}
-                  title={model.externalId}
-                  className="inline-flex min-h-6 max-w-[13rem] items-center truncate text-sm hover:underline"
-                >
-                  {model.name}
-                </Link>
-                <sup className="font-mono text-xs text-accent">{formatNumber(model.downloads)}</sup>
-                {index < rows.length - 1 ? (
-                  <span className="pl-2 text-rule-strong/30" aria-hidden="true">
-                    |
-                  </span>
-                ) : null}
-              </li>
-            ))}
-          </ol>
+        {/* Same right-edge fade as the desk nav: the ticker is longer than the page
+            and a term cut mid-word should read as "scrollable", not broken. */}
+        <div className="relative">
+          <div
+            className="no-scrollbar flex items-center gap-3 overflow-x-auto py-1.5"
+            tabIndex={0}
+            role="group"
+            aria-label={t(dict, "ribbon.title", { days })}
+          >
+            <span className="label shrink-0 border-r border-rule-strong/25 pr-3">
+              {t(dict, "ribbon.title", { days })}
+            </span>
+            <ol className="flex shrink-0 items-baseline gap-3">
+              {rows.map((model, index) => (
+                <li key={model.externalId} className="flex shrink-0 items-baseline gap-1">
+                  <Link
+                    href={hrefFor(locale, `/m/${model.slug}`)}
+                    title={model.externalId}
+                    className="inline-flex min-h-6 max-w-[11rem] items-center truncate text-sm hover:underline"
+                  >
+                    {model.name}
+                  </Link>
+                  <sup className="pl-1 font-mono text-xs text-accent">{formatNumber(model.downloads)}</sup>
+                  {index < rows.length - 1 ? (
+                    <span className="pl-2 text-rule-strong/30" aria-hidden="true">
+                      |
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </div>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-r from-transparent to-bg"
+          />
         </div>
       </div>
     </section>

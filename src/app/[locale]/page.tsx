@@ -57,9 +57,12 @@ export default async function FrontPage({ params }: { params: Promise<{ locale: 
       {/* The h1 is a strap line, not a poster: the nameplate above already carries
           the display size, so this states the route in one line and hands the rest
           of the screen to the lead story. */}
+      {/* The kicker names the *window*, not the lead story: `BAŞ HABER` printed
+          here and again above the hero headline, i.e. the same label twice on one
+          screen. The lead story's own kicker stays where it belongs. */}
       <PageHeader
         title={t(dict, "feed.title")}
-        kicker={t(dict, "front.lead")}
+        kicker={t(dict, "edition.window", { days })}
         aside={<span className="font-mono text-sm text-muted">{front.tracked} {t(dict, "edition.models")}</span>}
       />
 

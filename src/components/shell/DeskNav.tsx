@@ -23,6 +23,27 @@ import { dictionary, hrefFor, t, type Locale } from "@/i18n";
  * in the masthead's disclosure below it, because the masthead replaces its live
  * snapshot block with that disclosure on small screens.
  */
+/**
+ * The nav's short forms. The taxonomy keeps its full English name everywhere else
+ * (`categoryLabel`), because category names are terms rather than UI copy — but a
+ * nav row has to fit ten of them plus five sections, and at 1 440 px
+ * `EMBEDDING / RAG` was hard-cut mid-word (measured: the strip needed ~1 375 px
+ * in a 1 280 px container). These are the same English terms, abbreviated only
+ * where the abbreviation is the term everyone actually uses (LLM, RAG's parent
+ * category is still "Embedding").
+ */
+const NAV_SHORT: Record<string, string> = {
+  llm: "LLM",
+  image: "Image",
+  video: "Video",
+  coding: "Coding",
+  audio: "Audio",
+  multimodal: "Multimodal",
+  embedding: "Embedding",
+  vision: "Vision",
+  robotics: "Robotics"
+};
+
 export async function DeskNav({
   locale,
   active,
@@ -44,7 +65,7 @@ export async function DeskNav({
     { key: "", label: t(dict, "nav.all"), count: total },
     ...CATEGORY_RULES.filter((rule) => rule.key !== "news").map((rule) => ({
       key: rule.key,
-      label: categoryLabel(rule.key),
+      label: NAV_SHORT[rule.key] ?? categoryLabel(rule.key),
       count: counts.get(rule.key) ?? 0
     }))
   ];
@@ -80,8 +101,11 @@ export async function DeskNav({
           reachable at 1180 px: unfixed, the strip measured ~1 375 px and scrolled
           `NEWS · RESEARCH · STATS · COMPARE · GLOSSARY` completely out of view. */}
       <div className="flex items-stretch gap-3">
-        <div className="no-scrollbar min-w-0 flex-1 overflow-x-auto">
-          <ul className="flex items-stretch gap-5">
+        {/* The desks scroll; the right edge fades so a cut term reads as
+            "there is more" instead of "the label broke". */}
+        <div className="relative min-w-0 flex-1">
+          <div className="no-scrollbar -mb-px overflow-x-auto">
+            <ul className="flex items-stretch gap-5">
             {desks.map((desk) => {
               const isActive = desk.key === (active ?? "");
               return (
@@ -102,7 +126,12 @@ export async function DeskNav({
                 </li>
               );
             })}
-          </ul>
+            </ul>
+          </div>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-r from-transparent to-bg"
+          />
         </div>
 
         {/* Sections: desktop only (below `lg` the masthead disclosure carries them). */}

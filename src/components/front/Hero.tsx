@@ -40,10 +40,12 @@ export function Hero({ item, locale, total }: { item: SnapshotNews; locale: Loca
             priority
             className="aspect-[16/9] w-full border border-rule"
           />
-          {/* The reference's one ornament: a halftone dot burst in the corner. */}
+          {/* The reference's one ornament, pinned to the plate's corner as an
+              opaque pasted square: with a transparent background it read as a
+              clipped artefact and let the photograph show through the dots. */}
           <span
             aria-hidden="true"
-            className="absolute -right-2 -top-2 hidden h-12 w-12 plate-dots border border-rule bg-bg lg:block"
+            className="absolute -right-3 -top-3 z-10 hidden h-14 w-14 border border-rule bg-bg plate-dots lg:block"
           />
         </div>
       </Link>
