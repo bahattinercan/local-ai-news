@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ScrollStrip } from "../ui/ScrollStrip";
 import { getMostDownloaded } from "@/lib/store";
 import { formatNumber } from "@/lib/format";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
@@ -29,14 +30,10 @@ export async function Ribbon({ locale }: { locale: Locale }) {
   return (
     <section className="ribbon border-b border-rule no-print" aria-label={t(dict, "ribbon.title", { days })}>
       <div className="shell">
-        {/* Same right-edge fade as the desk nav: the ticker is longer than the page
-            and a term cut mid-word should read as "scrollable", not broken. */}
         <div className="relative">
-          <div
-            className="no-scrollbar flex items-center gap-3 overflow-x-auto py-1.5"
-            tabIndex={0}
-            role="group"
-            aria-label={t(dict, "ribbon.title", { days })}
+          <ScrollStrip
+            label={t(dict, "ribbon.title", { days })}
+            className="flex items-center gap-3 py-1"
           >
             <span className="label shrink-0 border-r border-rule-strong/25 pr-3">
               {t(dict, "ribbon.title", { days })}
@@ -60,7 +57,7 @@ export async function Ribbon({ locale }: { locale: Locale }) {
                 </li>
               ))}
             </ol>
-          </div>
+          </ScrollStrip>
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-r from-transparent to-bg"

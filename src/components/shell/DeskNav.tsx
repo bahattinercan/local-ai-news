@@ -4,6 +4,7 @@ import { CATEGORY_RULES, categoryLabel } from "@/lib/classify/rules";
 import { getCategoryCounts } from "@/lib/store";
 import { FEED_DEFAULTS, type FeedFilterInput } from "@/lib/query";
 import { cn } from "@/lib/format";
+import { ScrollStrip } from "../ui/ScrollStrip";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 
 /**
@@ -104,7 +105,7 @@ export async function DeskNav({
         {/* The desks scroll; the right edge fades so a cut term reads as
             "there is more" instead of "the label broke". */}
         <div className="relative min-w-0 flex-1">
-          <div className="no-scrollbar -mb-px overflow-x-auto">
+          <ScrollStrip label={t(dict, "nav.desks")} className="-mb-px">
             <ul className="flex items-stretch gap-5">
             {desks.map((desk) => {
               const isActive = desk.key === (active ?? "");
@@ -127,7 +128,7 @@ export async function DeskNav({
               );
             })}
             </ul>
-          </div>
+          </ScrollStrip>
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-r from-transparent to-bg"

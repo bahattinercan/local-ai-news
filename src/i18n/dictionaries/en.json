@@ -1,6 +1,7 @@
 {
   "brand": "OpenWeight Radar",
   "nav.primary": "Primary",
+  "nav.desks": "Desks",
   "feed.title": "New open-weight models you can run locally",
   "feed.lede": "Everything added inside the selected window, with the quality gate applied by default.",
   "feed.models": "Models",

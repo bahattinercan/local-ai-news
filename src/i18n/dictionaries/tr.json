@@ -1,6 +1,7 @@
 {
   "brand": "OpenWeight Radar",
   "nav.primary": "Ana gezinme",
+  "nav.desks": "Masalar",
   "feed.title": "Yerelde çalıştırabileceğiniz yeni açık ağırlıklı modeller",
   "feed.lede": "Seçilen pencere içinde eklenen tüm modeller; varsayılan olarak kalite kapısı uygulanır.",
   "feed.models": "Modeller",

@@ -371,6 +371,45 @@
     display: none;
   }
 
+  /* A scrollable strip with a visible, themed affordance (desk nav, ribbon). The
+     thin bar is the difference between "there is more" and "the label broke":
+     measured 2026-10-18, the ribbon was 2 966 px of content in a 1 248 px box with
+     `scrollbar-width: none`, so a mouse user could not reach any of it. */
+  .scroll-strip {
+    /* Deliberately NOT `scrollbar-width: thin` here: setting it makes Chrome ignore
+       the `::-webkit-scrollbar` rules below and fall back to the native thin bar,
+       which cost the shell 19 px of vertical space (measured: 180 → 199 px). */
+    overscroll-behavior-x: contain;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    /* Firefox has no `::-webkit-scrollbar`; this is its only knob. */
+    .scroll-strip {
+      scrollbar-width: thin;
+      scrollbar-color: var(--rule-strong) transparent;
+    }
+  }
+
+  .scroll-strip::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .scroll-strip::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Ink, not a hairline: the thumb sits on the ribbon wash, where `--rule` is
+     nearly the same value as the wash it crosses. Accent on hover/focus says the
+     bar itself is interactive. */
+  .scroll-strip::-webkit-scrollbar-thumb {
+    background: var(--rule-strong);
+  }
+
+  .scroll-strip:hover::-webkit-scrollbar-thumb,
+  .scroll-strip:focus-visible::-webkit-scrollbar-thumb {
+    background: var(--accent);
+  }
+
   .skeleton {
     background: linear-gradient(90deg, var(--surface) 0%, var(--raised) 40%, var(--surface) 80%);
     background-size: 200% 100%;
