@@ -64,13 +64,13 @@ Sahibinin isteği: *"kullanışlı, modern, göze hitap eden … bu tarz bir web
 | 5 | **Bölüm navigasyonu** | harf aralıklı büyük harf `LATEST FEATURED AUTOMOBILES …` + arama simgesi, ince çizgi üstünde | taksonomi *tipografi* olarak, pill olarak değil | `TÜMÜ · SES 247 · GÖMÜLÜ 244 · GÖRSEL 225 …` + arama simgesi |
 | 6 | **Gövde, 3 bölge** | sol kolon (portre + spot + `WATCH VIDEO →`), orta kahraman (foto, üst başlık `TRENDING`, 2 satır manşet, spot, imza + avatar + tarih + önceki/sonraki), sağ ray (renkli tanıtım kutusu + eylem, sonra küçük görselli haber satırları, sonra abonelik kutusu) | **rütbe**: bir haber önde, ikisi yanında, gerisi ray. Okuma sırası boyut ve konumla anlatılır | kahraman = pencerenin en iyi makalesi; sol kolon = runtime/release haberleri; sağ ray = "Kendin çalıştır" kutusu (kopyalanabilir komut) + son haberler + RSS kutusu |
 | 7 | **Süsleme** | kahraman görselinin sağ üstünde halftone nokta patlaması | metin dokusuna dair tek jest, bir köşede | mevcut radar `sweep` + `grid-bg`, sadece manşet gravürü ve kahraman köşesine indirgenmiş |
-| 8 | **Kart değil çizgi** | her ayrımı siyah ince çizgiler ve 3 px bölüm çizgisi yapıyor; tek pastel yıkama (pembe şerit) ve tek renkli kutu (mavi tanıtım) var | dikey alan harcamaz ve "uygulama" değil "basılmış" hissi verir | `--rule` ince çizgi + `--rule-strong` 3 px bölüm çizgisi; kart (`--surface` + gölge) akıştan tamamen çıkar |
+| 8 | **Kart değil çizgi** | her ayrımı siyah ince çizgiler ve 3 px bölüm çizgisi yapıyor; tek pastel yıkama (pembe şerit) ve tek kâğıt tonlu tanıtım kutusu var | dikey alan harcamaz ve "uygulama" değil "basılmış" hissi verir | `--rule` ince çizgi + `--rule-strong` 3 px bölüm çizgisi; kart (`--surface` + gölge) akıştan tamamen çıkar |
 
 **Neden işe yarıyor (çalınmaya değer beş kural):**
 
 1. **Hiyerarşiyi tipografi taşıyor.** Tüm rütbelendirmeyi dört boyut ve iki yazı tipi yapıyor; renk, gölge ve simgeye bağımlılık yok.
 2. **Konteyner yerine çizgi.** Ayrımı 1 px çizgi yapıyor; kart ise aynı iki satır metni çerçeve, köşe yuvarlaması, gölge ve dört yandan 16 px dolguya sarıyor (`FeedCard`'daki `card p-4`) ve sarılan her kart komşusuna boşluk dayatıyor.
-3. **Tek pastel.** Monokrom mürekkep üzerine pembe şerit + bir mavi kutu. Kıtlık, vurgunun anlam kazanmasını sağlıyor.
+3. **Tek pastel.** Monokrom mürekkep üzerine pembe şerit + bir renkli kutu. Kıtlık, vurgunun anlam kazanmasını sağlıyor. Referansta kutu mavi; burada mavi gazete kolonunda yabancı bir panel gibi durdu (görsel inceleme, 2026-10-20), bu yüzden `--promo` sayfanın kendi tonu ve kutuyu `--rule` taşıyor — bkz. §4.
 4. **Harf aralıklı küçük büyük harf.** Referansteki her etiket (`TRENDING`, `READ MORE`, `SUBSCRIBE TO ALL THE NEWS`) 11–13 px harf aralıklı büyük harf. En ucuz "retro basın" sinyali ve bedava.
 5. **Puan üst simgesi.** `9.1` başlığın yanında üst simge olarak: listeyi tablo kurmadan *sıralı* hale getiriyor.
 
@@ -156,7 +156,7 @@ Betik: `.shots/contrast.mjs` → `node .shots/contrast.mjs` (WCAG 2.x bağıl pa
   --rule-strong: #2a2823;  /* 3 px bölüm çizgisi */
   --control: #7d7869;      /* form/denetim sınırı (≥3:1) */
   --ribbon: #f6c9d8;       /* tek pastel yıkama */
-  --promo: #cfe4f5;        /* tek renkli kutu */
+  --promo: #e9e4d7;        /* tanıtım kutusu: sayfanın bir tonu, renkli panel değil */
   --plate-ink: #141310;    /* PressPlate mürekkebi */
 }
 
@@ -167,7 +167,7 @@ Betik: `.shots/contrast.mjs` → `node .shots/contrast.mjs` (WCAG 2.x bağıl pa
   --accent: #ff7ab0; --accent-2: #8fc4ea;
   --ok: #5fd39c; --warn: #e8bd63; --danger: #ff8b80;
   --rule: #33333d; --rule-strong: #d8d4c8; --control: #6b6a74;
-  --ribbon: #3a1c28; --promo: #1b2a38; --plate-ink: #f3f1ea;
+  --ribbon: #3a1c28; --promo: #1c1c22; --plate-ink: #f3f1ea;
 }
 ```
 
@@ -189,7 +189,7 @@ Betik: `.shots/contrast.mjs` → `node .shots/contrast.mjs` (WCAG 2.x bağıl pa
 | `rule / bg` | **1,48** | 1,55 | ≥ 1,4 (dekoratif ince çizgi) | geçti |
 | `rule / surface` | **1,66** | 1,44 | ≥ 1,4 | geçti |
 | `ribbon` üstünde mürekkep | **12,62** | — (gece şeridi koyu: üstüne `--text`) | ≥ 4,5 | geçti |
-| `promo` üstünde mürekkep | **14,22** | — | ≥ 4,5 | geçti |
+| `promo` üstünde mürekkep | **14,64** | 15,00 | ≥ 4,5 | geçti |
 | `surface / bg` | 1,12 | 1,08 | *eşik değil* | ayrımı dolgu değil `--rule` ve `--rule-strong` sağlar (D8). DESIGN-V2'nin "surface/bg ≥ 1,08" eşiği **kartlarla birlikte emekliye ayrıldı**. |
 
 DESIGN-V2 §6'ya göre iki bilinçli değişiklik: **kâğıt rampası tasarım gereği daha düşük kontrastlıdır** (gazete kâğıdı beyaz değildir: `--text` 18+ yerine 16,16) ve **vurgu rengi turkuaz/maviden gül/pembe'ye kayar**, çünkü sayfanın tek yıkaması şerittir. Her şey hem normal zeminde hem renkli kutularda AA'yı pay bırakarak geçiyor.

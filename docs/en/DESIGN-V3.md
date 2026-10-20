@@ -64,13 +64,13 @@ The owner's brief: *"kullanışlı, modern, göze hitap eden … bu tarz bir web
 | 5 | **Section nav** | hamburger + `LATEST FEATURED AUTOMOBILES …` in letterspaced caps + a search icon, sitting on a hairline | taxonomy as *type*, not as pills | `ALL · AUDIO 247 · EMBEDDING 244 · IMAGE 225 …` + search icon |
 | 6 | **Body, 3 zones** | left column (portrait + deck + `WATCH VIDEO →`), centre hero (photo, kicker `TRENDING`, 2-line headline, deck, byline + avatar + date + prev/next), right rail (tinted promo box + CTA, then teaser rows, then subscribe box) | **rank**: one story leads, two flank it, the rest is a rail. Reading order is expressed as size and position | hero = top paper of the window; left column = runtime/release stories; right rail = "Run it yourself" promo (copy command) + latest teasers + RSS box |
 | 7 | **Ornament** | halftone dot burst at the hero's top-right | one printed-texture gesture, in a corner | the existing radar sweep + `grid-bg`, reduced to masthead/hero corner only |
-| 8 | **Rules, not cards** | black hairlines and one 3 px section rule do all the separating; exactly one pastel wash (pink ribbon) and one tinted box (blue promo) | costs no vertical space and reads as "published", not "app" | `--rule` hairlines + `--rule-strong` 3 px section rules; cards (`--surface` + shadow) leave the feed entirely |
+| 8 | **Rules, not cards** | black hairlines and one 3 px section rule do all the separating; exactly one pastel wash (pink ribbon) and one paper-toned promo box | costs no vertical space and reads as "published", not "app" | `--rule` hairlines + `--rule-strong` 3 px section rules; cards (`--surface` + shadow) leave the feed entirely |
 
 **Why it works (the five rules worth stealing):**
 
 1. **Type carries the hierarchy.** Four sizes and two families do all the ranking; there is no reliance on colour, shadows or icons.
 2. **Rules instead of containers.** A 1 px line separates; a card wraps the same two lines of text in a border, a radius, a shadow and 16 px of padding on all four sides (`FeedCard`'s `card p-4`), and every wrapped card forces a gap to its neighbour.
-3. **One pastel.** Pink ribbon + one blue box against monochrome ink. Scarcity is what makes the accent mean something.
+3. **One pastel.** Pink ribbon + one tinted box against monochrome ink. Scarcity is what makes the accent mean something. The reference tints its box blue; here the blue read as a foreign panel in a newsprint column (visual review, 2026-10-20), so `--promo` is a shade of the page itself and `--rule` carries the box — see §4.
 4. **Small caps with tracking.** Every label (`TRENDING`, `READ MORE`, `SUBSCRIBE TO ALL THE NEWS`) is letterspaced caps at 11–13 px. This is the single cheapest "retro press" signal and it costs nothing.
 5. **The score superscript.** `9.1` set as a superscript next to a title turns a list into a *ranked* list without a table.
 
@@ -156,7 +156,7 @@ Script: `.shots/contrast.mjs` → `node .shots/contrast.mjs` (WCAG 2.x relative 
   --rule-strong: #2a2823;  /* 3 px section rule */
   --control: #7d7869;      /* input/control boundary (≥3:1) */
   --ribbon: #f6c9d8;       /* the one pastel wash */
-  --promo: #cfe4f5;        /* the one tinted box */
+  --promo: #e9e4d7;        /* the promo box: a shade of the page, not a coloured panel */
   --plate-ink: #141310;    /* PressPlate ink */
 }
 
@@ -167,7 +167,7 @@ Script: `.shots/contrast.mjs` → `node .shots/contrast.mjs` (WCAG 2.x relative 
   --accent: #ff7ab0; --accent-2: #8fc4ea;
   --ok: #5fd39c; --warn: #e8bd63; --danger: #ff8b80;
   --rule: #33333d; --rule-strong: #d8d4c8; --control: #6b6a74;
-  --ribbon: #3a1c28; --promo: #1b2a38; --plate-ink: #f3f1ea;
+  --ribbon: #3a1c28; --promo: #1c1c22; --plate-ink: #f3f1ea;
 }
 ```
 
@@ -189,7 +189,7 @@ Script: `.shots/contrast.mjs` → `node .shots/contrast.mjs` (WCAG 2.x relative 
 | `rule / bg` | **1.48** | 1.55 | ≥ 1.4 (decorative hairline) | pass |
 | `rule / surface` | **1.66** | 1.44 | ≥ 1.4 | pass |
 | ink on `ribbon` | **12.62** | — (night ribbon is dark: use `--text` on it) | ≥ 4.5 | pass |
-| ink on `promo` | **14.22** | — | ≥ 4.5 | pass |
+| ink on `promo` | **14.64** | 15.00 | ≥ 4.5 | pass |
 | `surface / bg` | 1.12 | 1.08 | *not a gate* | separation comes from `--rule` and `--rule-strong`, not from fills (D8). DESIGN-V2's "surface/bg ≥ 1.08" gate is **retired with the cards**. |
 
 Note the two deliberate changes against DESIGN-V2 §6: **the paper ramp is lower-contrast by design** (newsprint is not paper-white: `--text` 16.16 instead of 18+), and **the accent moves from teal/blue to rose/pink** because the ribbon is the page's only wash. Everything still clears AA with margin, including on the tinted boxes.

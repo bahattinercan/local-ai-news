@@ -20,8 +20,11 @@ export function promoCaption(model: ClassifiedModel): string {
  *
  * The reference spends its one coloured box on an advertisement; the most useful
  * thing this site can advertise is the fact that every model page ends in a
- * command you can paste. So the box is the site's own CTA, on the paper token
- * (`--promo`) with ink text (14.22:1 — checked by `scripts/contrast.ts`).
+ * command you can paste. So the box is the site's own CTA, on `--promo` with ink
+ * text (14.64:1 — checked by `scripts/contrast.ts`). `--promo` is a shade of the
+ * page, not a coloured panel: the original blue block read as a foreign element in
+ * a newsprint column, so the box is separated by its `--rule` border and its
+ * `--surface` command slip alone.
  *
  * It prints a real command for a real model from `runCommand()`, which is the
  * same function the model page uses, so the box can never advertise a command the

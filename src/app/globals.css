@@ -73,7 +73,11 @@
   --rule-strong: #2a2823;
   --control: #7d7869;
   --ribbon: #f6c9d8;
-  --promo: #cfe4f5;
+  /* The rail's promo box is paper, not a coloured panel: a saturated blue block
+     in a newsprint column read as a foreign element (measured against the user's
+     screenshot, 2026-10-20). It is now a shade of the page itself, one step below
+     `--bg`, and `--rule` does the separating. */
+  --promo: #e9e4d7;
 
   --plate-ink: #141310;
   --plate-wash: #e5e0d2;
@@ -104,7 +108,7 @@
   --rule-strong: #d8d4c8;
   --control: #6b6a74;
   --ribbon: #3a1c28;
-  --promo: #1b2a38;
+  --promo: #1c1c22;
 
   --plate-ink: #f3f1ea;
   --plate-wash: #232329;
@@ -280,6 +284,8 @@
     border-top: 1px solid var(--hairline);
   }
 
+  /* A paper shade one step below the page, with the code specimen left on
+     `--surface` so the command still reads as its own slip inside the box. */
   .promo {
     background: var(--promo);
     color: var(--text);
