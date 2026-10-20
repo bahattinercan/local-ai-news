@@ -61,6 +61,13 @@ export interface ClassifiedModel {
   url: string;
   /** Weight files only, capped; see MAX_STORED_FILES. */
   files?: Array<{ name: string; bytes: number }> | null;
+  /**
+   * Short plain-text excerpt of the Hugging Face model card (`lib/card-text.ts`).
+   * `undefined` = never fetched, `null` = fetched and the card held no printable
+   * prose. The backfill keys on that distinction so an empty card is not re-read
+   * on every run.
+   */
+  cardSummary?: string | null;
   cardMeta?: {
     baseModel?: string;
     datasets?: string[];

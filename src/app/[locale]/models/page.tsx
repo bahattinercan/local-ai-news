@@ -33,7 +33,9 @@ export default async function ModelsPage({
 
   return (
     <>
-      <DeskNav locale={locale} filters={feedFiltersOf(query)} />
+      {/* The index is the All desk's unfiltered target; the link itself points at
+          `/`, which 308s here as soon as there is a filter to carry. */}
+      <DeskNav locale={locale} active="" exact={false} filters={feedFiltersOf(query)} />
       <PageHeader title={t(dict, "nav.models")} lede={t(dict, "models.lede")} />
       <FeedView locale={locale} query={query} raw={normalizeRaw(raw)} />
     </>

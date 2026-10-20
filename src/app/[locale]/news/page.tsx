@@ -1,4 +1,4 @@
-import { getNews } from "@/lib/store";
+import { getNews, countNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 import { NewsList } from "@/components/NewsList";
 import { DeskNav } from "@/components/shell/DeskNav";
@@ -17,11 +17,12 @@ export default async function NewsPage({
   const dict = dictionary(locale);
   const query = parseNewsQuery(await searchParams);
 
-  const headline = await getNews({ ...query, limit: 20, page: 1 });
+  const headline = await getNews({ ...query, scope: "news", limit: 20, page: 1 });
+  const total = await countNews({ ...query, scope: "news" });
 
   return (
     <>
-      <DeskNav locale={locale} />
+      <DeskNav locale={locale} section="news" />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -36,7 +37,16 @@ export default async function NewsPage({
         }}
       />
 
-      <PageHeader title={t(dict, "news.title")} lede={t(dict, "news.subtitle")} />
+      <PageHeader
+        title={t(dict, "news.title")}
+        kicker={t(dict, "edition.window", { days: query.windowDays })}
+        lede={t(dict, "news.subtitle")}
+        aside={
+          <span className="font-mono text-sm text-muted">
+            {total} {t(dict, "news.items")}
+          </span>
+        }
+      />
 
       <NewsList locale={locale} query={{ ...query, scope: "news" }} />
     </>

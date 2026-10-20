@@ -11,7 +11,8 @@ export function Field({
   value,
   options,
   termSlug,
-  locale
+  locale,
+  className
 }: {
   label: string;
   name: string;
@@ -20,9 +21,11 @@ export function Field({
   /** Glossary entry that defines this filter, rendered as a `?` next to the label. */
   termSlug?: string;
   locale?: Locale;
+  /** Width/behaviour in the row, e.g. `flex-1` for the fields that share a line. */
+  className?: string;
 }) {
   return (
-    <label className="flex min-w-[110px] flex-col gap-1">
+    <label className={cn("flex min-w-[110px] flex-col gap-1", className)}>
       <span className="label text-muted">
         {termSlug && locale ? (
           <Term slug={termSlug} locale={locale}>
@@ -47,11 +50,14 @@ export function Field({
   );
 }
 
-export function SubmitButton({ label }: { label: string }) {
+export function SubmitButton({ label, className }: { label: string; className?: string }) {
   return (
     <button
       type="submit"
-      className="inline-flex h-11 shrink-0 items-center whitespace-nowrap border border-transparent bg-accent px-3.5 text-sm font-medium text-bg"
+      className={cn(
+        "inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap border border-transparent bg-accent px-3.5 text-sm font-medium text-bg",
+        className
+      )}
     >
       {label}
     </button>

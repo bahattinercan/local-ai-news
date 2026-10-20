@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, BookOpen, FlaskConical, Newspaper, Scale, Search } from "lucide-react";
+import { BarChart3, BookOpen, FlaskConical, Newspaper, Scale, Search, type LucideIcon } from "lucide-react";
 import { CATEGORY_RULES, categoryLabel } from "@/lib/classify/rules";
 import { getCategoryCounts } from "@/lib/store";
 import { FEED_DEFAULTS, type FeedFilterInput } from "@/lib/query";
@@ -17,8 +17,10 @@ import { dictionary, hrefFor, t, type Locale } from "@/i18n";
  * Two things it deliberately keeps from `TabBar`:
  *  - the count is the number of rows the link will actually open, computed from
  *    the reader's current filters, so a desk can never promise more than it shows;
- *  - the active desk is passed by the page, because a layout never receives the
- *    route params (`layout.tsx` documents this).
+ *  - the active item is passed by the page, because a layout never receives the
+ *    route params (`layout.tsx` documents this). That item can be a desk *or* a
+ *    section: every non-desk route used to inherit an undefined `active`, and the
+ *    nav then underlined **All** on News, Stats, Compare and Glossary alike.
  *
  * The section links (News/Research/Stats/Compare/Glossary) live here on `lg` and
  * in the masthead's disclosure below it, because the masthead replaces its live
@@ -45,13 +47,30 @@ const NAV_SHORT: Record<string, string> = {
   robotics: "Robotics"
 };
 
+/** The five section links, in the order they print; the key is the route segment. */
+export type DeskSection = "news" | "research" | "stats" | "compare" | "glossary";
+
 export async function DeskNav({
   locale,
   active,
+  section,
+  exact = true,
   filters
 }: {
   locale: Locale;
+  /** The desk the reader is standing in: a category key, or `""` for All. A page
+      that passes nothing marks no desk, so a dead end (a model id that does not
+      exist) says so instead of underlining All. */
   active?: string;
+  /** The section the reader is standing in. A page sets one of `active`/`section`,
+      never both; a page that sets neither marks nothing. */
+  section?: DeskSection;
+  /** `false` on a child page (a model, a news item, a glossary term): the marked
+      item is then the *ancestor* the reader came through, so it carries
+      `aria-current="true"` — the ARIA value for "current item in a set" — instead
+      of claiming to be this exact page. Defaults to `true`, so a flag a page
+      forgets can only understate the claim, never overstate it. */
+  exact?: boolean;
   filters?: FeedFilterInput;
 }) {
   const dict = dictionary(locale);
@@ -71,12 +90,17 @@ export async function DeskNav({
     }))
   ];
 
-  const sections = [
-    { href: hrefFor(locale, "/news"), label: t(dict, "nav.news"), icon: Newspaper },
-    { href: hrefFor(locale, "/research"), label: t(dict, "nav.research"), icon: FlaskConical },
-    { href: hrefFor(locale, "/stats"), label: t(dict, "nav.stats"), icon: BarChart3 },
-    { href: hrefFor(locale, "/compare"), label: t(dict, "nav.compare"), icon: Scale },
-    { href: hrefFor(locale, "/glossary"), label: t(dict, "nav.glossary"), icon: BookOpen }
+  /* `search` says whether the section's own list can answer `?q=`. News and
+     Research are the same `getNews` list under two scopes; Stats and Compare have
+     no list to search; the Glossary answers `?q=` itself since GLOSSARY-PLAN G-D4
+     (before that, searching from a definition page dumped the reader on the model
+     index). */
+  const sections: Array<{ key: DeskSection; href: string; label: string; icon: LucideIcon; search: boolean }> = [
+    { key: "news", href: hrefFor(locale, "/news"), label: t(dict, "nav.news"), icon: Newspaper, search: true },
+    { key: "research", href: hrefFor(locale, "/research"), label: t(dict, "nav.research"), icon: FlaskConical, search: true },
+    { key: "stats", href: hrefFor(locale, "/stats"), label: t(dict, "nav.stats"), icon: BarChart3, search: false },
+    { key: "compare", href: hrefFor(locale, "/compare"), label: t(dict, "nav.compare"), icon: Scale, search: false },
+    { key: "glossary", href: hrefFor(locale, "/glossary"), label: t(dict, "nav.glossary"), icon: BookOpen, search: true }
   ];
 
   /* Switching desk keeps the reader's filters; without this the destination would
@@ -91,9 +115,16 @@ export async function DeskNav({
   if (input.q) params.set("q", input.q);
   const suffix = params.size > 0 ? `?${params.toString()}` : "";
 
-  /* The search form posts to whichever list owns the current desk, so a search
-     from inside a category stays inside it. `/models` is the full index. */
-  const searchAction = active ? hrefFor(locale, `/c/${active}`) : hrefFor(locale, "/models");
+  /* The search form posts to whichever list owns the current desk **or section**, so
+     a search from inside a category — or from News — stays inside it. `/models` is
+     the full index, and the fallback for the pages that cannot answer `?q=`. */
+  const owningSection = sections.find((entry) => entry.key === section && entry.search);
+  const searchAction =
+    active !== undefined && active !== ""
+      ? hrefFor(locale, `/c/${active}`)
+      : owningSection
+        ? owningSection.href
+        : hrefFor(locale, "/models");
 
   return (
     <nav className="rule-strong rule-bottom mb-5" aria-label={t(dict, "nav.primary")}>
@@ -108,12 +139,15 @@ export async function DeskNav({
           <ScrollStrip label={t(dict, "nav.desks")} className="-mb-px">
             <ul className="flex items-stretch gap-5">
             {desks.map((desk) => {
-              const isActive = desk.key === (active ?? "");
+              /* A desk is marked only when the page passed one: `active` undefined
+                 (a section page, a dead end) must not match the empty key and
+                 underline All. */
+              const isActive = active !== undefined && desk.key === active;
               return (
                 <li key={desk.key || "all"} className="flex">
                   <Link
                     href={`${hrefFor(locale, desk.key ? `/c/${desk.key}` : "/")}${suffix}`}
-                    aria-current={isActive ? "page" : undefined}
+                    aria-current={isActive ? (exact ? "page" : "true") : undefined}
                     className={cn(
                       "label flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 pt-px",
                       isActive
@@ -137,16 +171,26 @@ export async function DeskNav({
 
         {/* Sections: desktop only (below `lg` the masthead disclosure carries them). */}
         <ul className="hidden shrink-0 items-stretch gap-3 lg:flex">
-          {sections.map((section) => {
-            const Icon = section.icon;
+          {sections.map((entry) => {
+            const Icon = entry.icon;
+            /* Sections used to render with no state at all, so the only thing the
+               nav ever marked was a desk — News/Research/Stats/Compare/Glossary
+               could never be "where am I" (docs/en/DESIGN-V3.md §0.2.9). */
+            const isActive = entry.key === section;
             return (
-              <li key={section.href} className="flex">
+              <li key={entry.href} className="flex">
                 <Link
-                  href={section.href}
-                  className="label flex h-11 items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent pt-px text-muted hover:border-rule-strong hover:text-text"
+                  href={entry.href}
+                  aria-current={isActive ? (exact ? "page" : "true") : undefined}
+                  className={cn(
+                    "label flex h-11 items-center gap-1.5 whitespace-nowrap border-b-2 pt-px",
+                    isActive
+                      ? "border-accent text-text"
+                      : "border-transparent text-muted hover:border-rule-strong hover:text-text"
+                  )}
                 >
-                  <Icon size={13} aria-hidden="true" />
-                  {section.label}
+                  <Icon size={13} aria-hidden="true" className={isActive ? "text-accent" : undefined} />
+                  {entry.label}
                 </Link>
               </li>
             );

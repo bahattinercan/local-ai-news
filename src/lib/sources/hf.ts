@@ -131,6 +131,32 @@ export class HfClient {
     return response;
   }
 
+  /**
+   * Same budget accounting and 429 handling as `request()`, but the caller owns
+   * the status check: a README can legitimately be absent, and "absent" must not
+   * be indistinguishable from "the network broke".
+   */
+  private async raw(url: string, accept: string): Promise<Response> {
+    if (this.budget.remaining <= 0) {
+      throw new Error(`rate limit budget exhausted (${this.budget.max} per ${this.budget.windowMs / 1000}s)`);
+    }
+
+    const headers: Record<string, string> = { Accept: accept };
+    if (this.token) headers.Authorization = `Bearer ${this.token}`;
+
+    const response = await this.fetchImpl(url, { headers });
+    this.budget.consume();
+
+    if (response.status === 429) {
+      const retryAfter = Number(response.headers.get("Retry-After") ?? 0);
+      const wait = Math.min(retryAfter * 1000 || 5000, this.maxWaitMs);
+      await sleep(wait);
+      return this.raw(url, accept);
+    }
+
+    return response;
+  }
+
   async listModels(params: HfListParams = {}): Promise<HfPage> {
     const url = new URL(`${BASE}/api/models`);
     if (params.pipelineTag) url.searchParams.set("pipeline_tag", params.pipelineTag);
@@ -154,6 +180,22 @@ export class HfClient {
     // only rfilename. Measured 2026-10-15: full=true -> no size, full=true&blobs=true -> size.
     const response = await this.request(`${BASE}/api/models/${id}?full=true&blobs=true`);
     return mapModelItem((await response.json()) as Record<string, unknown>);
+  }
+
+  /**
+   * The model card body (the repository README) as raw Markdown.
+   *
+   * The JSON API only exposes `cardData` — the frontmatter keys — so the prose a
+   * reader wants was never fetched at all (`grep -rni readme src` returned nothing
+   * before this). `null` means "there is no card to read" (404 on a repo without a
+   * README, or a gated/private repo answering 401/403); a hard failure still throws
+   * so the caller can decide whether to retry later.
+   */
+  async getModelCard(id: string): Promise<string | null> {
+    const response = await this.raw(`${BASE}/${id}/raw/main/README.md`, "text/plain, text/markdown;q=0.9, */*;q=0.5");
+    if (response.status === 404 || response.status === 401 || response.status === 403) return null;
+    if (!response.ok) throw new Error(`HTTP ${response.status} for ${id} README`);
+    return response.text();
   }
 
   async getTrending(): Promise<RawModel[]> {

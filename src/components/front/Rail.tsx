@@ -7,6 +7,15 @@ import { CopyCommand } from "../CopyCommand";
 import type { ClassifiedModel } from "@/lib/model";
 
 /**
+ * The caption over the command specimen: the model and why it is the one being
+ * advertised. Exported because `page.tsx` has to know how wide it renders to pick
+ * a model whose caption is not truncated (`railLines(promoCaption(model))`).
+ */
+export function promoCaption(model: ClassifiedModel): string {
+  return `${model.name} · ${formatNumber(model.downloads)}`;
+}
+
+/**
  * The tinted box in the rail (docs/en/DESIGN-V3.md §1 zone 6, right).
  *
  * The reference spends its one coloured box on an advertisement; the most useful
@@ -17,6 +26,11 @@ import type { ClassifiedModel } from "@/lib/model";
  * It prints a real command for a real model from `runCommand()`, which is the
  * same function the model page uses, so the box can never advertise a command the
  * site does not actually give.
+ *
+ * Layout: the command owns the full width of the rail and the actions sit on
+ * their own row. Sharing one row with the copy button left the command 129 px
+ * wide — 8 wrapped lines clamped to 2, i.e. `from transformers i / mport
+ * AutoModelFor…` with a third line cut in half (measured 1440 px, 2026-10-18).
  */
 export function PromoBox({ model, locale }: { model: ClassifiedModel; locale: Locale }) {
   const dict = dictionary(locale);
@@ -30,28 +44,38 @@ export function PromoBox({ model, locale }: { model: ClassifiedModel; locale: Lo
       </h2>
       <p className="mt-1 text-sm">{t(dict, "front.runItNote")}</p>
 
+      {/* The caption is set in the same 11 px mono as the specimen — it is the
+          specimen's label, not a headline — and its figure is `shrink-0`: the row
+          used to be a single `truncate`, so a 25-character name left the reader
+          with "35.4" of "35.4k". */}
       <Link
         href={hrefFor(locale, `/m/${model.slug}`)}
         title={model.externalId}
-        className="mt-3 flex min-h-6 items-center truncate font-mono text-xs hover:underline"
+        className="mt-3 flex min-h-6 items-center gap-2 font-mono text-[11px] hover:underline"
       >
-        {model.name}
-        <span className="text-muted"> · {formatNumber(model.downloads)}</span>
+        <span className="truncate">{model.name}</span>
+        <span className="shrink-0 text-muted">· {formatNumber(model.downloads)}</span>
       </Link>
 
-      {/* The command is a 95-character repo id at worst, and the rail is ~250 px:
-          two clamped lines are the advertisement, the copy button has the whole
-          thing, and the model page prints it in full. */}
-      <div className="mt-2 flex items-start gap-2">
-        <code className="line-clamp-2 min-w-0 flex-1 break-all border border-rule bg-surface px-2 py-1.5 font-mono text-[11px] leading-4">
-          {command}
-        </code>
-        <CopyCommand text={command} label={t(dict, "common.copy")} />
+      {/* 36 characters a line at 11 px mono, so the command that fits the two-line
+          budget reads as a specimen instead of a shred. `break-words` (not
+          `break-all`) wraps at the spaces first and inside a token only when the
+          token cannot fit a line alone; `-mx-2` buys those 36 columns back from
+          the box's padding while keeping `px-2` inside the hairline. `line-clamp-4`
+          is a backstop for a command the selector could not avoid, and it renders
+          an ellipsis instead of slicing a line through the middle, which is what
+          the two-line `break-all` box did. The copy button and the model page
+          still carry the whole string. */}
+      <code className="mt-2 -mx-2 line-clamp-4 block break-words border border-rule bg-surface px-2 py-1.5 font-mono text-[11px] leading-4">
+        {command}
+      </code>
+
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+        <CopyCommand text={command} label={t(dict, "common.copy")} copiedLabel={t(dict, "common.copied")} />
+        <Link href={hrefFor(locale, `/m/${model.slug}`)} className="arrow-link label text-accent">
+          {t(dict, "common.viewModel")}
+        </Link>
       </div>
-
-      <Link href={hrefFor(locale, `/m/${model.slug}`)} className="arrow-link label mt-3 inline-block text-accent">
-        {t(dict, "common.viewModel")}
-      </Link>
     </section>
   );
 }

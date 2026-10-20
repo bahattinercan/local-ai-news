@@ -243,7 +243,7 @@ Kurallar:
 /en/m/[id],   /tr/m/[id]            → model detay
 /en/news,     /tr/news              → haber akışı (kind filtresiyle)
 /en/compare?ids=a,b                 → karşılaştırma
-/en/stats                           → kategori bazlı hacim, haftalık grafik
+/en/stats                           → Veri Masası (docs/tr/STATS-PLAN.md)
 ```
 
 ### Feed kartı
@@ -284,7 +284,7 @@ GET  /api/categories
 GET  /api/feed?category=video&window=7d&sort=trending&runner=gguf&max_params=13&license=open&gate=passed&q=ltx
 GET  /api/models/:slug
 GET  /api/news?window=7d&category=video&kind=paper|release|announcement
-GET  /api/stats?days=30
+GET  /api/stats?window=30d&gate=passed
 GET  /feed.rss?category=&lang=
 POST /api/ingest/run        (secret korumalı, cron tetikler)
 ```

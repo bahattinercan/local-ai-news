@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { dictionary, t, type Locale } from "@/i18n";
-import { relativeTime } from "@/lib/format";
+import { cn, relativeTime } from "@/lib/format";
 import { getGeneratedAt } from "@/lib/store";
 
 /**
@@ -39,12 +39,12 @@ export function EmptyState({
   );
 }
 
-export async function DataNotice({ locale }: { locale: Locale }) {
+export async function DataNotice({ locale, className }: { locale: Locale; className?: string }) {
   const generatedAt = await getGeneratedAt();
   if (!generatedAt) return null;
   const dict = dictionary(locale);
   return (
-    <p className="mb-3 text-xs text-muted break-words font-mono">
+    <p className={cn("text-xs text-muted break-words font-mono", className ?? "mb-3")}>
       {t(dict, "data.updated", { when: relativeTime(generatedAt) })}
     </p>
   );

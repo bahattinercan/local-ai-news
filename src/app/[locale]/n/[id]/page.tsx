@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { ArrowUp, Clock, ExternalLink } from "lucide-react";
 import { getNewsItemByParam, getModel } from "@/lib/store";
+import { NEWS_SCOPE_KINDS } from "@/lib/query";
 import { categoryLabel } from "@/lib/classify/rules";
 import { formatNumber, relativeTime } from "@/lib/format";
 import { newsText } from "@/lib/news-text";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { EmptyState } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
-import { DeskNav } from "@/components/shell/DeskNav";
+import { DeskNav, type DeskSection } from "@/components/shell/DeskNav";
 import { FeedCard } from "@/components/FeedCard";
 import { Chip } from "@/components/ui/Chip";
 
@@ -55,9 +56,15 @@ export default async function NewsItemPage({
      page gets the longer budget (the list clamps to three lines). */
   const { title, body, buildTag } = newsText(item, { bodyMax: 4000 });
 
+  /* `/news` and `/research` are the two halves of one table (`NEWS_SCOPE_KINDS`),
+     so a detail page marks the half it came from: a paper is Research, everything
+     else is News. `exact={false}` because the reader is inside the section, not on
+     its list. */
+  const section: DeskSection = NEWS_SCOPE_KINDS.research?.includes(item.kind) ? "research" : "news";
+
   return (
     <>
-      <DeskNav locale={locale} />
+      <DeskNav locale={locale} section={section} exact={false} />
       <JsonLd
         data={{
           "@context": "https://schema.org",

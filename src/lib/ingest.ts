@@ -7,6 +7,8 @@ import { HfClient, type RawPaper } from "./sources/hf.ts";
 import { fetchFeed, type FeedItem } from "./sources/feeds.ts";
 import { newsSources, type SourceDefinition } from "./sources/registry.ts";
 import { isPoisonedText } from "./text-guard.ts";
+import { cardExcerpt } from "./card-text.ts";
+import { buildModelNameIndex, matchModelInText, type ModelNameIndex } from "./model-mentions.ts";
 import type { ClassifiedModel } from "./model.ts";
 import { loadSnapshot } from "./store.ts";
 import type { Snapshot, SnapshotNews } from "./store.ts";
@@ -21,6 +23,8 @@ export interface IngestOptions {
   maxDetailLookups?: number;
   /** Detail lookups spent on models already in the snapshot (never gated by `seen`). */
   maxBackfills?: number;
+  /** Model-card (README) reads per run; the largest cost after detail lookups. */
+  maxCards?: number;
 }
 
 export interface IngestResult {
@@ -34,6 +38,8 @@ export interface IngestResult {
   newsCount: number;
   /** Models that gained detail data in this run (gate pass, previously missing). */
   backfilled: number;
+  /** Model cards read in this run that produced printable prose. */
+  cardsBackfilled: number;
   /** Sources that failed this run; their previous items were kept (gate G5). */
   feedFailures: string[];
   snapshotPath: string | null;
@@ -51,8 +57,8 @@ export function shouldCreateRelease(model: ClassifiedModel): boolean {
     CURATED_ORGS.some((org) => org.toLowerCase() === (model.author ?? "").toLowerCase());
 }
 
-export function paperToNews(paper: RawPaper, models: ClassifiedModel[]): SnapshotNews {
-  const match = matchModel(paper.title, models);
+export function paperToNews(paper: RawPaper, models: ClassifiedModel[], index?: ModelNameIndex): SnapshotNews {
+  const match = matchModel(paper.title, models, index);
 
   return {
     externalId: paper.id,
@@ -87,23 +93,29 @@ export function releaseToNews(model: ClassifiedModel): SnapshotNews {
 
 /**
  * Model names that appear in the headline are linked back to the model page.
- * Same guard as `paperToNews`: names shorter than four characters match too
- * eagerly to be trusted.
+ *
+ * The rule moved to `lib/model-mentions.ts`: matching the *whole* name stopped
+ * working for long finetune ids (`nerkyor/Qwen3.8-27B-…-NInfer` is 108 characters
+ * and never appears in a headline), and plain word matching was measurably wrong
+ * (20 news rows were attributed to one model via the word "prompt"). A
+ * version-shaped token that names exactly one tracked model is the only loosening
+ * allowed here — a wrong `modelSlug` is printed on the news page as a fact.
  */
-function matchModel(title: string, models: ClassifiedModel[]): ClassifiedModel | undefined {
-  const needle = title.toLowerCase();
-  return models.find((model) => {
-    const name = model.name.toLowerCase();
-    return name.length > 3 && needle.includes(name);
-  });
+function matchModel(text: string, models: ClassifiedModel[], index?: ModelNameIndex): ClassifiedModel | undefined {
+  return matchModelInText(text, models, index);
 }
 
 /**
  * Feed sources share one shape, so the origin is carried by the external id
  * prefix (the dedupe key) and by `organization` for display.
  */
-export function feedToNews(item: FeedItem, source: SourceDefinition, models: ClassifiedModel[] = []): SnapshotNews {
-  const model = matchModel(item.title, models);
+export function feedToNews(
+  item: FeedItem,
+  source: SourceDefinition,
+  models: ClassifiedModel[] = [],
+  index?: ModelNameIndex
+): SnapshotNews {
+  const model = matchModel(item.title, models, index);
   return {
     externalId: `${source.key}:${item.id}`,
     kind: source.newsKind ?? "announcement",
@@ -128,7 +140,8 @@ export function feedToNews(item: FeedItem, source: SourceDefinition, models: Cla
 export async function ingestFeeds(
   models: ClassifiedModel[],
   news: SnapshotNews[],
-  fetchImpl: typeof fetch = fetch
+  fetchImpl: typeof fetch = fetch,
+  index?: ModelNameIndex
 ): Promise<string[]> {
   const failures: string[] = [];
   const sources = newsSources().filter((source) => source.format === "atom" || source.format === "rss");
@@ -138,7 +151,7 @@ export async function ingestFeeds(
       const items = await fetchFeed(source.baseUrl, source.format === "rss" ? "rss" : "atom", fetchImpl);
       let added = 0;
       for (const item of items) {
-        const entry = feedToNews(item, source, models);
+        const entry = feedToNews(item, source, models, index);
         if (news.some((existing) => existing.externalId === entry.externalId)) continue;
         news.push(entry);
         added += 1;
@@ -196,6 +209,51 @@ export async function backfillDetails(
   }
 
   return enriched;
+}
+
+/**
+ * The reader-facing gap this closes: `nerkyor/Qwen3.8-27B-…-NInfer` had a page of
+ * numbers, a VRAM box and a run command, and not one sentence about the model.
+ * The card body (README) was never fetched — only `cardData`, whose three rendered
+ * keys (`baseModel`, `datasets`, `languages`) are empty on most GGUF repos.
+ *
+ * Ordered by likes so the pages people actually open fill first, and keyed on
+ * `cardSummary === undefined` rather than on `files`, so a model that already has
+ * detail data still gets its text. A successful read stores `null` when the card
+ * is empty, which is what keeps an empty repo from being re-read every run.
+ */
+export interface CardSource {
+  getModelCard(_id: string): Promise<string | null>;
+}
+
+export async function backfillCards(
+  client: CardSource,
+  models: ClassifiedModel[],
+  limit: number,
+  options: { includeRejected?: boolean } = {}
+): Promise<number> {
+  const targets = models
+    .filter((model) => (options.includeRejected || (model.qualityPassed && !model.gated)) && model.cardSummary === undefined)
+    .sort((a, b) => b.likes - a.likes || b.downloads - a.downloads)
+    .slice(0, limit);
+
+  let filled = 0;
+  for (const model of targets) {
+    if (model.cardSummary !== undefined) continue;
+
+    let markdown: string | null;
+    try {
+      markdown = await client.getModelCard(model.externalId);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith("rate limit budget")) break;
+      continue;
+    }
+
+    model.cardSummary = markdown === null ? null : cardExcerpt(markdown);
+    if (model.cardSummary) filled += 1;
+  }
+
+  return filled;
 }
 
 function loadExistingSnapshot(): Snapshot | null {
@@ -364,8 +422,11 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
   }
 
   const papers = await attempt(() => client.getDailyPapers(), []);
+  /* One index for the whole run: the token counts must describe the tracked set,
+     and rebuilding them per news item would be 100× the work for the same answer. */
+  const nameIndex = buildModelNameIndex(models);
   for (const paper of papers) {
-    const entry = paperToNews(paper, models);
+    const entry = paperToNews(paper, models, nameIndex);
     const existingEntry = news.find((n) => n.externalId === entry.externalId);
     if (existingEntry) {
       existingEntry.upvotes = entry.upvotes;
@@ -374,7 +435,7 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
     news.push(entry);
   }
 
-  const feedFailures = await ingestFeeds(models, news);
+  const feedFailures = await ingestFeeds(models, news, fetch, nameIndex);
 
   // Backfill after the main loop so freshly discovered models get the first
   // slice of the detail budget, and reserve 10 requests of headroom so the
@@ -384,6 +445,14 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
     Math.min(options.maxBackfills ?? 120, options.maxRequests - client.requestsUsed - 10)
   );
   const backfilled = backfillBudget > 0 ? await backfillDetails(client, models, backfillBudget) : 0;
+
+  /* Cards run after details, with their own cap: a README read is one request, and
+     the detail pass must keep the budget it needs for `files`/`paramsTotal`. */
+  const cardBudget = Math.max(
+    0,
+    Math.min(options.maxCards ?? 80, options.maxRequests - client.requestsUsed - 10)
+  );
+  const cardsBackfilled = cardBudget > 0 ? await backfillCards(client, models, cardBudget) : 0;
 
   const result: IngestResult = {
     itemsTotal: total,
@@ -395,6 +464,7 @@ export async function runIngest(options: IngestOptions): Promise<IngestResult> {
     categoryDistribution: distribution,
     newsCount: news.length,
     backfilled,
+    cardsBackfilled,
     feedFailures,
     snapshotPath: null
   };

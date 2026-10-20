@@ -4,9 +4,11 @@ import { PageHeader } from "@/components/shell/PageHeader";
 import { Hero } from "@/components/front/Hero";
 import { StoryRow } from "@/components/front/StoryRow";
 import { ModelRow } from "@/components/front/ModelRow";
-import { PromoBox, RssBox } from "@/components/front/Rail";
+import { PromoBox, promoCaption, RssBox } from "@/components/front/Rail";
 import { EmptyState } from "@/components/EmptyState";
 import { getFrontPage } from "@/lib/store";
+import { railLines, RAIL_LINES, runCommand } from "@/lib/runner/command";
+import type { ClassifiedModel } from "@/lib/model";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 
 /**
@@ -30,7 +32,7 @@ export default async function FrontPage({ params }: { params: Promise<{ locale: 
   if (!front) {
     return (
       <>
-        <DeskNav locale={locale} />
+        <DeskNav locale={locale} active="" />
         <EmptyState
           locale={locale}
           message={t(dict, "empty.noModels")}
@@ -42,17 +44,38 @@ export default async function FrontPage({ params }: { params: Promise<{ locale: 
   }
 
   const lead = front.hero;
-  const columnStories = front.stories.slice(0, 3);
+  /* The column has to end where the rail does. Three rows left ~470 px of dead
+     rule under `ALL RESEARCH →`: measured at 1 280/1 440/1 920 the left column's
+     content was 529 px tall inside a 997 px grid row, while the right rail (the
+     tallest column, i.e. the one that sets the row height) ran the full 997.
+     A row measures 159 px there, so six rows give 1 006 px against the rail's
+     997 — the nearest reachable height (one row short leaves ~150 px of dead
+     rule, one row long adds 159). The 9 px tail that lands under the rail is the
+     cheap side of the error: the grid row is set by the tallest column, so an
+     overshoot there is invisible, while an undershoot is the gap this fixes. At
+     `lg` the rows grow to 175 px and the rail to 1 181 (the promo command wraps
+     onto more lines), so the tail stays one row short at that one width. */
+  const columnStories = front.stories.slice(0, 6);
   const railStories = front.wire.slice(0, 3);
   const wire = front.wire.slice(0, 6);
-  /* The promo box advertises a pasteable command, so a 95-character repo id is a
-     bad advertisement (measured p90 = 41, max = 95 characters). Prefer the most
-     downloaded model whose name still fits on one line next to its figure. */
-  const promo = front.hot.find((model) => model.name.length <= 32) ?? front.hot[0] ?? null;
+  /* The promo box advertises a pasteable command, so the *command* is the
+     constraint, not the model name. Passing on the name was the wrong proxy and
+     it failed on exactly the case the box exists to avoid: rank 2 was `DMAD`
+     (4 characters, so it "fitted") whose command is the 103-character `from
+     transformers import …` fallback, which is 8 wrapped lines of a 2-line box.
+     Measured over the served snapshot: commands run 46–140 characters. */
+  const fitsRail = (model: ClassifiedModel) =>
+    railLines(runCommand(model)) <= RAIL_LINES && railLines(promoCaption(model)) <= 1;
+  const promo =
+    front.hot.find(fitsRail) ??
+    [...front.hot].sort((a, b) => railLines(runCommand(a)) - railLines(runCommand(b)))[0] ??
+    null;
 
   return (
     <>
-      <DeskNav locale={locale} />
+      {/* The front page is the All desk's own target (its href is `/`), so this is
+          the one route where the desk is marked as the exact page. */}
+      <DeskNav locale={locale} active="" />
 
       {/* The h1 is a strap line, not a poster: the nameplate above already carries
           the display size, so this states the route in one line and hands the rest
@@ -85,7 +108,17 @@ export default async function FrontPage({ params }: { params: Promise<{ locale: 
 
         {/* centre: the lead story and the ranked band */}
         <div className="order-1 lg:order-none">
-          {lead ? <Hero item={lead} locale={locale} total={front.stories.length + 1} /> : null}
+          {lead ? (
+            <Hero
+              item={lead}
+              locale={locale}
+              trail={
+                <Link href={hrefFor(locale, "/research")} className="arrow-link text-accent">
+                  {t(dict, "front.papersNote")} <span className="font-mono">{front.stories.length + 1}</span>
+                </Link>
+              }
+            />
+          ) : null}
 
           {front.hot.length > 0 ? (
             <section className="mt-6" aria-labelledby="most-downloaded">

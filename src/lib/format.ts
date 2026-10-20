@@ -42,6 +42,28 @@ export function formatBytes(bytes: number | null | undefined): string {
 }
 
 /**
+ * An exact, grouped count for a data surface.
+ *
+ * `formatNumber` compacts ≥1 000 to "1.5k", which is right for a nav badge and
+ * wrong for a page whose whole job is the number: "606 of 1 544" cannot be
+ * printed as "606 of 1.5k" (docs/en/STATS-PLAN.md §4).
+ */
+export function formatCount(value: number | null | undefined, locale: "en" | "tr" = "en"): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  return new Intl.NumberFormat(locale === "tr" ? "tr-TR" : "en-US").format(value);
+}
+
+/** "39.2%" / "39,2%" — a rate, not a count. `Intl` handles the decimal comma. */
+export function formatPercent(value: number, locale: "en" | "tr" = "en", digits = 0): string {
+  const safe = Number.isFinite(value) ? value : 0;
+  return new Intl.NumberFormat(locale === "tr" ? "tr-TR" : "en-US", {
+    style: "percent",
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  }).format(safe);
+}
+
+/**
  * "18 October 2026" / "18 Ekim 2026" — the dateline under the nameplate.
  *
  * The date comes from the snapshot's `generatedAt`, never from `Date.now()`: the

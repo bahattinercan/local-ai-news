@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Clock } from "lucide-react";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
 import { relativeTime } from "@/lib/format";
@@ -19,8 +20,29 @@ import type { SnapshotNews } from "@/lib/store";
  *    clamped to two lines, and the deck is the first sentence of the abstract
  *    rather than the abstract — summaries average 1 484 characters, which is a
  *    wall of text, not a standfirst.
+ *
+ * The two route-dependent bits are props, not branches: `kicker` (the front page
+ * says "lead story", the wire desk says the same) and `trail` (the front page
+ * links to the papers desk, the news desk to the rest of that kind). `sizes` is a
+ * prop because the column the hero sits in is the caller's decision — passing a
+ * wrong hint here is what let a 720 px image outgrow its 600 px track before.
  */
-export function Hero({ item, locale, total }: { item: SnapshotNews; locale: Locale; total: number }) {
+export function Hero({
+  item,
+  locale,
+  kicker,
+  trail,
+  sizes = "(min-width: 1024px) 620px, 100vw"
+}: {
+  item: SnapshotNews;
+  locale: Locale;
+  /** Kicker above the headline; defaults to the front page's "lead story". */
+  kicker?: string;
+  /** Right end of the byline rule: a count, a link, nothing. */
+  trail?: ReactNode;
+  /** `next/image` sizes hint for the plate's actual column width. */
+  sizes?: string;
+}) {
   const dict = dictionary(locale);
   const { title, buildTag, body } = newsText(item, { bodyMax: 600 });
   const deck = buildTag ? subjectOf(body, 240) : subjectOf(body, 260);
@@ -36,7 +58,7 @@ export function Hero({ item, locale, total }: { item: SnapshotNews; locale: Loca
             name={title || item.title}
             width={720}
             height={396}
-            sizes="(min-width: 1024px) 620px, 100vw"
+            sizes={sizes}
             priority
             className="aspect-[16/9] w-full border border-rule"
           />
@@ -51,7 +73,7 @@ export function Hero({ item, locale, total }: { item: SnapshotNews; locale: Loca
       </Link>
 
       <p className="label mt-3 text-accent">
-        {t(dict, "front.lead")}
+        {kicker ?? t(dict, "front.lead")}
         {item.categoryKey ? ` · ${item.categoryKey}` : ""}
       </p>
 
@@ -71,12 +93,7 @@ export function Hero({ item, locale, total }: { item: SnapshotNews; locale: Loca
         <span className="flex items-center gap-1">
           <Clock size={11} aria-hidden="true" /> {relativeTime(item.publishedAt)}
         </span>
-        <Link
-          href={hrefFor(locale, "/research")}
-          className="arrow-link ml-auto text-accent"
-        >
-          {t(dict, "front.papersNote")} <span className="font-mono">{total}</span>
-        </Link>
+        {trail ? <span className="ml-auto">{trail}</span> : null}
       </p>
     </article>
   );

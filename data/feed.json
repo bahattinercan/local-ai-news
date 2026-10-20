@@ -3118,7 +3118,8 @@
         "ZhengmingYu/dmad",
         "Keenaswin/dmad"
       ],
-      "url": "https://huggingface.co/ZhengmingYu/DMAD"
+      "url": "https://huggingface.co/ZhengmingYu/DMAD",
+      "cardSummary": "This repository holds the DMAD students of the paper: 4-step students of MiniMax-H3 (33B, text-to-audio-video) and of Wan2.1-T2V (1.3B and 14B), 4- and 1-step students of SDXL, and 1-step students of the EDM ImageNet-64 teacher. The inference and training code is in the code repository (train/h3, train/wan, train/image). 2026/10/15: The Wan2.1 training data (42,158 Wan2.1-14B teacher samples with their real-video latents), so train/wan can start training right away 🤗 2026/10/10: 8 GB GPUs: a 5 s ComfyUI workflow for 8 GB GPUs, and --low-vram in the code repository now makes 5 s videos in …"
     },
     {
       "externalId": "Shishir1996/Minimax-H3-T2VA-Veda-8NFE-600Step-Preview",
@@ -3264,7 +3265,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/Iwannapose/minimax_h3_pdmd_2nfe_comfyui"
+      "url": "https://huggingface.co/Iwannapose/minimax_h3_pdmd_2nfe_comfyui",
+      "cardSummary": "ComfyUI-format conversion of the PDMD 2-NFE LoRA — the 2-step (2 NFE) student distilled from MiniMax-H3-33B with Projected Distribution Matching Distillation, rank 128, covering attention projections and both feed-forward layers of all 50 transformer blocks + 2 token-refiner blocks. (Companion repo for the 4-NFE variant: Iwannapose/minimaxh3pdmd4nfecomfyui.) The two are numerically identical (the source fp32 file is an exact cast of the bf16 one); the bf16 file is the one to use. Both are larger than the source because the fused qkvproj stores the block-diagonal zero padding explicitly …"
     },
     {
       "externalId": "Iwannapose/minimax_h3_pdmd_4nfe_comfyui",
@@ -3299,7 +3301,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/Iwannapose/minimax_h3_pdmd_4nfe_comfyui"
+      "url": "https://huggingface.co/Iwannapose/minimax_h3_pdmd_4nfe_comfyui",
+      "cardSummary": "ComfyUI-format conversion of the PDMD 4-NFE LoRA (loramodel0.safetensors) — the 4-step (4 NFE) student distilled from MiniMax-H3-33B with Projected Distribution Matching Distillation, rank 128, covering attention projections and both feed-forward layers of all 50 transformer blocks + 2 token-refiner blocks. Earlier uploads (base / keysv2 / v3 / v4 / v5) were broken conversions and have been removed: most of their keys matched nothing in the ComfyUI loader (silent no-op), and v4 missed the SwiGLU gate/value remap below. Source keys are Diffusers PEFT names …"
     },
     {
       "externalId": "OzzyGT/minimax_h3_preview_blocks",
@@ -3649,7 +3652,8 @@
       "spaces": [
         "hugging-apps/pdmd-4nfe-minimax-h3"
       ],
-      "url": "https://huggingface.co/pdmd2026/pdmd_4NFE_lora"
+      "url": "https://huggingface.co/pdmd2026/pdmd_4NFE_lora",
+      "cardSummary": "Paper (arXiv) · Project page This repository holds the LoRA adapter of a 4-step (4 NFE) student distilled from MiniMax-H3 with Projected Distribution Matching Distillation (PDMD). The same model is also available as full transformer weights in pdmd2026/pdmd4NFEfull. The adapter is applied to the transformer (MiniMaxH3Transformer3DModel) of the base model. Every other component (VAE, audio VAE, schedulers, text encoder, processor) is unchanged and comes from the base model. Tensor keys have the form transformer. .loraA.weight / transformer. .loraB.weight, where .weight is the corresponding …"
     },
     {
       "externalId": "agentdelhi/Wan2.1-T2V-1.3B",
@@ -3752,7 +3756,8 @@
         "hugging-apps/minimax-h3-360-equirect",
         "akhaliq/minimax-h3-360-equirect"
       ],
-      "url": "https://huggingface.co/rehan-fal/minimax-h3-360-equirect-lora"
+      "url": "https://huggingface.co/rehan-fal/minimax-h3-360-equirect-lora",
+      "cardSummary": "A LoRA for MiniMax H3 that makes the model generate 360° video: the whole sphere around the viewer unwrapped into one equirectangular frame, straight ahead in the centre, directly behind at the left and right edges, with H3's native audio. Squeeze the 21:9 output to 2:1, tag it as 360, and it plays in a Quest / DeoVR / Skybox / YouTube 360 as a full sphere you can look around. Same seed, same prompt. Left: base H3 (an ordinary wide shot). Middle: the alternate LoRA (A). Right: this LoRA (B). The LoRAs produce true equirect geometry: curved horizon, stretched poles, left and right edges that …"
     },
     {
       "externalId": "fbjr/h3-mutant-distill",
@@ -3932,7 +3937,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/QuantFunc/Minimax-H3-Quantfunc-4bit"
+      "url": "https://huggingface.co/QuantFunc/Minimax-H3-Quantfunc-4bit",
+      "cardSummary": "🌐 Website | 🐙 GitHub | 🤗 Hugging Face | 🤖 ModelScope | 🎨 Civitai | 🎮 Discord 4x compression, quality held. QuantFunc INT4 cuts MiniMax H3's core weight precision from 16-bit to 4-bit. Character detail, style fidelity and fast motion stay clear and coherent, while H3's native video+audio generation is fully preserved. In our internal FL2VA evaluation, QuantFunc INT4 vs the BF16 baseline (same prompt, same seed) measures 23.7 dB PSNR. All clips below were generated by MiniMax-H3-QuantFunc-4bit — click a player to watch. Live-action performance Animated chase High-speed car chase Stylized …"
     },
     {
       "externalId": "QuantFunc/LTX-2.5-QuantFunc-4bit",
@@ -4703,7 +4709,8 @@
         "babyline/veda-plan-explorer",
         "Jared101111/veda-minimax-h3-explorer"
       ],
-      "url": "https://huggingface.co/Veda-Sparse/Minimax-H3-T2VA-Veda-8NFE-600Step-Preview"
+      "url": "https://huggingface.co/Veda-Sparse/Minimax-H3-T2VA-Veda-8NFE-600Step-Preview",
+      "cardSummary": "Demo · Project Page· Comfy Node; · Code · Paper · Deployment Guide Don't just take our samples for it. Try your own prompts in the online demo. Available as a custom node on the Comfy Registry; see ComfyUI below. This checkpoint applies to all generation modalities supported by MiniMax-H3, including T2VA, FL2VA, and R2VA, as well as to arbitrary numbers of diffusion steps. The T2VA and 8NFE tags in the repository name only denote the training configuration and do not restrict where the predictor can be used. A dedicated R2VA fine-tuned checkpoint with further improved quality will be released …"
     },
     {
       "externalId": "Ziyaad30/minimax-h3-fp8",
@@ -5154,7 +5161,8 @@
       "spaces": [
         "hugging-apps/pdmd-4nfe-minimax-h3"
       ],
-      "url": "https://huggingface.co/pdmd2026/pdmd_2NFE_lora"
+      "url": "https://huggingface.co/pdmd2026/pdmd_2NFE_lora",
+      "cardSummary": "Paper (arXiv) · Project page This repository holds the LoRA adapter of a 2-step (2 NFE) student distilled from MiniMax-H3 with Projected Distribution Matching Distillation (PDMD). PDMD projects the DMD update onto the subspace orthogonal to the student–critic endpoint residual; it is a one-line change to DMD with no auxiliary loss, extra network, extra model pass, or extra training stage. The adapter is applied to the transformer (MiniMaxH3Transformer3DModel) of the base model. Every other component (VAE, audio VAE, schedulers, text encoder, processor) is unchanged and comes from the base …"
     },
     {
       "externalId": "gurujack/splashspeed-FastH3-8-Step-V2",
@@ -5227,7 +5235,8 @@
       "spaces": [
         "hugging-apps/wuli-art-minimax-h3-turbo"
       ],
-      "url": "https://huggingface.co/Wuli-art/MiniMax-H3-Turbo"
+      "url": "https://huggingface.co/Wuli-art/MiniMax-H3-Turbo",
+      "cardSummary": "MiniMax-H3-Turbo Fixed-step MiniMax-H3 checkpoints for text-to-video with audio and first-frame-to-video with audio. This repository contains three variants: turbo-4step/: four-step LoRA with fused video and audio output projections. turbo-8step/: eight denoising steps. turbo-6step/: six denoising steps. The 6- and 8-step variants store a complete Diffusers-format transformer. The 4-step variant stores a compact adapter for the official transformer, including a backbone LoRA and fused video/audio output projections. The demo downloads the remaining components from MiniMaxAI/MiniMax-H3. The …"
     },
     {
       "externalId": "pepsibox2740/optima-tools-ai-medium",
@@ -6005,7 +6014,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/lapadatbogdan/GLM-5.3-Flash-REAP144-Coder-GGUF"
+      "url": "https://huggingface.co/lapadatbogdan/GLM-5.3-Flash-REAP144-Coder-GGUF",
+      "cardSummary": "Known issue (15 Oct 2026): this release was calibrated on Python agentic coding sessions only. Outside that domain it loses general reasoning: it can get simple arithmetic wrong (for example 17 x 23) and often loops on other programming languages and on general questions, at every quant including Q8. A new release, calibrated on a mix of agentic sessions, code in 21 languages and math, is being validated and will replace these files. Until then, use this model for Python agentic coding only. GLM-5.3-Flash (321B MoE) with 144 of 288 experts per layer, chosen on real agentic coding sessions …"
     },
     {
       "externalId": "liodon-ai/deepseek-coder-6.7b-base-ONNX",
@@ -7635,7 +7645,8 @@
       "vramEstGb": 59.7,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-Coder390-EfficientThink-abliterated"
+      "url": "https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-Coder390-EfficientThink-abliterated",
+      "cardSummary": "This is an uncensored version of nerkyor/Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2 created with abliteration (see remove-refusals-with-transformers to know more about it). This is a crude, proof-of-concept implementation to remove refusals from an LLM model without using TransformerLens. Only layers 2 to 52 have been ablated. You can use this model in your applications by loading it with Hugging Face's transformers library: Risk of Sensitive or Controversial Outputs: This model’s safety filtering has been significantly reduced, potentially …"
     },
     {
       "externalId": "Smits23/Qwen2.5-Coder-7B-Instruct-GGUF",
@@ -10524,7 +10535,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/nerkyor/Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-GGUF-NInfer"
+      "url": "https://huggingface.co/nerkyor/Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-GGUF-NInfer",
+      "cardSummary": "A model post-trained with several rounds of SFT and RLOO on top of Qwen3.8-27B-EfficientThink-SFT-SimPO-DFlash2, which is itself the official Qwen3.8-27B post-trained with SFT and SimPO. It is built to fix the original model's habit of failing to stop: it already has an answer, yet keeps re-deriving until it hits the 94K cap with no final answer. This repository is the standalone GGUF repository with eight GGUF packages under GGUF/: Q2 / Q3 / Q4 LynnStyle (built-in Q40 MTP head), the same three as -Q8MTP versions (built-in Q80 MTP head), Q6K, and Q80 (each with a built-in MTP head), plus the …"
     },
     {
       "externalId": "GhostScientist/semanticwiki-coder-14b-v3",
@@ -11311,7 +11323,8 @@
       "vramEstGb": 0.4,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/qnguyen3/QUAN-Transcribe-1.0"
+      "url": "https://huggingface.co/qnguyen3/QUAN-Transcribe-1.0",
+      "cardSummary": null
     },
     {
       "externalId": "wozniakos10/whisper-tiny-en",
@@ -11888,7 +11901,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/FluidVoice-Labs/fluid-speech-mini-gguf"
+      "url": "https://huggingface.co/FluidVoice-Labs/fluid-speech-mini-gguf",
+      "cardSummary": "An English speech-to-text model built for dictation on phones and laptops. It matches the accuracy of Moondream's Parakeet Ultra (a 1.26 GB download) on the Open ASR Leaderboard's public English test sets, and was trained to keep transcribing the right person when someone else is talking in the room. Fluid Speech Mini is the speech model inside FluidVoice. The iPhone app is in TestFlight: for access, send us a message on X at @FluidVoiceApp. This is the GGUF build, for C++ apps on Windows and Linux: one 347 MB file that loads in the stock parakeet.cpp runtime, with about 485 MB of memory on a …"
     },
     {
       "externalId": "Prahaladha/hima",
@@ -12822,7 +12836,8 @@
       "spaces": [
         "hugging-apps/qwen3-asr-1-7b-ko"
       ],
-      "url": "https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko"
+      "url": "https://huggingface.co/TeamUNIVA/qwen3_asr_1.7b_ko",
+      "cardSummary": "English | 한국어 This model is a fine-tune of Qwen/Qwen3-ASR-1.7B on Korean speech data for automatic speech recognition (ASR), and the successor to TeamUNIVA/qwen3asr1.7bkobeta. It was initialized from the beta model and further trained with two rounds of SFT followed by reinforcement learning (GSPO) on an expanded dataset. It achieves lower error rates than both the base model and the beta model across Korean benchmarks, with a small degradation on English (LibriSpeech, +0.27 %p WER vs. the base model). Korean scores are measured in CER (Character Error Rate); the English score is measured in …"
     },
     {
       "externalId": "onnx-community/zero-stt-hinglish-ONNX",
@@ -13557,7 +13572,8 @@
         "thaitea/laya-vision-demo",
         "Leon4gr45/needle-router"
       ],
-      "url": "https://huggingface.co/thaitea/laya-vision"
+      "url": "https://huggingface.co/thaitea/laya-vision",
+      "cardSummary": "Typed, calibrated decisions about an image plus optional text, in one forward pass with no text generation. Give it a picture, some context and a set of questions. It answers each one as a multiple choice (choice), a yes/no probability (noul) or a level on a rubric you write (score), with probabilities you can act on at face value. It also plays simple games from pixels: the screen is the image and the buttons are the options. This checkpoint is 201M parameters: SmolVLM-256M-Instruct cut to 20 of its 30 language layers, then trained for 2 hours on question-answering data and game frames. It …"
     },
     {
       "externalId": "leonwatanabe/study-visual-question-answering83-2023",
@@ -15071,7 +15087,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/Edgonzalez3/paper_014782465_visual_question_answering"
+      "url": "https://huggingface.co/Edgonzalez3/paper_014782465_visual_question_answering",
+      "cardSummary": "Citation style: numeric apa Writing style: theoretical rigorous The full text is in paper014782465visualquestionanswering.md. paper014782465visualquestionanswering.md — main artifact of this repository See the license field above."
     },
     {
       "externalId": "aadhyasingh/paper_014704920_visual_question_answering",
@@ -15103,7 +15120,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/aadhyasingh/paper_014704920_visual_question_answering"
+      "url": "https://huggingface.co/aadhyasingh/paper_014704920_visual_question_answering",
+      "cardSummary": "Citation style: endnote Writing style: detailed descriptive The full text is in paper014704920visualquestionanswering.md. paper014704920visualquestionanswering.md — main artifact of this repository See the license field above."
     },
     {
       "externalId": "christianhof/paper_015561242_visual_question_answering",
@@ -15135,7 +15153,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/christianhof/paper_015561242_visual_question_answering"
+      "url": "https://huggingface.co/christianhof/paper_015561242_visual_question_answering",
+      "cardSummary": "Citation style: author year Writing style: argumentative The full text is in paper015561242visualquestionanswering.md. paper015561242visualquestionanswering.md — main artifact of this repository See the license field above."
     },
     {
       "externalId": "gabrielamarques/paper_015384925_visual_question_answering",
@@ -15167,7 +15186,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/gabrielamarques/paper_015384925_visual_question_answering"
+      "url": "https://huggingface.co/gabrielamarques/paper_015384925_visual_question_answering",
+      "cardSummary": "Citation style: endnote Writing style: argumentative The full text is in paper015384925visualquestionanswering.md. paper015384925visualquestionanswering.md — main artifact of this repository See the license field above."
     },
     {
       "externalId": "marcelosantoskuw/paper_015153151_visual_question_answering",
@@ -15199,7 +15219,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/marcelosantoskuw/paper_015153151_visual_question_answering"
+      "url": "https://huggingface.co/marcelosantoskuw/paper_015153151_visual_question_answering",
+      "cardSummary": "Citation style: endnote Writing style: theoretical rigorous The full text is in paper015153151visualquestionanswering.md. paper015153151visualquestionanswering.md — main artifact of this repository See the license field above."
     },
     {
       "externalId": "thompsonvow/paper_015449687_visual_question_answering",
@@ -15231,7 +15252,8 @@
       "vramEstGb": null,
       "sampleImages": [],
       "spaces": [],
-      "url": "https://huggingface.co/thompsonvow/paper_015449687_visual_question_answering"
+      "url": "https://huggingface.co/thompsonvow/paper_015449687_visual_question_answering",
+      "cardSummary": "Citation style: author year Writing style: theoretical rigorous The full text is in paper015449687visualquestionanswering.md. paper015449687visualquestionanswering.md — main artifact of this repository See the license field above."
     },
     {
       "externalId": "ASD12ZXCQE/MyAwesomeModel-TestRepo",
@@ -20443,7 +20465,8 @@
       "spaces": [
         "hugging-apps/qwen-image-2-1-lightning"
       ],
-      "url": "https://huggingface.co/lightx2v/Qwen-Image-2.1-Lightning"
+      "url": "https://huggingface.co/lightx2v/Qwen-Image-2.1-Lightning",
+      "cardSummary": "A 4-step distilled LoRA for Qwen-Image-2.1, supporting text-to-image generation and image editing. Training was performed entirely on 16 Huawei Ascend 910B NPUs, using DMD in LightX2V. For inference on heterogeneous hardware platforms, refer to the LightX2V platform scripts. Both examples use the training noise schedule: four steps with dynamic exponential shifting and no terminal stretching. Training and LightX2V inference keep latents in FP32; these BF16 Diffusers examples can produce different numerical results. Run this example from the directory containing pytorchloraweights.safetensors …"
     },
     {
       "externalId": "Carnationstulip/Tulip-Hilda_B_Art_Style-Con_Qwen_2.1",
@@ -22737,7 +22760,8 @@
       "spaces": [
         "hugging-apps/self-gradient-forcing-plus"
       ],
-      "url": "https://huggingface.co/ZihanSu/Self_Gradient_Forcing_Plus"
+      "url": "https://huggingface.co/ZihanSu/Self_Gradient_Forcing_Plus",
+      "cardSummary": "Self Gradient Forcing Plus Decoupling Gradient Flows for Autoregressive Video Generation Paper · Project Page · GitHub SGF+ separates context-writing and denoising parameters to resolve conflicting gradient updates, improving autoregressive video generation and enabling rollouts of up to 24 hours from only 5s training windows. The environment follows the SGF setup. Run the following commands from the repository root. The script uses the Hugging Face CLI command hf by default. Set HFCLI=huggingface-cli if your environment still uses the older command name. It downloads: Wan base models to …"
     },
     {
       "externalId": "Artemio567/LTX-2.5-uncensored-v1.1-FP8",
@@ -22908,7 +22932,8 @@
         "tardellirs/model-pulse",
         "emanforhelp/model-pulse"
       ],
-      "url": "https://huggingface.co/Veda-Sparse/Minimax-H3-R2VA-Veda-Preview"
+      "url": "https://huggingface.co/Veda-Sparse/Minimax-H3-R2VA-Veda-Preview",
+      "cardSummary": "Demo · Project Page · Code · Paper · Deployment Guide Veda is a learned sparse-attention method for video diffusion models. This checkpoint brings Veda to MiniMax-H3 reference-to-audio-video generation. It selects visual reference and generated video tiles independently; text, VLM conditioning, and audio attention remain dense. The predictor is not a LoRA and leaves the backbone weights unchanged. This preview was fine-tuned for 600 updates from the T2VA predictor on 5.17-second R2VA clips. It uses the MiniMax-H3 Turbo LoRA for eight-step generation, with up to 32 visual-reference tiles and …"
     },
     {
       "externalId": "ApolloRaines/LTX-2.5-22b-OmniGen-v12",

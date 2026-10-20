@@ -84,6 +84,63 @@ genliğin yerleşim genişliği olmasını bekliyor, kırpılan süsleri yok say
 taşmada non-zero ile çıkıyor — 900 px'lik bir fixture ile kanıtlandı (+540 px,
 exit 1).
 
+## Model sayfası metni (18 Ekim 2026)
+
+Model sayfası metinsiz bir teknik föydü: ingest yalnızca `cardData` saklıyordu ve
+gösterilen üç anahtar (`baseModel`, `datasets`, `languages`) GGUF repolarının
+çoğunda boş, bu yüzden `nerkyor/Qwen3.8-27B-…-NInfer` sayfası numaralar, VRAM
+kutusu ve çalıştırma komutundan ibaretti — modelin *ne olduğunu* söyleyen tek cümle
+yoktu.
+
+- **Model kartı gövdesi bir kez okunuyor.** `HfClient.getModelCard()`
+  `/{repo}/raw/main/README.md` adresini çeker; `lib/card-text.ts` Markdown'ı en
+  fazla 600 karakterlik düz metne çevirir (frontmatter, rozet satırları, satır içi
+  HTML, tablolar, kod blokları ve baştaki yazar/afiliasyon bloğu atılır). Satırda
+  `cardSummary` olarak saklanır ve "Bu model hakkında" başlığı altında kartın
+  tamamına bağlantıyla gösterilir — özet + atıf, kartın bütünü asla.
+- **`undefined` ile `null` farklı şeyler.** `undefined` = hiç çekilmedi,
+  `null` = çekildi ve boş; böylece boş bir README her koşuda değil, ömründe bir kez
+  istek harcar. Backfill (`npm run cards-backfill` ve `runIngest` içindeki aynı
+  geçiş) kapıyı geçen modelleri beğeni sırasına göre hedefler ve kendi istek
+  tavanıyla çalışır ki detay geçişinin bütçesi bozulmasın.
+- **Model sayfası artık ters bağlantıyı da gösteriyor.** `getModelNews()` "bu
+  modelden nerede bahsedilmiş" diye sorar — ilişki eskiden tek yönlüydü (haber →
+  model). Eşleştirme `lib/model-mentions.ts`'e taşındı: başlıkta tam repo adını
+  aramak 108 karakterlik finetune id'lerinde hiç tutmuyordu (104 haberin 6'sında
+  `modelSlug` vardı) ve düz kelime eşleştirmesi ölçülebilir şekilde yanlıştı ("prompt"
+  yüzünden 20 haber tek modele yazılmıştı). Yalnızca sürüm biçimli token'lara
+  (altı karakter, içinde rakam) güvenilir: bahsetme için `tokenDf <= 3`, saklanan
+  `modelSlug` için `tokenDf === 1`. Yayındaki snapshot'ta ölçüm: 915 modelin 5'i
+  bahis kazanıyor ve hepsi gerçek; eşleşme yoksa bölüm hiç basılmıyor (kapı G3).
+  Mevcut korpusta sıkı ingest kuralı 98 bağlantısız satırda **0** yeni bağlantı
+  üretti; bu istenen muhafazakâr sonuç.
+
+
+## İstatistik sayfası: iki zaman ekseni, tek pencere sözlüğü (2026-10-20)
+
+Kaydedildi çünkü ikisi de mevcut sayıların nasıl okunacağını değiştiriyor; tam plan
+ve ölçülmüş uygulama kaydı [STATS-PLAN.md](STATS-PLAN.md) içinde.
+
+- **İki adlı zaman ekseni.** `tracked` = `firstSeenAt` (Radar'ın satırı ilk gördüğü
+  an) ve `created` = `createdAt` (Hugging Face depo tarihi). Sunulan anlık
+  görüntüde ölçüldü: `firstSeenAt` **3** günü, `createdAt` **49** günü kapsıyor;
+  yani "ilk görülme" üzerinden 7 / 30 / 90 / 180 gün hep 606 döndürüyordu ve
+  sitenin dürüstçe çizebileceği tek günlük seri depo oluşturma serisiydi. Her
+  `/stats` paneli hangi ekseni saydığını basar; envanter panelleri `firstSeenAt`'te
+  kalır (sayıları akış sekmeleriyle eşit kalsın diye), zaman paneli `createdAt`'e
+  taşınır.
+- **Tek pencere sözlüğü.** `/stats` artık `?window=24h|7d|30d|90d` alır — akışın
+  kendi `WINDOWS`'u — ve `?days=` takma ad olarak ayrıştırılır (30 → 30d, 180 →
+  90d). Eski sayfa 7 / 30 / 90 / 180 gün sunuyordu ve hiçbiri farklı olamıyordu.
+- **Karar 9'un belgelenmiş tek gevşetmesi.** "Her şeyi göster" 30 günle sınırlı
+  kalır ve akış hâlâ kategori ister; *toplu* bir yüzey
+  (`normalizeFeedQuery(input, { aggregate: true })`) bu sınır içinde tüm takip
+  kümesini isteyebilir çünkü en fazla dokuz satır çizer. Kapı paneli her durumda
+  kapıdan bağımsızdır, yani filtrenin sakladığı şey filtre açıkken de görünür.
+- **`/api/stats` şekil değiştirdi** (`stats`/`series` → tek pano: `totals`,
+  `categories`, `gateReasons`, `cadence`, `tracking`, `runners`, `wire`). Eski
+  anahtarları tüketen kod yoktu; `docs/*/PLAN.md` aynı değişiklikte güncellendi.
+
 ## Henüz yapılmadı (F6 kalanı)
 
 Admin override paneli, e-posta özeti, yerel Ollama entegrasyonu (`localhost:11434/api/tags`), harici haber kaynakları (karar 3'ü deler).

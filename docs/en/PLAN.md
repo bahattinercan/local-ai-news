@@ -334,7 +334,7 @@ Rules:
 /en/m/[id],   /tr/m/[id]            → model detail
 /en/news,     /tr/news              → news feed (filter by kind)
 /en/compare?ids=a,b                 → comparison
-/en/stats                           → per-category volume, weekly chart
+/en/stats                           → the Data Desk (docs/en/STATS-PLAN.md)
 ```
 
 ### Feed card
@@ -375,7 +375,7 @@ GET  /api/categories
 GET  /api/feed?category=video&window=7d&sort=trending&runner=gguf&max_params=13&license=open&gate=passed&q=ltx
 GET  /api/models/:slug
 GET  /api/news?window=7d&category=video&kind=paper|release|announcement
-GET  /api/stats?days=30
+GET  /api/stats?window=30d&gate=passed
 GET  /feed.rss?category=&lang=
 POST /api/ingest/run        (secret-protected, called by cron)
 ```

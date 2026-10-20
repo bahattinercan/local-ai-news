@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Activity, Box, Clock, Cpu, Database, Globe, HardDrive, Heart, Layers, Link as LinkIcon, ShieldCheck, Zap } from "lucide-react";
-import { getModel, getFeed } from "@/lib/store";
+import { Activity, Box, Clock, Cpu, Database, ExternalLink, Globe, HardDrive, Heart, Layers, Link as LinkIcon, ShieldCheck, Zap } from "lucide-react";
+import { getModel, getFeed, getModelNews } from "@/lib/store";
 import { runCommand } from "@/lib/runner/command";
 import { categoryLabel } from "@/lib/classify/rules";
 import { formatBytes, formatNumber, daysSince, relativeTime } from "@/lib/format";
@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { DeskNav } from "@/components/shell/DeskNav";
 import { PressPlate } from "@/components/ui/PressPlate";
 import { FeedCard } from "@/components/FeedCard";
+import { StoryRow } from "@/components/front/StoryRow";
 import { Chip } from "@/components/ui/Chip";
 import { CopyCommand } from "@/components/CopyCommand";
 import { VramCalculator } from "@/components/VramCalculator";
@@ -53,12 +54,13 @@ export default async function ModelPage({
 
   const specs: Array<{ icon: typeof Cpu; label: string; value: string; glossary?: string }> = [];
   if (model.paramsTotal) specs.push({ icon: Cpu, label: t(dict, "card.params"), value: formatParams(model.paramsTotal), glossary: "params" });
-  if (model.storageBytes) specs.push({ icon: HardDrive, label: t(dict, "card.storage"), value: formatBytes(model.storageBytes) });
+  if (model.storageBytes) specs.push({ icon: HardDrive, label: t(dict, "card.storage"), value: formatBytes(model.storageBytes), glossary: "storage-size" });
   if (model.quantizations.length) specs.push({ icon: Layers, label: t(dict, "detail.quantizations"), value: model.quantizations.join(" · "), glossary: "quantization" });
-  if (model.runners.length) specs.push({ icon: Zap, label: t(dict, "card.runners"), value: model.runners.join(" · ") });
+  if (model.runners.length) specs.push({ icon: Zap, label: t(dict, "card.runners"), value: model.runners.join(" · "), glossary: "runner" });
+  if (model.libraryName) specs.push({ icon: Box, label: t(dict, "detail.library"), value: model.libraryName, glossary: "library" });
   if (model.vramEstGb) specs.push({ icon: Box, label: t(dict, "card.vram"), value: `~${model.vramEstGb} GB`, glossary: "vram" });
   if (model.licenseName || model.license) specs.push({ icon: ShieldCheck, label: t(dict, "card.license"), value: model.licenseName ?? model.license ?? "—" });
-  specs.push({ icon: Heart, label: t(dict, "detail.popularity"), value: `♥ ${formatNumber(model.likes)} · ⬇ ${formatNumber(model.downloads)}` });
+  specs.push({ icon: Heart, label: t(dict, "detail.popularity"), value: `♥ ${formatNumber(model.likes)} · ⬇ ${formatNumber(model.downloads)}`, glossary: "downloads" });
   specs.push({ icon: Clock, label: t(dict, "card.new"), value: `${daysSince(model.firstSeenAt)}d (${relativeTime(model.firstSeenAt)})` });
   if (model.gateReason) specs.push({ icon: ShieldCheck, label: t(dict, "detail.gateReason"), value: model.gateReason });
   if (model.spaces.length) specs.push({ icon: LinkIcon, label: t(dict, "detail.spaces"), value: model.spaces.slice(0, 5).join(", ") });
@@ -67,10 +69,16 @@ export default async function ModelPage({
   if (model.cardMeta?.languages?.length) specs.push({ icon: Globe, label: t(dict, "detail.languages"), value: model.cardMeta.languages.join(" · ") });
 
   const command = runCommand(model);
+  /* "What was written about this model": the reverse of the news → model link.
+     Empty on most rows, so the section is conditional (NEWS-PLAN G3) and the
+     page never prints a heading with nothing under it. */
+  const mentions = await getModelNews(model, { limit: 4, windowDays: 90 });
 
   return (
     <>
-      <DeskNav locale={locale} />
+      {/* The model's own desk is the honest mark here: a detail page is inside a
+          category, not on the category list (`aria-current="true"`, not `"page"`). */}
+      <DeskNav locale={locale} active={model.primaryCategory} exact={false} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -128,6 +136,26 @@ export default async function ModelPage({
           </div>
         </div>
       </section>
+
+      {/* The card body is the only prose most repositories have. It is printed
+          before the spec grid because a reader wants to know what the model *is*
+          before how many bytes it ships — and it is an excerpt with a link, never
+          the whole card (`lib/card-text.ts`). */}
+      {model.cardSummary ? (
+        <section className="mt-4">
+          <h2 className="flex flex-wrap items-baseline gap-2 text-lg font-semibold mb-2">
+            {t(dict, "detail.about")}
+            <span className="text-xs font-normal text-muted">{t(dict, "detail.aboutNote")}</span>
+          </h2>
+          <div className="card p-4">
+            <p className="text-sm leading-relaxed break-words">{model.cardSummary}</p>
+            <a href={model.url} className="mt-2 inline-flex items-center gap-1.5 text-sm text-accent">
+              <ExternalLink size={13} aria-hidden="true" />
+              {t(dict, "detail.aboutFull")}
+            </a>
+          </div>
+        </section>
+      ) : null}
 
       <section className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {specs.map((spec) => {
@@ -193,9 +221,23 @@ export default async function ModelPage({
         <h2 className="text-lg font-semibold mb-2">{t(dict, "detail.runCommand")}</h2>
         <div className="card p-3 flex flex-wrap items-center gap-3">
           <pre className="flex-1 min-w-[220px] font-mono text-sm whitespace-pre-wrap break-words">{command}</pre>
-          <CopyCommand text={command} label={t(dict, "common.copy")} />
+          <CopyCommand text={command} label={t(dict, "common.copy")} copiedLabel={t(dict, "common.copied")} />
         </div>
       </section>
+
+      {mentions.length > 0 ? (
+        <section className="mt-6">
+          <h2 className="flex flex-wrap items-baseline gap-2 text-lg font-semibold mb-3">
+            {t(dict, "detail.mentions")}
+            <span className="text-xs font-normal text-muted">{t(dict, "detail.mentionsNote")}</span>
+          </h2>
+          <div className="grid grid-cols-1 gap-x-8 md:grid-cols-2">
+            {mentions.map((item) => (
+              <StoryRow key={item.externalId} item={item} locale={locale} art="plate" />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="mt-6">
         <h2 className="text-lg font-semibold mb-3">{t(dict, "detail.related")}</h2>

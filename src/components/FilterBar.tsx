@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Filter, SlidersHorizontal, X } from "lucide-react";
+import { ChevronUp, Filter, SlidersHorizontal, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { RUNNERS } from "@/lib/runner/detect";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
@@ -90,13 +90,18 @@ export function FilterBar({
         </label>
         <SubmitButton label={t(dict, "filters.apply")} />
 
-        <details className="w-full lg:w-auto">
-          <summary className="inline-flex h-11 cursor-pointer items-center gap-1.5 border border-rule px-3 text-muted hover:border-rule-strong hover:text-text">
-            <SlidersHorizontal size={14} aria-hidden="true" />
+        {/* `.filters-more` (globals.css) keeps the summary in the row above — the
+            button does not move — while the panel becomes a flex row of its own,
+            so its four selects sit side by side across the full width instead of
+            wrapping inside a button-width box. */}
+        <details className="filters-more group">
+          <summary className="inline-flex h-11 shrink-0 cursor-pointer items-center gap-1.5 border border-rule px-3 text-muted hover:border-rule-strong hover:text-text">
+            <SlidersHorizontal size={14} aria-hidden="true" className="group-open:hidden" />
+            <ChevronUp size={14} aria-hidden="true" className="hidden group-open:inline" />
             {t(dict, "filters.more")}
             {secondaryActive > 0 ? <span className="font-mono text-xs text-accent">{secondaryActive}</span> : null}
           </summary>
-          <div className="mt-2 flex flex-wrap items-end gap-2 border border-rule bg-surface p-2">
+          <div className="mt-2 hidden w-full flex-wrap items-end gap-2 border border-rule bg-surface p-2 group-open:flex">
             {secondary.map((field) => (
               <Field
                 key={field.name}
@@ -106,6 +111,9 @@ export function FilterBar({
                 options={field.options}
                 termSlug={field.termSlug}
                 locale={locale}
+                /* `flex-1` divides the row between the four selects instead of
+                   leaving two thirds of it empty after content-sized boxes. */
+                className="min-w-[150px] flex-1"
               />
             ))}
             {children}

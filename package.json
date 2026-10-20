@@ -15,9 +15,13 @@
     "test": "tsx --test tests/*.test.ts",
     "sources-check": "tsx scripts/verify-sources.ts",
     "ingest": "tsx scripts/ingest.ts",
+    "cards-backfill": "tsx scripts/backfill-cards.ts",
     "classify-check": "tsx scripts/classify-check.ts",
     "verify-ui": "tsx scripts/measure-ui.ts",
-    "publish": "tsx scripts/publish-snapshot.ts"
+    "verify-nav": "tsx scripts/check-nav-current.ts",
+    "verify-theme": "tsx scripts/check-theme.ts",
+    "publish": "tsx scripts/publish-snapshot.ts",
+    "verify-glossary": "tsx scripts/measure-glossary.ts"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",

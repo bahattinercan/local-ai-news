@@ -16,6 +16,10 @@ Her doküman iki dilde eşleşir. **EN kaynaktır, TR eşdeğerdir.** Bir dilde 
 | Design v2 — clarity + modernisation plan (measured audit, 2026-10-16) | [en/DESIGN-V2.md](en/DESIGN-V2.md) | [tr/DESIGN-V2.md](tr/DESIGN-V2.md) |
 | Design v3 — "Basın Baskısı": retro broadsheet front page (implemented, measured 2026-10-18) | [en/DESIGN-V3.md](en/DESIGN-V3.md) | [tr/DESIGN-V3.md](tr/DESIGN-V3.md) |
 | News & AI-detail expansion plan | [en/NEWS-PLAN.md](en/NEWS-PLAN.md) | [tr/NEWS-PLAN.md](tr/NEWS-PLAN.md) |
+| Compare page v1 — the pair sheet (implemented, measured 2026-10-20) | [en/COMPARE-PLAN.md](en/COMPARE-PLAN.md) | [tr/COMPARE-PLAN.md](tr/COMPARE-PLAN.md) |
+| Stats page v2 — "the Data Desk" (plan, measured 2026-10-20) | [en/STATS-PLAN.md](en/STATS-PLAN.md) | [tr/STATS-PLAN.md](tr/STATS-PLAN.md) |
+| Glossary v2 plan (measured, 2026-10-20) | [en/GLOSSARY-PLAN.md](en/GLOSSARY-PLAN.md) | [tr/GLOSSARY-PLAN.md](tr/GLOSSARY-PLAN.md) |
+| SEO plan v2 — crawlability, index policy, competitor map, content depth (plan, measured 2026-10-20) | [en/SEO-PLAN.md](en/SEO-PLAN.md) | [tr/SEO-PLAN.md](tr/SEO-PLAN.md) |
 | Data storage (no Neon) | [en/DATA-STORAGE.md](en/DATA-STORAGE.md) | [tr/DATA-STORAGE.md](tr/DATA-STORAGE.md) |
 
 ## Conventions / Kurallar

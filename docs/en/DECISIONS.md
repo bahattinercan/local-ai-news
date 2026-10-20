@@ -85,6 +85,62 @@ Measured on the live tree, then fixed — all six points below were reproducing 
   the layout width, ignores clipped decorations, and exits non-zero on overflow —
   proved with a 900 px fixture (+540 px, exit 1).
 
+## Model page text (2026-10-18)
+
+A model page was a spec sheet with no prose: the ingest stored `cardData` only, and
+the three keys it rendered (`baseModel`, `datasets`, `languages`) are empty on most
+GGUF repositories, so `nerkyor/Qwen3.8-27B-…-NInfer` printed numbers, a VRAM box
+and a run command with nothing saying what the model *is*.
+
+- **The model card body is read, once.** `HfClient.getModelCard()` fetches
+  `/{repo}/raw/main/README.md`; `lib/card-text.ts` turns the Markdown into a
+  ≤600-character plain-text excerpt (frontmatter, badge rows, inline HTML, tables,
+  code fences and a leading author/affiliation block are dropped). It is stored on
+  the row as `cardSummary` and rendered under "About this model" with a link to the
+  full card — an excerpt plus attribution, never the whole card.
+- **`undefined` and `null` mean different things.** `undefined` = never fetched,
+  `null` = fetched and empty, so an empty README costs one request ever, not one
+  per run. The backfill (`npm run cards-backfill`, and the same pass inside
+  `runIngest`) targets gate-passing models by likes, with its own request cap so
+  the detail pass keeps its budget.
+- **A model page now shows the reverse link too.** `getModelNews()` asks "what
+  mentions this model" — the relation used to run one way only (news → model).
+  Matching moved to `lib/model-mentions.ts` because requiring the whole repo name
+  in a headline can never fire for 108-character finetune ids (6 / 104 news rows
+  carried `modelSlug`), and plain word matching was measurably wrong (20 rows
+  attributed to one model via "prompt"). Only version-shaped tokens (six
+  characters, containing a digit) are trusted, with `tokenDf <= 3` for mentions and
+  `tokenDf === 1` for a stored `modelSlug`. Measured on the served snapshot: 5 of
+  915 models gain a mention and every hit is real; the section is not rendered when
+  nothing matches (gate G3). On the current corpus the stricter ingest rule added
+  **0** new links in 98 unlinked rows, which is the intended conservative result.
+
+
+## Stats page: two time axes, one window vocabulary (2026-10-20)
+
+Recorded because both change how existing numbers may be read; the full plan and
+the measured implementation log are in [STATS-PLAN.md](STATS-PLAN.md).
+
+- **Two named time axes.** `tracked` = `firstSeenAt` (when the Radar first saw the
+  row) and `created` = `createdAt` (the Hugging Face repo date). Measured on the
+  served snapshot: `firstSeenAt` spans **3** days, `createdAt` **49**, so 7 / 30 /
+  90 / 180 days of "first seen" all returned 606 while the only daily series the
+  site could honestly draw was the repo-creation one. Every `/stats` panel now
+  prints which axis it counts; the inventory panels keep `firstSeenAt` so their
+  numbers still equal the feed tabs, and the time panel moves to `createdAt`.
+- **One window vocabulary.** `/stats` takes `?window=24h|7d|30d|90d`, the feed's
+  own `WINDOWS`, and `?days=` is parsed as an alias (30 → 30d, 180 → 90d). The old
+  page offered 7 / 30 / 90 / 180 days, none of which could differ.
+- **Decision 9 has one documented relaxation.** "Show everything" stays limited
+  to 30 days, and the feed still requires a category; an *aggregate* surface
+  (`normalizeFeedQuery(input, { aggregate: true })`) may ask for the whole tracked
+  set inside that limit because it renders at most nine rows. The gate panel is
+  gate-independent in every state, so what the filter hides is visible even when
+  the filter is on.
+- **`/api/stats` changed shape** (`stats`/`series` → one board: `totals`,
+  `categories`, `gateReasons`, `cadence`, `tracking`, `runners`, `wire`). No code
+  consumed the old keys; `docs/*/PLAN.md` was updated in the same change.
+
 ## Not implemented yet (F6 remainder)
 
 Admin override panel, email digest, local Ollama integration (`localhost:11434/api/tags`), external news sources (would break decision 3).

@@ -4,6 +4,8 @@ import { CATEGORY_RULES } from "./classify/rules.ts";
 import { NEWS_SCOPE_KINDS, FEED_DEFAULTS, normalizeFeedQuery, type FeedFilterInput } from "./query.ts";
 import { hasGrowthSignal } from "./heat.ts";
 import { cleanLabel } from "./text-guard.ts";
+import { buildStatsBoard, emptyStatsBoard } from "./stats.ts";
+import { buildModelNameIndex, newsForModel } from "./model-mentions.ts";
 import type { ClassifiedModel } from "./model.ts";
 
 export interface SnapshotNews {
@@ -252,20 +254,6 @@ export async function getPulse(days: number, category?: string): Promise<Pulse |
   };
 }
 
-export async function getDailySeries(days: number, options: StatsOptions = {}): Promise<Array<{ date: string; count: number }>> {
-  const snapshot = await loadSnapshot();
-  if (!snapshot) return [];
-
-  const buckets = new Map<string, number>();
-  for (const model of filterModels(snapshot, statsQuery(days, options))) {
-    const date = model.firstSeenAt.slice(0, 10);
-    buckets.set(date, (buckets.get(date) ?? 0) + 1);
-  }
-  return [...buckets.entries()]
-    .map(([date, count]) => ({ date, count }))
-    .sort((a, b) => a.date.localeCompare(b.date));
-}
-
 /**
  * The front page's band: "most downloaded inside the window".
  *
@@ -364,6 +352,97 @@ export async function getModel(slug: string): Promise<ClassifiedModel | null> {
 }
 
 /**
+ * Resolve a compare list in one snapshot read instead of N (`getModel` per slug,
+ * which is what the page used to do). Order follows `slugs`, because the first
+ * column is the baseline every delta is computed against.
+ *
+ * Slugs are matched exactly first and then case-insensitively: hub ids keep their
+ * case, and a reader pasting `qwen/Qwen3-8B` should not be told the model does not
+ * exist.
+ */
+export async function getModelsBySlugs(slugs: string[]): Promise<ClassifiedModel[]> {
+  if (slugs.length === 0) return [];
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return [];
+
+  const exact = new Map<string, ClassifiedModel>();
+  const folded = new Map<string, ClassifiedModel>();
+  for (const model of snapshot.models) {
+    exact.set(model.slug, model);
+    const key = model.slug.toLowerCase();
+    if (!folded.has(key)) folded.set(key, model);
+  }
+
+  return slugs
+    .map((slug) => exact.get(slug) ?? folded.get(slug.toLowerCase()) ?? null)
+    .filter((model): model is ClassifiedModel => model !== null);
+}
+
+/** Slug set for link targets (a base model that is itself tracked). */
+export async function getTrackedSlugs(): Promise<Set<string>> {
+  const snapshot = await loadSnapshot();
+  return new Set(snapshot?.models.map((model) => model.slug) ?? []);
+}
+
+/**
+ * What to compare with. The empty page wants this week's most downloaded models;
+ * a one-model sheet wants its own category first, then the rest of the window.
+ * Both come from the same `filterModels` definition the feed uses, so a suggestion
+ * can never point at a row the feed would not show.
+ */
+export async function getCompareSuggestions(
+  seed: ClassifiedModel | null,
+  limit: number,
+  exclude: string[] = []
+): Promise<ClassifiedModel[]> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return [];
+
+  const skip = new Set([...(seed ? [seed.slug] : []), ...exclude].map((slug) => slug.toLowerCase()));
+  const pool = filterModels(snapshot, {
+    windowDays: 7,
+    sort: "downloads",
+    gate: "passed",
+    excludeGated: true,
+    limit: 0,
+    page: 1
+  });
+
+  const ordered = seed
+    ? [...pool].sort((a, b) => {
+        const sameCategory =
+          Number(b.primaryCategory === seed.primaryCategory) - Number(a.primaryCategory === seed.primaryCategory);
+        return sameCategory !== 0 ? sameCategory : (b.downloads ?? 0) - (a.downloads ?? 0);
+      })
+    : [...pool].sort((a, b) => (b.downloads ?? 0) - (a.downloads ?? 0));
+
+  return ordered.filter((model) => !skip.has(model.slug.toLowerCase())).slice(0, limit);
+}
+
+/**
+ * The other direction of the news ↔ model link.
+ *
+ * Until this existed the relation was one-way: a news item with `modelSlug`
+ * linked to its model page, but a model page had no way to ask "what was written
+ * about this?". The matcher lives in `lib/model-mentions.ts` together with the
+ * measurements that justify its thresholds; here it only needs the snapshot, so a
+ * model with no mentions (measured: 94 % of the tracked set today) renders no
+ * section at all instead of an empty heading (docs/en/NEWS-PLAN.md G3).
+ */
+export async function getModelNews(
+  model: ClassifiedModel,
+  options: { windowDays?: number; limit?: number } = {}
+): Promise<SnapshotNews[]> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return [];
+
+  const windowDays = options.windowDays ?? 90;
+  const index = buildModelNameIndex(snapshot.models);
+  const rows = normalizeNews(snapshot).filter((item) => withinWindow(item.publishedAt, windowDays));
+  return newsForModel(model, rows, index, options.limit ?? 6);
+}
+
+/**
  * Next 16 hands a dynamic segment through **still percent-encoded**: `params.id`
  * arrived as `reddit_localllama%3At3_1x6yk1f` (length 30) for both the raw and
  * the encoded request url. Encoding is not optional on the way in — external ids
@@ -421,38 +500,14 @@ export async function countNews(query: NewsQuery): Promise<number> {
   return filterNews(snapshot, query).length;
 }
 
-export async function getStats(
-  days: number,
-  options: StatsOptions = {}
-): Promise<Array<{ category: string; count: number }>> {
+export async function getStatsBoard(days: number, options: { gate?: "passed" | "all" } = {}) {
   const snapshot = await loadSnapshot();
-  if (!snapshot) return [];
-
-  /* Same filter definition as the feed (and the tab badges), so /stats cannot
-     print "Audio 244" next to a feed tab that says "Audio 17". Before this it
-     counted every tracked row, gate and gated repo included, while the feed
-     defaulted to gate-passed. */
-  const rows = filterModels(snapshot, statsQuery(days, options));
-  const counts = new Map<string, number>();
-  for (const model of rows) counts.set(model.primaryCategory, (counts.get(model.primaryCategory) ?? 0) + 1);
-  return [...counts.entries()].map(([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count);
-}
-
-/** The filter set the stats surfaces share with the feed. */
-export interface StatsOptions {
-  gate?: "passed" | "all";
-  excludeGated?: boolean;
-}
-
-function statsQuery(days: number, options: StatsOptions): FeedQuery {
-  return {
-    windowDays: days,
-    sort: "new",
-    gate: options.gate ?? FEED_DEFAULTS.gate,
-    excludeGated: options.excludeGated ?? true,
-    limit: 0,
-    page: 1
-  };
+  const gate = options.gate ?? FEED_DEFAULTS.gate;
+  /* The Data Desk reads the snapshot once for every panel instead of running
+     `filterModels` per chart, and it is the one surface allowed to ask for the
+     whole tracked set inside 30 days (docs/en/STATS-PLAN.md S3). */
+  if (!snapshot) return emptyStatsBoard(days, gate);
+  return buildStatsBoard(snapshot, { windowDays: days, gate });
 }
 
 /**
@@ -503,4 +558,99 @@ export async function getCategories(): Promise<Array<{ key: string; labelEn: str
   return CATEGORY_RULES
     .filter((rule) => rule.key !== "news" && present.has(rule.key))
     .map((rule) => ({ key: rule.key, labelEn: rule.labelEn, labelTr: rule.labelTr, sortOrder: rule.sortOrder }));
+}
+
+/**
+ * The snapshot figures the glossary is allowed to print
+ * (docs/en/GLOSSARY-PLAN.md G-D6).
+ *
+ * Ten entries used to state numbers in prose — "46 GGUF repositories", "1 633
+ * models", a bytes/parameter table — and every one of them was a copy of a value
+ * that lives somewhere else. This derives all of it from the same cached snapshot
+ * the feed reads, in one pass, so a page can never print a figure the feed
+ * disagrees with (and an ingest cannot silently falsify a definition).
+ *
+ * `coverage` counts *models*, not occurrences: a repository that ships six
+ * quantizations must not make "how many repositories publish a quantization"
+ * read six times too high.
+ */
+export interface GlossaryEvidence {
+  total: number;
+  snapshotAt: string | null;
+  coverage: {
+    quantizations: number;
+    runners: number;
+    library: number;
+    params: number;
+    gate: number;
+    downloads: number;
+    likes: number;
+    storage: number;
+    gated: number;
+  };
+  /** Top values per field, descending, capped so the block stays one screen. */
+  quantizations: Array<[string, number]>;
+  runners: Array<[string, number]>;
+  library: Array<[string, number]>;
+}
+
+const EVIDENCE_TOP = 6;
+
+function topValues(values: string[], limit = EVIDENCE_TOP): Array<[string, number]> {
+  const counts = new Map<string, number>();
+  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, limit);
+}
+
+export async function getGlossaryEvidence(): Promise<GlossaryEvidence | null> {
+  const snapshot = await loadSnapshot();
+  if (!snapshot) return null;
+
+  const models = snapshot.models;
+  const coverage = {
+    quantizations: 0,
+    runners: 0,
+    library: 0,
+    params: 0,
+    gate: 0,
+    downloads: 0,
+    likes: 0,
+    storage: 0,
+    gated: 0
+  };
+  const quantizations: string[] = [];
+  const runners: string[] = [];
+  const library: string[] = [];
+
+  for (const model of models) {
+    if (model.quantizations.length > 0) {
+      coverage.quantizations += 1;
+      quantizations.push(...model.quantizations);
+    }
+    if (model.runners.length > 0) {
+      coverage.runners += 1;
+      runners.push(...model.runners);
+    }
+    if (model.libraryName) {
+      coverage.library += 1;
+      library.push(model.libraryName);
+    }
+    if (model.paramsTotal) coverage.params += 1;
+    if (model.qualityPassed) coverage.gate += 1;
+    if (model.downloads > 0) coverage.downloads += 1;
+    if (model.likes > 0) coverage.likes += 1;
+    if (model.storageBytes) coverage.storage += 1;
+    if (model.gated) coverage.gated += 1;
+  }
+
+  return {
+    total: models.length,
+    snapshotAt: snapshot.generatedAt ?? null,
+    coverage,
+    quantizations: topValues(quantizations),
+    runners: topValues(runners),
+    library: topValues(library)
+  };
 }

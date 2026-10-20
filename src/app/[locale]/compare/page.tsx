@@ -1,21 +1,90 @@
-import { getModel } from "@/lib/store";
-import { formatParams } from "@/lib/runner/vram";
-import { categoryLabel } from "@/lib/classify/rules";
-import { formatNumber } from "@/lib/format";
-import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
-import { EmptyState } from "@/components/EmptyState";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { DeskNav } from "@/components/shell/DeskNav";
 import { PageHeader } from "@/components/shell/PageHeader";
+import { DataNotice } from "@/components/EmptyState";
+import { CompareFootnote, CompareSheet } from "@/components/compare/CompareSheet";
+import {
+  CompareActions,
+  CompareAddForm,
+  ComparePairs,
+  CompareSuggestions
+} from "@/components/compare/ComparePicker";
+import {
+  COMPARE_CAP,
+  compareHref,
+  compareRows,
+  compareSlugOf,
+  parseCompareIds,
+  splitResolved,
+  suggestPairs,
+  topDifferences
+} from "@/lib/compare";
+import { getCompareSuggestions, getModelsBySlugs, getTrackedSlugs } from "@/lib/store";
+import { dictionary, hrefFor, pickLocale, t, type Locale } from "@/i18n";
 import type { ClassifiedModel } from "@/lib/model";
 
-type Direction = "max" | "min" | null;
+/**
+ * The comparison sheet (docs/en/COMPARE-PLAN.md).
+ *
+ * The address is the state, and it accepts what a reader actually has: the Hub
+ * repo id (`owner/model`), the feed's slug (`owner-model`), or a Hub URL. The same
+ * parser backs the add form, so the taught form and the working form cannot drift
+ * apart — the empty state used to document `?ids=owner/model`, which never
+ * resolved because `slugify()` turns `/` into `-`.
+ *
+ * Every state is explained: nothing selected (picker + computed pairs), one model
+ * (neighbours), unresolvable addresses (named, not silently dropped), more than
+ * four (named), duplicates (named). Nothing is invented and nothing disappears.
+ */
 
-interface Row {
-  label: string;
-  get: (_model: ClassifiedModel) => string;
-  numeric?: (_model: ClassifiedModel) => number | null;
-  direction?: Direction;
+const FOOTNOTE_ID = "compare-how-to-read";
+
+function single(value: string | string[] | undefined): string {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return typeof raw === "string" ? raw : "";
+}
+
+interface CompareSearch {
+  ids?: string | string[];
+  add?: string | string[];
+}
+
+export async function generateMetadata({
+  params,
+  searchParams
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<CompareSearch>;
+}): Promise<Metadata> {
+  const locale = pickLocale((await params).locale);
+  const dict = dictionary(locale);
+  const parsed = parseCompareIds((await searchParams).ids);
+  const models = await getModelsBySlugs(parsed.slugs);
+  const canonical = compareHref(locale, models.map((model) => model.slug));
+
+  if (models.length === 0) {
+    return {
+      title: `${t(dict, "compare.title")} — ${t(dict, "brand")}`,
+      description: t(dict, "compare.metaDescription"),
+      alternates: { canonical }
+    };
+  }
+
+  const names = models.map((model) => model.externalId);
+  const lead = names.slice(0, 2).join(` ${t(dict, "compare.vs")} `);
+  const short = names.length > 2 ? `${lead} +${names.length - 2}` : lead;
+
+  return {
+    title: t(dict, "compare.metaTitle", { names: short }),
+    description: t(dict, "compare.metaDescriptionModels", { names: names.join(", ") }),
+    alternates: { canonical },
+    /* A tool page with near-infinite permutations: compared sheets are excluded
+       from the index, the empty /compare stays indexable and stays in the sitemap. */
+    robots: { index: false, follow: true }
+  };
 }
 
 export default async function ComparePage({
@@ -23,126 +92,157 @@ export default async function ComparePage({
   searchParams
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+  searchParams: Promise<CompareSearch>;
 }) {
   const locale = pickLocale((await params).locale);
   const dict = dictionary(locale);
-  const raw = (await searchParams).ids ?? "";
-  const slugs = String(raw).split(",").map((slug) => slug.trim()).filter(Boolean).slice(0, 6);
+  const search = await searchParams;
 
-  if (slugs.length === 0) {
-    return (
-      <>
-        <DeskNav locale={locale} />
-        <EmptyState
-          locale={locale}
-          message={t(dict, "compare.title")}
-          hint={t(dict, "empty.compareHint")}
-          action={{ href: hrefFor(locale, "/models"), label: t(dict, "empty.backToFeed") }}
-        />
-      </>
-    );
-  }
+  const parsed = parseCompareIds(search.ids);
+  const { models: resolvedModels, rejected } = splitResolved(parsed.tokens, await getModelsBySlugs(parsed.slugs));
+  const models = resolvedModels;
 
-  const models = (await Promise.all(slugs.map((slug) => getModel(slug)))).filter(
-    (model): model is ClassifiedModel => model !== null
-  );
+  /* The add form is a GET form: it carries the current list plus a typed address. */
+  const addRaw = single(search.add).trim();
+  let addError: string | null = null;
+  let addBlocked = false;
 
-  if (models.length === 0) {
-    return (
-      <>
-        <DeskNav locale={locale} />
-        <EmptyState
-          locale={locale}
-          message={t(dict, "empty.noModels")}
-          hint={t(dict, "empty.compareHint")}
-          action={{ href: hrefFor(locale, "/models"), label: t(dict, "empty.backToFeed") }}
-        />
-      </>
-    );
-  }
-
-  const rows: Row[] = [
-    { label: t(dict, "filters.category"), get: (m) => categoryLabel(m.primaryCategory) },
-    {
-      label: t(dict, "card.params"),
-      get: (m) => formatParams(m.paramsTotal),
-      numeric: (m) => m.paramsTotal,
-      direction: "min"
-    },
-    {
-      label: t(dict, "card.vram"),
-      get: (m) => (m.vramEstGb ? `~${m.vramEstGb} GB` : "—"),
-      numeric: (m) => m.vramEstGb,
-      direction: "min"
-    },
-    { label: t(dict, "detail.quantizations"), get: (m) => m.quantizations.join(", ") || "—" },
-    { label: t(dict, "card.runners"), get: (m) => m.runners.join(", ") || "—" },
-    { label: t(dict, "card.license"), get: (m) => m.license ?? "—" },
-    {
-      label: t(dict, "card.downloads"),
-      get: (m) => formatNumber(m.downloads),
-      numeric: (m) => m.downloads,
-      direction: "max"
-    },
-    {
-      label: t(dict, "card.likes"),
-      get: (m) => formatNumber(m.likes),
-      numeric: (m) => m.likes,
-      direction: "max"
+  if (addRaw) {
+    const slug = compareSlugOf(addRaw);
+    if (!slug) {
+      addError = addRaw;
+    } else if (models.some((model) => model.slug.toLowerCase() === slug.toLowerCase())) {
+      /* Already on the sheet: clean the address instead of showing a duplicate. */
+      redirect(compareHref(locale, models.map((model) => model.slug)));
+    } else if (models.length >= COMPARE_CAP) {
+      addBlocked = true;
+    } else {
+      const [added] = await getModelsBySlugs([slug]);
+      if (added) redirect(compareHref(locale, [...models.map((model) => model.slug), added.slug]));
+      addError = addRaw;
     }
-  ];
+  }
 
-  const bestIndex = (row: Row): number | null => {
-    if (!row.numeric || !row.direction) return null;
-    const values = models.map(row.numeric).filter((value): value is number => value !== null && value > 0);
-    if (values.length < 2) return null;
-    const target = row.direction === "max" ? Math.max(...values) : Math.min(...values);
-    return models.findIndex((model) => row.numeric!(model) === target);
-  };
+  const notices: string[] = [];
+  if (addError) notices.push(t(dict, "compare.addNotFound", { value: addError }));
+  if (addBlocked) notices.push(t(dict, "compare.capReached", { cap: COMPARE_CAP }));
+  if (rejected.length > 0) {
+    notices.push(
+      t(dict, "compare.rejected", {
+        count: rejected.length,
+        total: parsed.tokens.length,
+        list: rejected.join(", ")
+      })
+    );
+  }
+  if (parsed.overflow.length > 0) {
+    notices.push(t(dict, "compare.overflow", { cap: COMPARE_CAP, list: parsed.overflow.join(", ") }));
+  }
+  if (parsed.duplicates.length > 0) {
+    notices.push(t(dict, "compare.duplicates", { list: parsed.duplicates.join(", ") }));
+  }
+  if (models.length === 1) notices.push(t(dict, "compare.oneModel"));
+
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
+  const path = compareHref(locale, models.map((model) => model.slug));
+  const absoluteUrl = host ? `${protocol}://${host}${path}` : path;
+
+  /* One snapshot read for the empty state too: chips are this week's most
+     downloaded, pairs are computed from the same pool (C14). */
+  const suggestions = models.length === 0 ? await getCompareSuggestions(null, 40) : [];
+  const neighbours = models.length === 1 ? await getCompareSuggestions(models[0], 6) : [];
+
+  const groups =
+    models.length > 0 ? compareRows(models, locale, { knownSlugs: await getTrackedSlugs() }) : [];
+  const differences = topDifferences(groups);
 
   return (
     <>
-      <DeskNav locale={locale} />
-      <PageHeader title={t(dict, "compare.title")} kicker={t(dict, "nav.compare")} />
+      <DeskNav locale={locale} section="compare" />
+      <PageHeader
+        title={t(dict, "compare.title")}
+        kicker={t(dict, "nav.compare")}
+        lede={t(dict, "compare.lede")}
+        aside={
+          models.length > 0 ? (
+            <span className="font-mono text-xs text-muted">
+              {t(dict, "compare.selected", { count: models.length, cap: COMPARE_CAP })}
+            </span>
+          ) : undefined
+        }
+      />
+      <DataNotice locale={locale} />
 
-      <div className="card overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead className="sticky top-0">
-            <tr className="border-b border-border text-left">
-              <th className="label py-3 pr-3 text-muted">{t(dict, "common.viewModel")}</th>
-              {models.map((model) => (
-                <th key={model.slug} className="py-3 pr-3 font-medium">
-                  <Link href={`/m/${model.slug}`} className="hover:text-accent">
-                    {model.externalId}
-                  </Link>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => {
-              const best = bestIndex(row);
-              return (
-                <tr key={row.label} className="border-b border-border">
-                  <td className="label py-2.5 pr-3 font-normal tracking-normal text-muted normal-case">{row.label}</td>
-                  {models.map((model, index) => (
-                    <td
-                      key={model.slug}
-                      className={
-                        "py-2.5 pr-3 font-mono" + (index === best ? " text-accent font-semibold" : "")
-                      }
-                    >
-                      {row.get(model)}
-                      {index === best ? <span className="text-xs text-muted"> · {t(dict, "compare.best")}</span> : null}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      {notices.length > 0 ? (
+        <ul role="status" className="mb-3 space-y-1 border-l-2 border-accent pl-3 text-sm text-muted">
+          {notices.map((notice) => (
+            <li key={notice}>{notice}</li>
+          ))}
+        </ul>
+      ) : null}
+
+      {models.length === 0 ? (
+        <EmptyCompare locale={locale} suggestions={suggestions} />
+      ) : (
+        <>
+          <CompareAddForm locale={locale} selected={models} value={addError ?? ""} />
+          {models.length === 1 ? (
+            <CompareSuggestions
+              locale={locale}
+              models={neighbours}
+              selected={models}
+              title={t(dict, "compare.neighbours")}
+            />
+          ) : null}
+          <CompareActions locale={locale} models={models} absoluteUrl={absoluteUrl} />
+          <div className="mt-4">
+            <CompareSheet
+              locale={locale}
+              models={models}
+              groups={groups}
+              differences={differences}
+              footnoteId={FOOTNOTE_ID}
+            />
+          </div>
+          <CompareFootnote locale={locale} id={FOOTNOTE_ID} />
+        </>
+      )}
+    </>
+  );
+}
+
+/** Nothing selected: teach the three address forms, then offer two ways in. */
+function EmptyCompare({ locale, suggestions }: { locale: Locale; suggestions: ClassifiedModel[] }) {
+  const dict = dictionary(locale);
+  const chips = suggestions.slice(0, 8);
+  const pairs = suggestPairs(suggestions, 3);
+
+  return (
+    <>
+      <section className="rule-strong border-b border-rule pt-4 pb-5">
+        <h2 className="font-display text-lg font-bold tracking-tight">{t(dict, "compare.emptyTitle")}</h2>
+        <p className="mt-1 max-w-2xl text-sm text-muted">{t(dict, "compare.emptyBody")}</p>
+        <p className="mt-2 font-mono text-xs text-muted">{t(dict, "compare.formatExamples")}</p>
+        <CompareAddForm locale={locale} selected={[]} />
+      </section>
+
+      <CompareSuggestions
+        locale={locale}
+        models={chips}
+        selected={[]}
+        title={t(dict, "compare.mostDownloaded")}
+      />
+      <ComparePairs locale={locale} pairs={pairs} />
+
+      <p className="mt-6 text-sm">
+        <Link href={hrefFor(locale, "/models")} className="text-muted hover:text-text">
+          {t(dict, "empty.backToFeed")}
+        </Link>
+      </p>
+
+      <CompareFootnote locale={locale} id={FOOTNOTE_ID} />
     </>
   );
 }

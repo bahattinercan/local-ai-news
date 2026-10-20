@@ -416,6 +416,116 @@
     animation: shimmer 1.4s linear infinite;
     border-radius: var(--radius-sm);
   }
+
+  /* ---------- the comparison sheet (docs/en/COMPARE-PLAN.md §3.2) ---------- */
+
+  /*
+   * Below 768 px the sheet scrolls sideways (a 148 px minimum per model column)
+   * with the label column pinned. From 768 px up the table fits, so the wrapper
+   * does not clip at all — and that is deliberate: `overflow-x: auto` computes
+   * `overflow-y` to `hidden`, which turns the wrapper into a scroll port whose
+   * vertical scroll range is zero, so `position: sticky` on the header row can
+   * never reach the viewport (measured on the previous sheet: header top −31 px
+   * after a 362 px page scroll, and again at −494 px with four models).
+   */
+  .compare-scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-strong) transparent;
+  }
+
+  @media (min-width: 768px) {
+    .compare-scroll {
+      overflow: visible;
+    }
+  }
+
+  .compare-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .compare-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .compare-scroll::-webkit-scrollbar-thumb {
+    background: var(--rule-strong);
+  }
+
+  .compare-scroll:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /*
+   * A fixed layout, because the browser's auto layout is what shrank the label
+   * column to 77 px with three models and 60 px with six: the long repo id won
+   * the width it asked for and the labels that explain the numbers lost theirs.
+   */
+  .compare-table {
+    width: 100%;
+    /* Collapsed borders vanish on sticky cells in Chrome; rules are inset shadows. */
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+  }
+
+  .compare-table th,
+  .compare-table td {
+    box-shadow: inset 0 -1px 0 var(--rule);
+    vertical-align: top;
+  }
+
+  .compare-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    box-shadow: inset 0 -2px 0 var(--rule-strong);
+  }
+
+  .compare-table .compare-label-col,
+  .compare-table .compare-label {
+    width: 6rem;
+  }
+
+  .compare-table tbody .compare-label {
+    /* Pinned while the models scroll past: a 34 px label column at 390 px was
+       the same defect as no label column at all. */
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: var(--bg);
+    box-shadow: inset -1px 0 0 var(--rule), inset 0 -1px 0 var(--rule);
+  }
+  .compare-table thead .compare-label {
+    left: 0;
+    z-index: 30;
+  }
+
+  .compare-table .compare-group th {
+    background: var(--raised);
+    box-shadow: inset 0 -1px 0 var(--rule-strong);
+  }
+
+  /* Inside the layer, deliberately: an unlayered rule outranks every layered one
+     (DESIGN-V3 §0.2.6), and these are defaults, not overrides. */
+  @media (min-width: 640px) {
+    .compare-table .compare-label-col,
+    .compare-table .compare-label {
+      width: 8.75rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    /* Below the table breakpoint the sheet scrolls sideways instead of squeezing:
+       148 px per model is the narrowest column that still sets a readable repo
+       name on two lines (measured against the 102-character longest id). */
+    .compare-table {
+      min-width: calc(var(--compare-cols, 2) * 148px + 6rem);
+    }
+  }
 }
 
 @media (min-width: 640px) {
@@ -466,6 +576,24 @@ summary {
 
 summary::-webkit-details-marker {
   display: none;
+}
+
+/* The filters disclosure sits `display: contents` in the filter row: that keeps
+   its summary in the row (the button does not move when the panel opens) and
+   lets the panel span a row of its own. Chrome wraps the panel in an internal
+   `::details-content` box, which would then be the flex item — a shrink-to-fit
+   one, so the four selects stayed wrapped inside a button-width box; flatten
+   that wrapper too. Kept as two rules on purpose: an unsupported pseudo-element
+   invalidates a whole selector *list*, and browsers without it (Safari < 18.4,
+   Firefox < 139) drop only the second rule — they have no wrapper box to
+   flatten in the first place. The open/closed switch is a Tailwind
+   `hidden`/`group-open:flex` pair on the panel, never the UA rule. */
+.filters-more {
+  display: contents;
+}
+
+.filters-more::details-content {
+  display: contents;
 }
 
 .chev {
