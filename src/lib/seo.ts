@@ -1,0 +1,278 @@
+import type { Metadata } from "next";
+import { CATEGORY_RULES, categoryLabel } from "@/lib/classify/rules";
+import { formatCount, formatEditionDate } from "@/lib/format";
+import { newsText, truncateAtWord } from "@/lib/news-text";
+import { formatParams } from "@/lib/runner/vram";
+import type { ClassifiedModel } from "@/lib/model";
+import type { SnapshotNews } from "@/lib/store";
+import type { Locale } from "@/i18n";
+
+/**
+ * The single place that decides what a crawler is told (docs/en/SEO-PLAN.md §4).
+ *
+ * Before this module existed, every route inherited the root layout's one title
+ * and description and no route emitted a canonical, an alternate or an OG tag.
+ * The rule is now: a page's metadata is derived from the page's own data, and
+ * the helpers here are pure so the title/description builders can be unit-tested
+ * without a server.
+ */
+
+const FALLBACK_SITE_URL = "https://openweightradar.com";
+
+/** Read once per server process; `.env` is the only place the origin lives. */
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL).replace(/\/+$/, "");
+
+export const SITE_NAME = "OpenWeight Radar";
+
+/** Normalise a locale-relative path into the absolute canonical URL. */
+export function canonicalUrl(locale: Locale, path: string): string {
+  const clean = path === "/" || path === "" ? "" : path.startsWith("/") ? path : `/${path}`;
+  return `${SITE_URL}/${locale}${clean}`;
+}
+
+/**
+ * `en`, `tr` and `x-default`. Every indexable page in this site exists in both
+ * locales and the entity slug is identical, so the path alone is enough.
+ * `x-default` points at EN, which is the source of truth for entity facts.
+ */
+export function languageAlternates(path: string, query = ""): Record<string, string> {
+  const clean = path === "/" || path === "" ? "" : path.startsWith("/") ? path : `/${path}`;
+  const suffix = query ? (query.startsWith("?") ? query : `?${query}`) : "";
+  return {
+    en: `${SITE_URL}/en${clean}${suffix}`,
+    tr: `${SITE_URL}/tr${clean}${suffix}`,
+    "x-default": `${SITE_URL}/en${clean}${suffix}`
+  };
+}
+
+/* ------------------------------------------------------------- index policy -- */
+
+const SPEC_KEYS = [
+  "paramsTotal",
+  "license",
+  "libraryName",
+  "storageBytes",
+  "vramEstGb",
+  "files",
+  "quantizations",
+  "runners"
+] as const;
+
+function present(value: unknown): boolean {
+  if (value === null || value === undefined) return false;
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === "string") return value.trim() !== "";
+  return true;
+}
+
+/** How many of the eight local-fit fields this model actually reports. */
+export function specCount(model: ClassifiedModel): number {
+  return SPEC_KEYS.filter((key) => present(model[key])).length;
+}
+
+/**
+ * Decision S4: a gate-passed model with enough specs — or, after the card
+ * backfill, enough prose — is worth indexing. Everything else stays reachable
+ * but `noindex, follow`, so the site never ships 1 400 near-empty pages.
+ *
+ * Measured on the 2026-10-20 snapshot: 430 of 529 gate-passed models qualify
+ * today; the same predicate expands to all 529 once `cardSummary` is filled.
+ */
+export function isIndexableModel(model: ClassifiedModel): boolean {
+  return model.qualityPassed && (specCount(model) >= 4 || (model.cardSummary?.trim().length ?? 0) >= 200);
+}
+
+/** A paper with a stub summary is not a document; everything else is. */
+export function isIndexableNews(item: SnapshotNews): boolean {
+  return item.kind !== "paper" || (item.summary?.trim().length ?? 0) >= 300;
+}
+
+/* ---------------------------------------------------------------- builders -- */
+
+/**
+ * A one-word category for titles, because "language / llm" is not a noun. These
+ * are taxonomy terms, not UI copy, but the Turkish column is still a translation
+ * of the *word* — "görüntü modeli" is what a Turkish reader searches for, while
+ * the category label on the desk stays English by decision.
+ */
+const CATEGORY_WORD: Record<string, { en: string; tr: string }> = {
+  llm: { en: "LLM", tr: "LLM" },
+  image: { en: "image", tr: "görüntü" },
+  video: { en: "video", tr: "video" },
+  coding: { en: "coding", tr: "kod" },
+  audio: { en: "audio", tr: "ses" },
+  multimodal: { en: "multimodal", tr: "çoklu mod" },
+  embedding: { en: "embedding", tr: "embedding" },
+  vision: { en: "vision", tr: "görü" },
+  robotics: { en: "robotics", tr: "robotik" }
+};
+
+export function categoryWord(key: string, locale: Locale = "en"): string {
+  return CATEGORY_WORD[key]?.[locale] ?? categoryLabel(key).toLowerCase();
+}
+
+/**
+ * A long repo id is shortened from the **front of the name**, never the end.
+ * Two repositories can share the first sixty characters and differ in the last
+ * thirty (`…-inv-gen-rlhint-…` vs `…-aug-combine-rlhint-…`), so an end cut made
+ * two different pages carry the same `<title>`. The owner stays, the variant
+ * tail stays; only the middle of the name is dropped.
+ */
+function shortModelId(model: ClassifiedModel): string {
+  const full = model.externalId;
+  if (full.length <= 50) return full;
+  const slash = full.indexOf("/");
+  const owner = slash > 0 ? full.slice(0, slash) : "";
+  const name = slash > 0 ? full.slice(slash + 1) : full;
+  const tail = name.slice(-42);
+  return owner ? `${owner}/…${tail}` : `…${tail}`;
+}
+
+/** 60 characters of entity, then a word boundary, never a hard cut. */
+export function modelTitle(model: ClassifiedModel, locale: Locale = "en"): string {
+  const params = model.paramsTotal ? formatParams(model.paramsTotal) : null;
+  const category = categoryWord(model.primaryCategory, locale);
+  /* Cut the id, not the finished title: the tail of a long repo id is where two
+     near-identical repos differ, and it must survive next to the descriptor. */
+  const id = shortModelId(model);
+  if (locale === "tr") {
+    return params ? `${id} — ${params} yerel ${category} modeli` : `${id} — yerel ${category} modeli`;
+  }
+  return params ? `${id} — ${params} local ${category} model` : `${id} — local ${category} model`;
+}
+
+/**
+ * The description is built from facts that are present, and it says which ones
+ * are absent by omission — never "unknown", "null" or a bare dash. License and
+ * quantization come before the long-tail facts because they are what a reader
+ * deciding whether to run the model actually needs.
+ */
+export function modelDescription(model: ClassifiedModel, locale: Locale): string {
+  const date = formatEditionDate(model.firstSeenAt, locale);
+  const category = categoryWord(model.primaryCategory, locale);
+  const params = model.paramsTotal ? formatParams(model.paramsTotal) : null;
+  const parts: string[] = [];
+
+  if (locale === "tr") {
+    parts.push(
+      `${model.externalId}, ${date} tarihinde ilk kez görülen ${params ? `${params} ` : ""}${category} modeli.`
+    );
+    if (model.licenseName || model.license) parts.push(`Lisans: ${model.licenseName ?? model.license}.`);
+    if (model.quantizations.length > 0) parts.push(`Kuantizasyon: ${model.quantizations.slice(0, 4).join(", ")}.`);
+    if (model.runners.length > 0) parts.push(`Şunlarla çalışır: ${model.runners.slice(0, 3).join(", ")}.`);
+    if (model.vramEstGb) parts.push(`~${model.vramEstGb} GB VRAM.`);
+  } else {
+    parts.push(`${model.externalId} is a ${params ? `${params} ` : ""}${category} model first seen ${date}.`);
+    if (model.licenseName || model.license) parts.push(`License: ${model.licenseName ?? model.license}.`);
+    if (model.quantizations.length > 0) parts.push(`Quantizations: ${model.quantizations.slice(0, 4).join(", ")}.`);
+    if (model.runners.length > 0) parts.push(`Runs with ${model.runners.slice(0, 3).join(", ")}.`);
+    if (model.vramEstGb) parts.push(`~${model.vramEstGb} GB VRAM.`);
+  }
+
+  const facts = parts.join(" ");
+  const summary = model.cardSummary?.trim();
+  if (!summary) return truncateAtWord(facts, 160);
+
+  /* The excerpt is a bonus, not the spine: append it only when the facts leave
+     room, so a 160-character budget can never cut the license or the quant. */
+  const room = 160 - facts.length - 1;
+  if (room < 30) return truncateAtWord(facts, 160);
+  return truncateAtWord(`${facts} ${truncateAtWord(summary, room)}`, 160);
+}
+
+/** The cleaned headline, not the stored build tag. */
+export function newsTitle(item: SnapshotNews): string {
+  const { title, buildTag } = newsText(item, { titleMax: 90, bodyMax: 80 });
+  const base = title || buildTag || item.title || "Update";
+  return truncateAtWord(base, 70);
+}
+
+/** The summary with URLs removed; the page never republishes the source body. */
+export function newsDescription(item: SnapshotNews, locale: Locale): string {
+  const { body } = newsText(item, { titleMax: 120, bodyMax: 400 });
+  const fallback =
+    locale === "tr"
+      ? "Hugging Face akışından yerelde çalıştırılabilir açık ağırlıklı modeller ve runtime haberleri."
+      : "Open-weight models and runtime news you can run locally, from the Hugging Face feeds.";
+  return truncateAtWord(body || item.summary?.trim() || fallback, 160);
+}
+
+export function modelPath(model: ClassifiedModel): string {
+  return `/m/${model.slug}`;
+}
+
+export function newsPath(item: SnapshotNews): string {
+  return `/n/${encodeURIComponent(item.externalId)}`;
+}
+
+/* ---------------------------------------------------------- list surfaces -- */
+
+export const FEED_FILTER_KEYS = ["window", "sort", "gate", "runner", "maxParams", "license", "q"] as const;
+
+export interface ListMetadataInput {
+  path: string;
+  raw: Record<string, string | string[] | undefined>;
+  /** Query keys that make this surface a tool view rather than a document. */
+  filterKeys?: readonly string[];
+  /** Whether `?page=N` (with no other query) is a real, indexable document. */
+  pageIsIndexable?: boolean;
+}
+
+export interface ListMetadata {
+  alternates: NonNullable<Metadata["alternates"]>;
+  robots?: Metadata["robots"];
+}
+
+function single(value: string | string[] | undefined): string {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return typeof raw === "string" ? raw.trim() : "";
+}
+
+function hasAny(raw: Record<string, string | string[] | undefined>, keys: readonly string[]): boolean {
+  return keys.some((key) => single(raw[key]) !== "");
+}
+
+/**
+ * Canonical + robots for a list surface.
+ *
+ * - No query: the bare route is the canonical document.
+ * - `?page=N` alone: self-canonical and indexable (pagination is a path, not a
+ *   duplicate) — except on surfaces that declare `pageIsIndexable: false`.
+ * - Any filter: `noindex, follow` and a canonical back to the bare route. The
+ *   crawler can see the directive because the URL is never blocked in robots.
+ */
+export function listMetadata(locale: Locale, input: ListMetadataInput): ListMetadata {
+  const { path, raw, filterKeys = FEED_FILTER_KEYS, pageIsIndexable = true } = input;
+  const filtered = hasAny(raw, filterKeys);
+  const page = Number(single(raw.page));
+  const pageIsReal = Number.isInteger(page) && page > 1;
+  const indexable = !filtered && (pageIsReal ? pageIsIndexable : true);
+  const base = canonicalUrl(locale, path);
+
+  if (!indexable) {
+    return { alternates: { canonical: base }, robots: { index: false, follow: true } };
+  }
+
+  if (pageIsReal) {
+    return {
+      alternates: {
+        canonical: `${base}?page=${page}`,
+        languages: languageAlternates(path, `page=${page}`)
+      }
+    };
+  }
+
+  return { alternates: { canonical: base, languages: languageAlternates(path) } };
+}
+
+/** The category keys that are user-facing desks (not `news`). */
+export const DESK_KEYS = CATEGORY_RULES.filter((rule) => rule.key !== "news").map((rule) => rule.key);
+
+export function isDesk(key: string): boolean {
+  return DESK_KEYS.includes(key);
+}
+
+/** "1 402" / "1.402" — descriptions carry an exact number, not a compacted one. */
+export function descriptionCount(value: number | null | undefined, locale: Locale): string {
+  return formatCount(value ?? 0, locale);
+}

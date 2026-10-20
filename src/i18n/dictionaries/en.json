@@ -298,5 +298,8 @@
   "front.viewAll": "All {label}",
   "front.noStories": "No stories in this window yet.",
   "desk.title": "{label} desk",
-  "desk.lede": "New {label} models first seen inside the selected window, with the quality gate applied by default."
+  "desk.lede": "New {label} models first seen inside the selected window, with the quality gate applied by default.",
+  "notFound.title": "Page not found",
+  "notFound.lede": "The address is not in this edition. It may have left the window, or the link may be wrong.",
+  "notFound.searchLabel": "Search the index"
 }

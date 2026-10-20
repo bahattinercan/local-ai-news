@@ -850,6 +850,44 @@ P0/P1 sonrası beklenen: 7/7 farklı başlık, 3 canonical/hreflang çifti, 3/3 
 
 ---
 
+## 15.1 Uygulama günlüğü — P0 (2026-10-21)
+
+Tamamlananlar:
+
+- `src/lib/seo.ts` — canonical/alternate üreticileri, `specCount`/`isIndexableModel`/`isIndexableNews`, model/haber başlık ve açıklama üreticileri, liste yüzeyleri için `listMetadata`.
+- `[locale]/layout.tsx` — `metadataBase`, başlık şablonu, varsayılan açıklama, OG/Twitter varsayılanları, robots direktifleri, env'den GSC/Bing doğrulaması.
+- Ön sayfa, `/models`, `/c/*`, `/m/*`, `/n/*`, `/news`, `/research`, `/glossary`, `/glossary/*`, `/stats` ve `/compare` üzerinde `generateMetadata`.
+- Her dizine uygun rotada canonical + `en`/`tr`/`x-default`. Filtreli görünümler `noindex, follow` ve çıplak rotaya canonical; yalnızca `?page=N` `/models` ve `/c/*` üzerinde kendine canonical.
+- Bilinmeyen model/haber/kategori için `notFound()`; 3/3 probda gerçek 404. Next 16.4.0 HTML gövdesinde hâlâ kendi yerleşik 404 kabuğunu çiziyor (iç içe `not-found.tsx` dosyaları derleniyor ama kabuk tarafından kullanılmıyor); durum ve `noindex` doğru, gövde takip işi.
+- `/` ve locale'siz yollar için `308`, `Vary: Accept-Language` ile — CDN TR yönlendirmesini EN okura sunamasın.
+- Sitemap: **1 342 URL** (32 çekirdek + 30 sözlük + 860 model + 420 haber), sorgu dizesi yok, `noindex` URL yok, gerçek `lastModified`, `x-default` ve snapshot'ta varsa görsel kayıtları.
+- `robots.txt`: `Disallow: /api/`, sitemap, açık AI tarayıcı izin listesi.
+- Sitemap taramasının bulduğu gizli 500 düzeltildi: `getNewsItem` ham satırı döndürüyordu; `organization` alanı nesne olan 40 makalenin detay sayfası (`{_id, name, fullname, avatar}`) çöküyordu — iki locale'de **80 URL**. Detay yolu artık listenin kullandığı `normalizeNews` korumasını kullanıyor.
+
+Doğrulama, üretim derlemesi ve kanonik host yerel sunucuya eşlenerek:
+
+| Kontrol | Sonuç |
+|---|---|
+| 200 dönen sitemap URL'si | **1 342 / 1 342** |
+| `noindex` taşıyan sitemap URL'si | **0** |
+| Canonical uyuşmazlığı | **0** |
+| `en`/`tr`/`x-default` eksik sayfa | **0** |
+| Locale başına benzersiz başlık | **671 / 671**, 0 kopya, 0 boş |
+| 404 probu | **3 / 3** |
+| Yönlendirme probu | **2 / 2** 308, `Vary: Accept-Language` |
+| Filtreli görünüm | `noindex, follow`, canonical `/en/models` |
+| İnce model | `noindex` ve sitemap'te yok |
+| `typecheck` / `lint` / `test` | geçti / geçti / **176 geçti** |
+
+Plandan sapmalar:
+
+- **Dört değil tek sitemap.** Next 16, `generateSitemaps` çocuklarını `/sitemap/{id}.xml` altında üretiyor ama `/sitemap.xml` indeksi üretmiyor; 1 342 URL 50 000 sınırının çok altında, bölme P1'e veya hacme kalıyor.
+- **Yerleşik 404 gövdesi.** Durum, `noindex` ve tarama davranışı doğru; markalı 404, iç içe `not-found` HTML kabuğunda çizilene kadar bekliyor.
+- **Hesaplar hâlâ sahibin işi.** GSC/Bing property'leri ve analitik oluşturulmadı; doğrulama env değişkenleri ve olay planı hazır.
+- **Özel alan adı hâlâ NXDOMAIN.** P0'ın otorite yarısı, sahip alan adını bağlayana kadar tamamlanamaz.
+
+---
+
 ## 16. Ek A — uygulama haritası
 
 | Dosya | Değişiklik | Faz |
@@ -880,5 +918,6 @@ P0/P1 sonrası beklenen: 7/7 farklı başlık, 3 canonical/hreflang çifti, 3/3 
 |---|---|---|
 | v1 | 2026-10-20 | Ölçülmüş başlangıç, rota/dizin matrisi, metadata şartnamesi, yapısal veri, sitemap/robots/RSS, içerik derinliği, fazlar ve doğrulama. |
 | v2 | 2026-10-20 | Rakip/SERP kanıtı (§2.1), sorgu portföyü (§2.2), gerçekçi SERP özellikleri (§2.3), taşıma runbook'u (§3.5), rubrik (§7.7), bağlantı matrisi (§8.1), enstrümantasyon/dizinleme/log incelemesi (§10.4–10.6), 90 günlük takvim (§11.5), bağlantı kazanımı (§11.6), budama (§11.7), uygulama haritası (§16) eklendi. Düzeltmeler: Software App zengin sonucu puanlama olmadan ulaşılamaz; FAQ/HowTo işaretlemesi kaldıraç değil; genel VRAM hesaplayıcı koşullu. |
+| v2.1 | 2026-10-21 | P0 uygulandı; §15.1 doğrulamayı, gizli 500 hatasını ve üç sapmayı (tek sitemap, yerleşik 404 kabuğu, sahip hesapları) kaydediyor. |
 
 Sonraki revizyon §2.1'deki arama anlık görüntüsünü kayıtlı bir SERP denetimiyle (tarih, sorgu, ilk 10 URL, özellik tipi) değiştirmeli ve göreceli KPI'ları ilk dört haftalık GSC verisiyle yenilemeli.

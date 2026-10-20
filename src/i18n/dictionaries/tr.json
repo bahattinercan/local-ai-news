@@ -298,5 +298,8 @@
   "front.viewAll": "Tümü: {label}",
   "front.noStories": "Bu pencerede henüz haber yok.",
   "desk.title": "{label} masası",
-  "desk.lede": "Seçilen pencere içinde ilk kez görülen yeni {label} modelleri; varsayılan olarak kalite kapısı uygulanır."
+  "desk.lede": "Seçilen pencere içinde ilk kez görülen yeni {label} modelleri; varsayılan olarak kalite kapısı uygulanır.",
+  "notFound.title": "Sayfa bulunamadı",
+  "notFound.lede": "Bu adres bu edisyonda yok. Pencereden çıkmış olabilir ya da bağlantı yanlış.",
+  "notFound.searchLabel": "Dizinde ara"
 }

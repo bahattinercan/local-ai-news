@@ -850,6 +850,44 @@ Expected after P0/P1: 7/7 distinct titles, 3 canonical/hreflang pairs, 3/3 404s,
 
 ---
 
+## 15.1 Implementation log — P0 (2026-10-21)
+
+Landed:
+
+- `src/lib/seo.ts` — canonical/alternate builders, `specCount`/`isIndexableModel`/`isIndexableNews`, model/news title and description builders, `listMetadata` for list surfaces.
+- `[locale]/layout.tsx` — `metadataBase`, title template, default description, OG/Twitter defaults, robots directives, GSC/Bing verification from env.
+- `generateMetadata` on the front page, `/models`, `/c/*`, `/m/*`, `/n/*`, `/news`, `/research`, `/glossary`, `/glossary/*`, `/stats` and `/compare`.
+- Canonical + `en`/`tr`/`x-default` on every indexable route. Filtered views are `noindex, follow` with a canonical to the bare route; `?page=N` alone is self-canonical on `/models` and `/c/*`.
+- `notFound()` for unknown model/news/category; the status is a real 404 on 3/3 probes. Next 16.4.0 still renders its built-in 404 shell in the HTML body (the nested `not-found.tsx` files compile but are not used by the shell); the status and `noindex` are correct, the body is a follow-up.
+- `308` for `/` and no-locale paths, with `Vary: Accept-Language` so a CDN cannot serve the TR redirect to an EN reader.
+- Sitemap: **1 342 URLs** (32 core + 30 glossary + 860 models + 420 news), no query strings, no `noindex` URLs, real `lastModified`, `x-default` and image entries where the snapshot has one.
+- `robots.txt`: `Disallow: /api/`, sitemap, explicit AI-crawler allow list.
+- Fixed a latent 500 found by the sitemap crawl: `getNewsItem` returned raw rows, so 40 papers whose `organization` is an object (`{_id, name, fullname, avatar}`) crashed their detail pages — **80 URLs** across both locales. The detail path now uses `normalizeNews`, the same guard the list uses.
+
+Verification, production build with the canonical host mapped to the local server:
+
+| Check | Result |
+|---|---|
+| Sitemap URLs returning 200 | **1 342 / 1 342** |
+| Sitemap URLs carrying `noindex` | **0** |
+| Canonical mismatches | **0** |
+| Pages missing any of `en`/`tr`/`x-default` | **0** |
+| Unique titles per locale | **671 / 671**, 0 duplicates, 0 empty |
+| 404 probes | **3 / 3** |
+| Redirect probes | **2 / 2** at 308, `Vary: Accept-Language` |
+| Filtered view | `noindex, follow`, canonical `/en/models` |
+| Thin model | `noindex` and absent from the sitemap |
+| `typecheck` / `lint` / `test` | pass / pass / **176 pass** |
+
+Deviations from the plan:
+
+- **One sitemap, not four.** Next 16 emits `generateSitemaps` children at `/sitemap/{id}.xml` but no index at `/sitemap.xml`; 1 342 URLs are far below the 50 000 limit, so splitting waits for P1 or volume.
+- **Built-in 404 body.** The status, `noindex` and crawl behaviour are correct; a fully branded 404 waits until nested `not-found` renders in the HTML shell.
+- **Accounts are still owner work.** GSC/Bing properties and analytics were not created; the verification env vars and event plan are wired.
+- **Custom domain is still NXDOMAIN.** P0 cannot complete the authority half until the owner attaches it.
+
+---
+
 ## 16. Appendix A — implementation map
 
 | File | Change | Phase |
@@ -880,5 +918,6 @@ Expected after P0/P1: 7/7 distinct titles, 3 canonical/hreflang pairs, 3/3 404s,
 |---|---|---|
 | v1 | 2026-10-20 | Measured baseline, route/index matrix, metadata spec, structured data, sitemaps/robots/RSS, content depth, phases and verification. |
 | v2 | 2026-10-20 | Added competitor/SERP evidence (§2.1), query portfolio (§2.2), realistic SERP features (§2.3), migration runbook (§3.5), rubric (§7.7), link matrix (§8.1), instrumentation/indexing/log review (§10.4–10.6), 90-day calendar (§11.5), link acquisition (§11.6), pruning (§11.7), implementation map (§16). Corrected: Software App rich result is not achievable without ratings; FAQ/HowTo markup is not a lever; the generic VRAM calculator is conditional. |
+| v2.1 | 2026-10-21 | P0 implemented; §15.1 records the verification, the latent 500 and the three deviations (single sitemap, built-in 404 shell, owner accounts). |
 
 The next revision should replace §2.1's search snapshot with a recorded SERP audit (date, query, top 10 URLs, feature type) and replace the relative KPIs with the first four weeks of GSC data.

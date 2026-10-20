@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getStatsBoard } from "@/lib/store";
 import { GATE_THRESHOLDS } from "@/lib/classify/gate";
@@ -14,6 +15,7 @@ import { Term } from "@/components/ui/Term";
 import { FEED_DEFAULTS, parseStatsQuery } from "@/lib/query";
 import { FOLDED_CATEGORY, foldSlices } from "@/lib/stats";
 import { formatClock, formatCount, formatEditionDate, formatPercent } from "@/lib/format";
+import { SITE_NAME, canonicalUrl, descriptionCount, listMetadata } from "@/lib/seo";
 
 /**
  * The Data Desk (docs/en/STATS-PLAN.md).
@@ -31,6 +33,41 @@ import { formatClock, formatCount, formatEditionDate, formatPercent } from "@/li
  *  3. **The gate explains itself.** Its panel is gate-independent on purpose, so
  *     what the filter hides is visible in both of the filter's states.
  */
+export async function generateMetadata({
+  params,
+  searchParams
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const locale = pickLocale((await params).locale);
+  const raw = await searchParams;
+  const query = parseStatsQuery(raw);
+  const board = await getStatsBoard(query.windowDays, { gate: query.gate });
+  const { totals } = board;
+  const title = locale === "tr" ? "Açık ağırlıklı model istatistikleri" : "Open-weight model statistics";
+  const description =
+    locale === "tr"
+      ? `${descriptionCount(totals.tracked, locale)} model izleniyor, ${descriptionCount(totals.passed, locale)} tanesi kalite kapısını geçiyor, medyan ${descriptionCount(totals.medianDownloads, locale)} indirme. Kategori payı, runner kapsamı ve günlük tempo.`
+      : `${descriptionCount(totals.tracked, locale)} models tracked, ${descriptionCount(totals.passed, locale)} pass the gate, ${descriptionCount(totals.medianDownloads, locale)} median downloads. Category share, runner coverage and daily cadence.`;
+  const canonical = canonicalUrl(locale, "/stats");
+  const meta = listMetadata(locale, {
+    path: "/stats",
+    raw,
+    filterKeys: ["window", "days", "gate"],
+    pageIsIndexable: false
+  });
+
+  return {
+    title,
+    description,
+    alternates: meta.alternates,
+    robots: meta.robots,
+    openGraph: { type: "website", url: canonical, title: `${title} · ${SITE_NAME}`, description },
+    twitter: { card: "summary" }
+  };
+}
+
 export default async function StatsPage({
   params,
   searchParams

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { DeskNav } from "@/components/shell/DeskNav";
 import { PageHeader } from "@/components/shell/PageHeader";
@@ -6,10 +7,35 @@ import { StoryRow } from "@/components/front/StoryRow";
 import { ModelRow } from "@/components/front/ModelRow";
 import { PromoBox, promoCaption, RssBox } from "@/components/front/Rail";
 import { EmptyState } from "@/components/EmptyState";
-import { getFrontPage } from "@/lib/store";
+import { getFrontPage, getPulse } from "@/lib/store";
 import { railLines, RAIL_LINES, runCommand } from "@/lib/runner/command";
 import type { ClassifiedModel } from "@/lib/model";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
+import { SITE_NAME, canonicalUrl, descriptionCount, languageAlternates } from "@/lib/seo";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const locale = pickLocale((await params).locale);
+  const pulse = await getPulse(7);
+  const tracked = descriptionCount(pulse?.tracked, locale);
+  const passed = descriptionCount(pulse?.passed, locale);
+  const title =
+    locale === "tr"
+      ? `${SITE_NAME} — yerelde çalıştırabileceğin açık ağırlıklı modeller`
+      : `${SITE_NAME} — open-weight models you can run locally`;
+  const description =
+    locale === "tr"
+      ? `Son 7 günde ${tracked} açık ağırlıklı model izleniyor, ${passed} tanesi kalite kapısını geçiyor. Yerelde çalıştırabileceğin yeni LLM, görüntü, video, ses ve kod modelleri, 10 dakikada bir güncellenir.`
+      : `${tracked} open-weight models tracked in the last 7 days, ${passed} pass the quality gate. New LLM, image, video, audio and coding models you can run locally, updated every 10 minutes.`;
+  const canonical = canonicalUrl(locale, "/");
+
+  return {
+    title: { absolute: title },
+    description,
+    alternates: { canonical, languages: languageAlternates("/") },
+    openGraph: { type: "website", url: canonical, title, description },
+    twitter: { card: "summary" }
+  };
+}
 
 /**
  * The front page (docs/en/DESIGN-V3.md §7.1).

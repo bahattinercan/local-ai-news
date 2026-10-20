@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Fragment } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,17 +13,47 @@ import {
 } from "@/lib/glossary";
 import { getGlossaryEvidence } from "@/lib/store";
 import { relativeTime } from "@/lib/format";
+import { truncateAtWord } from "@/lib/news-text";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
 import { VramCalculator } from "@/components/VramCalculator";
 import { Evidence } from "@/components/glossary/Evidence";
 import { QuantizationTable } from "@/components/glossary/QuantizationTable";
 import { VramExamples } from "@/components/glossary/VramExamples";
+import { SITE_NAME, canonicalUrl, languageAlternates } from "@/lib/seo";
 import { DeskNav } from "@/components/shell/DeskNav";
 
 /** Derived, never hand-listed: a new entry is prerendered automatically. */
 export function generateStaticParams() {
   return GLOSSARY.map((entry) => ({ slug: entry.slug }));
+}
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale, slug } = await params;
+  const locale = pickLocale(rawLocale);
+  const entry = getGlossaryEntry(slug);
+  if (!entry) notFound();
+
+  const text = glossaryText(entry, locale);
+  const path = `/glossary/${entry.slug}`;
+  const canonical = canonicalUrl(locale, path);
+  const tail =
+    locale === "tr"
+      ? "Tanım, güncel snapshot'tan kanıt ve VRAM hesaplayıcı."
+      : "Definition, evidence from the current snapshot and a VRAM calculator.";
+  const description = truncateAtWord(`${text.summary} ${tail}`, 160);
+
+  return {
+    title: text.term,
+    description,
+    alternates: { canonical, languages: languageAlternates(path) },
+    openGraph: { type: "article", url: canonical, title: `${text.term} · ${SITE_NAME}`, description },
+    twitter: { card: "summary" }
+  };
 }
 
 /**

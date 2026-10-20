@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ArrowUp, Clock, ExternalLink } from "lucide-react";
 import { getNewsItemByParam, getModel } from "@/lib/store";
 import { NEWS_SCOPE_KINDS } from "@/lib/query";
@@ -6,11 +8,11 @@ import { categoryLabel } from "@/lib/classify/rules";
 import { formatNumber, relativeTime } from "@/lib/format";
 import { newsText } from "@/lib/news-text";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
-import { EmptyState } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
 import { DeskNav, type DeskSection } from "@/components/shell/DeskNav";
 import { FeedCard } from "@/components/FeedCard";
 import { Chip } from "@/components/ui/Chip";
+import { SITE_NAME, canonicalUrl, isIndexableNews, languageAlternates, newsDescription, newsPath, newsTitle } from "@/lib/seo";
 
 const KIND_TONE: Record<string, "accent" | "ok" | "warn" | "danger"> = {
   paper: "accent",
@@ -19,6 +21,39 @@ const KIND_TONE: Record<string, "accent" | "ok" | "warn" | "danger"> = {
   runtime: "warn",
   community: "accent"
 };
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale, id } = await params;
+  const locale = pickLocale(rawLocale);
+  const item = await getNewsItemByParam(id);
+  if (!item) notFound();
+
+  const title = newsTitle(item);
+  const description = newsDescription(item, locale);
+  const path = newsPath(item);
+  const canonical = canonicalUrl(locale, path);
+
+  return {
+    title,
+    description,
+    alternates: { canonical, languages: languageAlternates(path) },
+    openGraph: {
+      type: "article",
+      url: canonical,
+      title: `${title} · ${SITE_NAME}`,
+      description,
+      publishedTime: item.publishedAt,
+      modifiedTime: item.publishedAt,
+      section: item.categoryKey ? categoryLabel(item.categoryKey) : item.kind
+    },
+    twitter: { card: "summary" },
+    robots: isIndexableNews(item) ? undefined : { index: false, follow: true }
+  };
+}
 
 /**
  * News detail. Decision D1 of docs/en/NEWS-PLAN.md: this page shows the stored
@@ -34,20 +69,7 @@ export default async function NewsItemPage({
   const locale = pickLocale(rawLocale);
   const dict = dictionary(locale);
   const item = await getNewsItemByParam(id);
-
-  if (!item) {
-    return (
-      <>
-        <DeskNav locale={locale} />
-        <EmptyState
-          locale={locale}
-          message={t(dict, "empty.noModels")}
-          hint={t(dict, "empty.notFoundHint")}
-          action={{ href: hrefFor(locale, "/news"), label: t(dict, "empty.backToNews") }}
-        />
-      </>
-    );
-  }
+  if (!item) notFound();
 
   // Gate G3: the related-model block appears only when the link resolved.
   const model = item.modelSlug ? await getModel(item.modelSlug) : null;

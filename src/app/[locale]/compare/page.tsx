@@ -24,6 +24,7 @@ import {
 } from "@/lib/compare";
 import { getCompareSuggestions, getModelsBySlugs, getTrackedSlugs } from "@/lib/store";
 import { dictionary, hrefFor, pickLocale, t, type Locale } from "@/i18n";
+import { languageAlternates } from "@/lib/seo";
 import type { ClassifiedModel } from "@/lib/model";
 
 /**
@@ -66,21 +67,29 @@ export async function generateMetadata({
   const canonical = compareHref(locale, models.map((model) => model.slug));
 
   if (models.length === 0) {
+    const title = t(dict, "compare.title");
+    const description = t(dict, "compare.metaDescription");
     return {
-      title: `${t(dict, "compare.title")} — ${t(dict, "brand")}`,
-      description: t(dict, "compare.metaDescription"),
-      alternates: { canonical }
+      title,
+      description,
+      alternates: { canonical, languages: languageAlternates("/compare") },
+      openGraph: { type: "website", url: canonical, title, description },
+      twitter: { card: "summary" }
     };
   }
 
   const names = models.map((model) => model.externalId);
   const lead = names.slice(0, 2).join(` ${t(dict, "compare.vs")} `);
   const short = names.length > 2 ? `${lead} +${names.length - 2}` : lead;
+  const title = t(dict, "compare.metaTitle", { names: short });
+  const description = t(dict, "compare.metaDescriptionModels", { names: names.join(", ") });
 
   return {
-    title: t(dict, "compare.metaTitle", { names: short }),
-    description: t(dict, "compare.metaDescriptionModels", { names: names.join(", ") }),
+    title,
+    description,
     alternates: { canonical },
+    openGraph: { type: "website", url: canonical, title, description },
+    twitter: { card: "summary" },
     /* A tool page with near-infinite permutations: compared sheets are excluded
        from the index, the empty /compare stays indexable and stays in the sitemap. */
     robots: { index: false, follow: true }

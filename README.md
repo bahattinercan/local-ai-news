@@ -26,7 +26,9 @@ Copy `.env.example` to `.env`:
 - `BLOB_READ_WRITE_TOKEN` — Vercel Blob token used to publish the snapshot
 - `SNAPSHOT_URL` — optional explicit snapshot URL; otherwise discovered from the token
 - `INGEST_SECRET` — protects `POST /api/ingest/run`
-- `NEXT_PUBLIC_SITE_URL` — canonical origin for sitemap/RSS/hreflang
+- `NEXT_PUBLIC_SITE_URL` — canonical origin for canonical links, sitemap, RSS and hreflang
+- `GOOGLE_SITE_VERIFICATION` — optional Search Console verification token
+- `BING_SITE_VERIFICATION` — optional Bing Webmaster verification token
 - `HF_TOKEN` — optional, raises the HF rate limit
 
 ## Layout

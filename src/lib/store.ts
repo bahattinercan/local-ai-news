@@ -470,7 +470,11 @@ export async function getNewsItemByParam(rawId: string): Promise<SnapshotNews | 
 export async function getNewsItem(externalId: string): Promise<SnapshotNews | null> {
   const snapshot = await loadSnapshot();
   if (!snapshot) return null;
-  return snapshot.news.find((item) => item.externalId === externalId) ?? null;
+  /* The detail route used to read the raw row while the list normalised it, so a
+     paper whose `organization` is an object (`{_id, name, fullname, avatar}`)
+     crashed the page with "Objects are not valid as a React child". Normalise the
+     detail path with the same function the list uses. */
+  return normalizeNews(snapshot).find((item) => item.externalId === externalId) ?? null;
 }
 
 /** Shared by getNews and countNews so the two can never disagree. */

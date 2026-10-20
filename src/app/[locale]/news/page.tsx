@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getNews, countNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 import { NewsList } from "@/components/NewsList";
@@ -5,6 +6,41 @@ import { DeskNav } from "@/components/shell/DeskNav";
 import { PageHeader } from "@/components/shell/PageHeader";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
+import { SITE_NAME, canonicalUrl, descriptionCount, listMetadata } from "@/lib/seo";
+
+const NEWS_FILTER_KEYS = ["window", "scope", "category", "kind", "limit"] as const;
+
+export async function generateMetadata({
+  params,
+  searchParams
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const locale = pickLocale((await params).locale);
+  const raw = await searchParams;
+  const query = parseNewsQuery(raw);
+  const total = await countNews({ ...query, scope: "news" });
+  const title =
+    locale === "tr"
+      ? "Yerel AI haberleri — sürümler, runtime'lar ve duyurular"
+      : "Local AI news — releases, runtimes and announcements";
+  const description =
+    locale === "tr"
+      ? `Son ${query.windowDays} günde ${descriptionCount(total, locale)} model sürümü ve runtime güncellemesi; kaynağı ve bahsettiği modelle birlikte.`
+      : `${descriptionCount(total, locale)} model releases and runtime updates from the last ${query.windowDays} days, with the source and the model each one mentions.`;
+  const canonical = canonicalUrl(locale, "/news");
+  const meta = listMetadata(locale, { path: "/news", raw, filterKeys: NEWS_FILTER_KEYS, pageIsIndexable: false });
+
+  return {
+    title,
+    description,
+    alternates: meta.alternates,
+    robots: meta.robots,
+    openGraph: { type: "website", url: canonical, title: `${title} · ${SITE_NAME}`, description },
+    twitter: { card: "summary" }
+  };
+}
 
 export default async function NewsPage({
   params,

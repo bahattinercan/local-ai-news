@@ -1,5 +1,7 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Activity, Box, Clock, Cpu, Database, ExternalLink, Globe, HardDrive, Heart, Layers, Link as LinkIcon, ShieldCheck, Zap } from "lucide-react";
 import { getModel, getFeed, getModelNews } from "@/lib/store";
 import { runCommand } from "@/lib/runner/command";
@@ -7,7 +9,7 @@ import { categoryLabel } from "@/lib/classify/rules";
 import { formatBytes, formatNumber, daysSince, relativeTime } from "@/lib/format";
 import { formatParams } from "@/lib/runner/vram";
 import { dictionary, hrefFor, pickLocale, t } from "@/i18n";
-import { EmptyState, DataNotice } from "@/components/EmptyState";
+import { DataNotice } from "@/components/EmptyState";
 import { JsonLd } from "@/components/JsonLd";
 import { DeskNav } from "@/components/shell/DeskNav";
 import { PressPlate } from "@/components/ui/PressPlate";
@@ -16,6 +18,41 @@ import { StoryRow } from "@/components/front/StoryRow";
 import { Chip } from "@/components/ui/Chip";
 import { CopyCommand } from "@/components/CopyCommand";
 import { VramCalculator } from "@/components/VramCalculator";
+import { SITE_NAME, canonicalUrl, isIndexableModel, languageAlternates, modelDescription, modelPath, modelTitle } from "@/lib/seo";
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale, slug } = await params;
+  const locale = pickLocale(rawLocale);
+  const model = await getModel(slug);
+  if (!model) {
+    return { title: "Model not found", robots: { index: false, follow: true } };
+  }
+
+  const title = modelTitle(model, locale);
+  const description = modelDescription(model, locale);
+  const path = modelPath(model);
+  const canonical = canonicalUrl(locale, path);
+
+  return {
+    title,
+    description,
+    alternates: { canonical, languages: languageAlternates(path) },
+    openGraph: {
+      type: "article",
+      url: canonical,
+      title: `${title} · ${SITE_NAME}`,
+      description,
+      publishedTime: model.createdAt,
+      modifiedTime: model.updatedAt || model.firstSeenAt
+    },
+    twitter: { card: "summary" },
+    robots: isIndexableModel(model) ? undefined : { index: false, follow: true }
+  };
+}
 
 export default async function ModelPage({
   params
@@ -26,21 +63,7 @@ export default async function ModelPage({
   const locale = pickLocale(rawLocale);
   const dict = dictionary(locale);
   const model = await getModel(slug);
-
-  if (!model) {
-    return (
-      <>
-        <DeskNav locale={locale} />
-        <DataNotice locale={locale} />
-        <EmptyState
-          locale={locale}
-          message={t(dict, "empty.noModels")}
-          hint={t(dict, "empty.notFoundHint")}
-          action={{ href: hrefFor(locale, "/models"), label: t(dict, "empty.backToFeed") }}
-        />
-      </>
-    );
-  }
+  if (!model) notFound();
 
   const related = await getFeed({
     category: model.primaryCategory,

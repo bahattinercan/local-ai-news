@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   GLOSSARY,
@@ -17,6 +18,7 @@ import { GhostLink, SubmitButton } from "@/components/ui/Controls";
 import { GlossaryRow } from "@/components/glossary/GlossaryRow";
 import { DeskNav } from "@/components/shell/DeskNav";
 import { PageHeader } from "@/components/shell/PageHeader";
+import { SITE_NAME, canonicalUrl, listMetadata } from "@/lib/seo";
 
 /**
  * The glossary index — an Almanac page (docs/en/DESIGN-V3.md §7.1, GLOSSARY-PLAN.md).
@@ -33,6 +35,34 @@ const CATEGORY_KEYS = Object.keys(GLOSSARY_CATEGORIES) as GlossaryCategory[];
 
 function isCategory(value: string | undefined): value is GlossaryCategory {
   return value !== undefined && CATEGORY_KEYS.includes(value as GlossaryCategory);
+}
+
+export async function generateMetadata({
+  params,
+  searchParams
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const locale = pickLocale((await params).locale);
+  const raw = await searchParams;
+  const title =
+    locale === "tr" ? "Yerel AI sözlüğü — kuantizasyon, VRAM, GGUF, MoE" : "Local AI glossary — quantization, VRAM, GGUF, MoE";
+  const description =
+    locale === "tr"
+      ? `${GLOSSARY.length} terim, spec sheet'lerin arkasındaki kavramlar; her biri güncel snapshot sayıları, kanıt ve VRAM hesaplayıcı ile.`
+      : `${GLOSSARY.length} terms behind the spec sheets, each with the numbers from the current snapshot, evidence and a VRAM calculator.`;
+  const canonical = canonicalUrl(locale, "/glossary");
+  const meta = listMetadata(locale, { path: "/glossary", raw, filterKeys: ["q", "cat"], pageIsIndexable: false });
+
+  return {
+    title,
+    description,
+    alternates: meta.alternates,
+    robots: meta.robots,
+    openGraph: { type: "website", url: canonical, title: `${title} · ${SITE_NAME}`, description },
+    twitter: { card: "summary" }
+  };
 }
 
 export default async function GlossaryPage({

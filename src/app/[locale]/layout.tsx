@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { Masthead } from "@/components/shell/Masthead";
@@ -6,15 +7,46 @@ import { Footer } from "@/components/Footer";
 import { grotesk, mono, display } from "../fonts";
 import { DEFAULT_THEME, THEME_BOOTSTRAP } from "@/lib/theme";
 import { ThemeSync } from "@/components/ThemeSync";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
 import "../globals.css";
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  const dict = dictionary(pickLocale(locale));
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = pickLocale(raw);
+  const dict = dictionary(locale);
+  const tagline = t(dict, "tagline");
+  const description =
+    locale === "tr"
+      ? "Yerelde çalıştırabileceğin yeni açık ağırlıklı AI modellerini izle: parametre, VRAM, kuantizasyon, runner ve lisans, 10 dakikada bir güncellenir."
+      : "Track new open-weight AI models you can run locally: params, VRAM, quantization, runners and license, updated every 10 minutes.";
+
   return {
-    title: `${t(dict, "brand")} — ${t(dict, "tagline")}`,
-    description: t(dict, "tagline"),
-    icons: { icon: "/icon.svg", apple: "/apple-icon.png" }
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: `${t(dict, "brand")} — ${tagline}`,
+      template: `%s · ${SITE_NAME}`
+    },
+    description,
+    applicationName: SITE_NAME,
+    icons: { icon: "/icon.svg", apple: "/apple-icon.png" },
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      locale: locale === "tr" ? "tr_TR" : "en_US",
+      alternateLocale: [locale === "tr" ? "en_US" : "tr_TR"]
+    },
+    twitter: { card: "summary" },
+    robots: {
+      // No index/follow here: a 404 must be able to add its own noindex without
+      // competing with a layout-level "index, follow". The other directives are
+      // safe defaults for every page that is indexable.
+      "max-image-preview": "large",
+      "max-snippet": -1
+    },
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION,
+      other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : {}
+    }
   };
 }
 

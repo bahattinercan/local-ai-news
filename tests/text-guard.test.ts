@@ -31,17 +31,26 @@ function snapshotWith(news: Array<Partial<SnapshotNews>>): Snapshot {
 }
 
 test("the store never serves a poisoned news label", () => {
-  const [poisoned, missing, fine] = normalizeNews(
+  const [poisoned, missing, fine, objectByline] = normalizeNews(
     snapshotWith([
       { externalId: "a", kind: "paper", title: "A", url: "u", publishedAt: "2026-10-18T00:00:00Z", organization: "[object Object]" },
       { externalId: "b", kind: "paper", title: "B", url: "u", publishedAt: "2026-10-18T00:00:00Z", organization: null },
-      { externalId: "c", kind: "paper", title: "C", url: "u", publishedAt: "2026-10-18T00:00:00Z", organization: "Qwen" }
+      { externalId: "c", kind: "paper", title: "C", url: "u", publishedAt: "2026-10-18T00:00:00Z", organization: "Qwen" },
+      {
+        externalId: "d",
+        kind: "paper",
+        title: "D",
+        url: "u",
+        publishedAt: "2026-10-18T00:00:00Z",
+        organization: { _id: "x", name: "n", fullname: "f", avatar: "a" } as unknown as string
+      }
     ])
   );
 
   assert.equal(poisoned.organization, null);
   assert.equal(missing.organization, null);
   assert.equal(fine.organization, "Qwen");
+  assert.equal(objectByline.organization, null);
 });
 
 test("news normalisation still degrades to an empty list", () => {

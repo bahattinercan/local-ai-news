@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getNews, countNews } from "@/lib/store";
 import { parseNewsQuery } from "@/lib/query";
 import { NewsList } from "@/components/NewsList";
@@ -5,6 +6,41 @@ import { DeskNav } from "@/components/shell/DeskNav";
 import { PageHeader } from "@/components/shell/PageHeader";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { JsonLd } from "@/components/JsonLd";
+import { SITE_NAME, canonicalUrl, descriptionCount, listMetadata } from "@/lib/seo";
+
+const RESEARCH_FILTER_KEYS = ["window", "scope", "category", "kind", "limit"] as const;
+
+export async function generateMetadata({
+  params,
+  searchParams
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const locale = pickLocale((await params).locale);
+  const raw = await searchParams;
+  const query = parseNewsQuery(raw);
+  const total = await countNews({ ...query, scope: "research" });
+  const title =
+    locale === "tr"
+      ? "Açık ağırlıklı AI makaleleri — günlük araştırma akışı"
+      : "Open-weight AI papers — daily research feed";
+  const description =
+    locale === "tr"
+      ? `Hugging Face günlük akışından ${descriptionCount(total, locale)} makale; yerelde çalıştırılabilir açık ağırlıklar yayınlayan işlere odaklanır.`
+      : `${descriptionCount(total, locale)} papers from the Hugging Face daily feed, focused on work that ships open weights you can run.`;
+  const canonical = canonicalUrl(locale, "/research");
+  const meta = listMetadata(locale, { path: "/research", raw, filterKeys: RESEARCH_FILTER_KEYS, pageIsIndexable: false });
+
+  return {
+    title,
+    description,
+    alternates: meta.alternates,
+    robots: meta.robots,
+    openGraph: { type: "website", url: canonical, title: `${title} · ${SITE_NAME}`, description },
+    twitter: { card: "summary" }
+  };
+}
 
 /**
  * Papers live here, not on /news. The feed was 72% papers (150/209), which

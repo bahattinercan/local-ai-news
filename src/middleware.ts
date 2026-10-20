@@ -26,6 +26,17 @@ function detectLocale(request: NextRequest): Locale {
   return "en";
 }
 
+/**
+ * A locale redirect depends on `Accept-Language`, so it must say so or a CDN can
+ * serve the Turkish redirect to an English reader. 308 (not 307) because these
+ * are permanent addresses: `/` is the site, `/{path}` is `/{locale}/{path}`.
+ */
+function permanentLocaleRedirect(request: NextRequest, target: URL): NextResponse {
+  const response = NextResponse.redirect(target, 308);
+  response.headers.set("Vary", "Accept-Language");
+  return response;
+}
+
 export function middleware(request: NextRequest) {
   const path = new URL(request.url).pathname;
 
@@ -44,11 +55,11 @@ export function middleware(request: NextRequest) {
   const segments = path.split("/").filter(Boolean);
 
   if (segments.length === 0) {
-    return NextResponse.redirect(new URL(`/${detectLocale(request)}`, request.url));
+    return permanentLocaleRedirect(request, new URL(`/${detectLocale(request)}`, request.url));
   }
 
   if (!isLocale(segments[0])) {
-    return NextResponse.redirect(new URL(`/${detectLocale(request)}${path}`, request.url));
+    return permanentLocaleRedirect(request, new URL(`/${detectLocale(request)}${path}`, request.url));
   }
 
   /* The index moved from `/` to `/models` (docs/en/DESIGN-V3.md D3). A URL that
