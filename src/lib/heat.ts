@@ -30,16 +30,40 @@ export function growthCoverage(models: ClassifiedModel[]): number {
   return measured / models.length;
 }
 
+/**
+ * Share of rows whose delta is actually non-zero, in [0, 1]. A baseline alone
+ * does not mean anything moved: a model first seen in this very run has
+ * `downloads === downloadsAtFirstSeen`, so its delta is a measured `0`, which is
+ * "no growth observed yet" rather than "growth". Measured but flat rows must not
+ * count here, otherwise a band of fresh models renders eight green `+0` labels
+ * and the column says nothing - `docs/en/DESIGN-V3.md` P0-2 asks for the column
+ * to stay dormant until real baselines accumulate instead of printing `+0`.
+ */
+function movedGrowthCoverage(models: ClassifiedModel[]): number {
+  if (models.length === 0) return 0;
+  const moved = models.filter((model) => {
+    const growth = growthOf(model);
+    return growth !== null && growth > 0;
+  }).length;
+  return moved / models.length;
+}
+
 /** Below this share the column is mostly empty, so the band prints totals instead. */
 export const GROWTH_COVERAGE_GATE = 0.6;
 
 /**
- * Whether a band should print `+Δ` at all. Both conditions are required: enough
- * coverage (otherwise the column is a lie by omission) and enough rows for a
- * share to mean anything.
+ * Whether a band should print `+Δ` at all. All conditions are required: enough
+ * measured rows (otherwise the column is a lie by omission), enough of them
+ * actually non-zero (otherwise it is a column of `+0`), and enough rows overall
+ * for a share to mean anything. Both shares reuse the same gate - a second,
+ * invented threshold would be one more number nobody re-measures.
  */
 export function hasGrowthSignal(models: ClassifiedModel[]): boolean {
-  return models.length >= 4 && growthCoverage(models) >= GROWTH_COVERAGE_GATE;
+  return (
+    models.length >= 4 &&
+    growthCoverage(models) >= GROWTH_COVERAGE_GATE &&
+    movedGrowthCoverage(models) >= GROWTH_COVERAGE_GATE
+  );
 }
 
 /** "+119k" / "0" - what the band prints when `hasGrowthSignal` is true. */

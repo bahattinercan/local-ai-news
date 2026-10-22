@@ -39,6 +39,30 @@ test("the band only prints a delta when the column is mostly filled", () => {
   assert.equal(hasGrowthSignal(measured(0, 12)), false);
 });
 
+test("a band of flat deltas keeps the column dormant instead of printing +0", () => {
+  // Measured on the live site against docs/en/DESIGN-V3.md P0-2: the eight rows of
+  // "Most downloaded" all printed a green "+0" - every baseline existed, but none
+  // had moved since first sighting, so the column showed a zero, not a delta.
+  const flat = Array.from({ length: 8 }, (_, i) =>
+    model({ externalId: `flat${i}`, downloads: 8_000, downloadsAtFirstSeen: 8_000 })
+  );
+  assert.equal(growthCoverage(flat), 1); // measurable...
+  assert.equal(hasGrowthSignal(flat), false); // ...but nothing to show
+  assert.equal(hasGrowthSignal([]), false);
+
+  // A non-zero share has to clear the same gate: 5 of 8 moved is enough, 4 is not.
+  const moved = (movedCount: number) =>
+    Array.from({ length: 8 }, (_, i) =>
+      model({
+        externalId: `mix${i}`,
+        downloads: i < movedCount ? 8_500 : 8_000,
+        downloadsAtFirstSeen: 8_000
+      })
+    );
+  assert.equal(hasGrowthSignal(moved(4)), false);
+  assert.equal(hasGrowthSignal(moved(5)), true);
+});
+
 test("growth labels are compact and always signed", () => {
   assert.equal(formatGrowth(0), "+0");
   assert.equal(formatGrowth(842), "+842");
