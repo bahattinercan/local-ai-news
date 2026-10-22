@@ -57,6 +57,14 @@
 
 `npm test` **228/228**; yeni test: *"a band of flat deltas keeps the column dormant instead of printing +0"*. Açık kalan bir şey yok: bandın satırlarının en az %60'ı sıfır olmayan bir fark taşıyana kadar bant yaş kolonunu basmaya devam ediyor ve eşik artık canlı siteye değil bir teste bağlı.
 
+### 0.4 Kategori etiketleri lokalize - 2026-10-22
+
+0.3'ün ölçümü `/en` üzerinde yapılmıştı. Aynı bant `/tr` üzerinde **8/8** satırı hâlâ İngilizce başlık etiketiyle basıyordu ("Video / Embedding / RAG / Vision / CV / Coding"); koordinatör bunu canlı sitede doğruladı. Bu bir belirti, hata değil: DESIGN.md 9. sıra kararı kategori adlarının iki dilde de İngilizce kalacağını söylüyordu. Sahip bu kararı 2026-10-22'de **tersine çevirdi** ve `a0c404a` *"feat(i18n): localize category names through categoryLabel(key, locale)"* değişikliğini **15 dosya**, **+166/-47** ile uyguluyor.
+
+Yeni imza `categoryLabel(key: string, locale: Locale)`: `en` için `labelEn`, `tr` için `labelTr` dönüyor. Locale zorunlu bir parametre, yani eski kararın dayandığı derleme hatası koruması aynen duruyor - locale'i atlayan bir call site derlenmiyor. Sadece etiketler değişiyor, taksonomi kimlikleri değişmiyor: `key`, `/c/[category]` URL'leri, `/api/categories` içindeki `labelEn`/`labelTr` alanları ve `sortOrder` dokunulmadı; `/api/categories` eskiden cevapladığı şeyi cevaplıyor. `DeskNav` kısa formları dil başına ayırıyor (`NAV_SHORT`) ve şerit genişlemiyor: Türkçe satırın en uzun kelimesi **7 karakter** (`Görüntü`, `Robotik`), İngilizce'de ise **10** (`Multimodal`); İngilizce satır ise birebir önceki gibi basılıyor.
+
+`npm test` **232/232**, **4 yeni test** `tests/category-label.test.ts` içinde (iki locale, her `CATEGORY_RULES` kuralı, Türkçe nav bütçe sınırı ve değişmeyen İngilizce satır). Dürüst risk: görsel/nav genişlik ölçümü **yapılmadı** - bunun için dev server ve tarayıcı gerekiyor - bu yüzden genişlemiyor iddiası yukarıdaki karakter bütçesine (7'e karşı 10) dayanıyor, yeniden ölçülmüş piksel genişliğine değil. Bir sonraki yerleşim değişikliğinden önce nav şeridi tarayıcıda yeniden ölçülmeli.
+
 ---
 
 ## 1. Referans aslında ne?

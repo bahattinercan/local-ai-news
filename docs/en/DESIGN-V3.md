@@ -57,6 +57,14 @@ Fixed in `7b72d69` *"fix(front): keep the growth column dormant while every delt
 
 `npm test` **228/228**; the new test is *"a band of flat deltas keeps the column dormant instead of printing +0"*. Nothing is left open: the band keeps the age column until at least 60 % of its rows have a non-zero delta, and the gate is covered by a test rather than by the live site.
 
+### 0.4 Category labels localized - 2026-10-22
+
+The 0.3 re-check was measured on `/en`. The same band on `/tr` printed **8/8** rows whose headline label was still English ("Video / Embedding / RAG / Vision / CV / Coding"); the coordinator confirmed this on the live site. That is a symptom, not a bug: DESIGN.md decision 9 said category names stay English in both locales. The owner **reversed** that decision on 2026-10-22, and `a0c404a` *"feat(i18n): localize category names through categoryLabel(key, locale)"* implements it across **15 files**, **+166/-47**.
+
+The new signature is `categoryLabel(key: string, locale: Locale)`: `en` returns `labelEn`, `tr` returns `labelTr`. The locale is a required parameter, so the compile-error protection that the old decision relied on still holds - a call site that forgets the locale does not build. Only labels move; the taxonomy identities do not: `key`, `/c/[category]` URLs, the `labelEn`/`labelTr` fields in `/api/categories` and `sortOrder` are untouched, so `/api/categories` answers exactly as before. `DeskNav` splits its short forms per locale (`NAV_SHORT`), and the strip does not widen: the Turkish row's longest word is **7 characters** (`Görüntü`, `Robotik`) against English's **10** (`Multimodal`), and the English row is byte-for-byte what it printed before.
+
+`npm test` **232/232**, including **4 new tests** in `tests/category-label.test.ts` (both locales, every `CATEGORY_RULES` entry, the Turkish nav budget, and the unchanged English row). Honest risk: the visual/nav width measurement was **not** done - it needs a dev server plus a browser - so the no-growth claim rests on the character budget above (7 vs 10), not on a re-measured pixel width. Re-measure the nav strip in a browser before the next layout change.
+
 ---
 
 ## 1. What the reference actually is
