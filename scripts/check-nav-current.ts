@@ -45,20 +45,35 @@ type Expectation = {
   anyOf?: string[];
 };
 
-async function fetchText(path: string): Promise<string> {
+/** A page as the check needs it: the status decides whether the body may be read.
+    404 is readable on purpose - the dead-end expectation below reads that body to
+    see whether the not-found route rendered a nav at all. Every other non-2xx is
+    a break: it says nothing about the nav. */
+type Page = { status: number; text: string };
+
+async function fetchPage(path: string, allow404 = false): Promise<Page> {
   const response = await fetch(`${BASE}${path}`);
-  if (!response.ok) throw new Error(`${path} → ${response.status}`);
-  return response.text();
+  if (!response.ok && !(allow404 && response.status === 404)) {
+    throw new Error(`${path} → ${response.status}`);
+  }
+  return { status: response.status, text: await response.text() };
 }
 
-/** The nav is the only `<nav>` that carries the search form; slice it out. */
-function deskNav(html: string): string {
+/** The nav is the only `<nav>` that carries the search form; slice it out. `null`
+    when the document has no desk nav at all - the not-found fallback below. */
+function findDeskNav(html: string): string | null {
   const marker = `aria-label="${dict["nav.primary"]}"`;
   const start = html.indexOf(marker);
-  if (start < 0) throw new Error("desk nav not found (aria-label missing)");
+  if (start < 0) return null;
   const open = html.lastIndexOf("<nav", start);
   const close = html.indexOf("</nav>", start);
   return html.slice(open, close);
+}
+
+function deskNav(html: string): string {
+  const nav = findDeskNav(html);
+  if (nav === null) throw new Error("desk nav not found (aria-label missing)");
+  return nav;
 }
 
 type Mark = { label: string; current: string; href: string };
@@ -93,9 +108,9 @@ function firstHref(html: string, pattern: RegExp): string {
 async function main(): Promise<void> {
   const home = `/${LOCALE}`;
   /* Real slugs, read from the site itself, so the list cannot go stale. */
-  const models = await fetchText(`${home}/models`);
-  const news = await fetchText(`${home}/news`);
-  const glossary = await fetchText(`${home}/glossary`);
+  const models = (await fetchPage(`${home}/models`)).text;
+  const news = (await fetchPage(`${home}/news`)).text;
+  const glossary = (await fetchPage(`${home}/glossary`)).text;
   const modelSlug = firstHref(models, new RegExp(`href="/${LOCALE}/m/([^"]+)"`));
   const newsId = firstHref(news, new RegExp(`href="/${LOCALE}/n/([^"]+)"`));
   const term = firstHref(glossary, new RegExp(`href="/${LOCALE}/glossary/([^"]+)"`));
@@ -122,11 +137,36 @@ async function main(): Promise<void> {
     { path: `${home}/m/__no-such-model__`, label: null }
   ];
 
+  /* The one route that must 404. Two shapes pass: with a desk nav in the body,
+     nothing may be marked; without one, nothing can be marked. */
+  const DEAD_END = `${home}/m/__no-such-model__`;
+
   const failures: string[] = [];
   for (const expectation of expectations) {
+    const deadEnd = expectation.path === DEAD_END;
     let nav: string;
     try {
-      nav = deskNav(await fetchText(expectation.path));
+      const page = await fetchPage(expectation.path, deadEnd);
+      if (deadEnd) {
+        if (page.status !== 404) {
+          throw new Error("dead-end sample resolved; the not-found route must 404");
+        }
+        /* Today the 404 is Next's access-fallback document: this app has no
+           `app/layout.tsx` (the root layout is `app/[locale]/layout.tsx`, a
+           top-level dynamic segment), so the not-found UI is replayed to the
+           client and the desk nav never reaches the HTML. A document with no nav
+           has no marked item, which is exactly what the dead end asserts. */
+        const deadEndNav = findDeskNav(page.text);
+        if (deadEndNav === null) {
+          console.log(
+            `${"ok".padEnd(5)}${expectation.path.padEnd(42)}dead end: 404, no nav rendered (global not-found fallback) - nothing marked`
+          );
+          continue;
+        }
+        nav = deadEndNav;
+      } else {
+        nav = deskNav(page.text);
+      }
     } catch (error) {
       failures.push(`${expectation.path}: ${(error as Error).message}`);
       console.log(`${expectation.path.padEnd(42)} FETCH FAILED`);
