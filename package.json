@@ -21,7 +21,8 @@
     "verify-nav": "tsx scripts/check-nav-current.ts",
     "verify-theme": "tsx scripts/check-theme.ts",
     "publish": "tsx scripts/publish-snapshot.ts",
-    "verify-glossary": "tsx scripts/measure-glossary.ts"
+    "verify-glossary": "tsx scripts/measure-glossary.ts",
+    "seo-audit": "tsx scripts/seo-audit.ts"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",
