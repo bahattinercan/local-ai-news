@@ -6,6 +6,23 @@ import { isRateLimited } from "@/lib/rateLimit";
 const EXCLUDED = ["/sitemap.xml", "/robots.txt", "/feed.rss", "/favicon.ico"];
 
 /**
+ * Paths owned by the platform, not by the site. Measured 2026-10-22:
+ * `/_vercel/insights/script.js` answered 307 to `/en/_vercel/insights/script.js`,
+ * which is a 404 — three segments, so `EXCLUDED` and `STATIC_FILE` both miss it,
+ * and `_vercel` is not a locale. The `@vercel/analytics` collector mounted in the
+ * layout therefore never loaded and the dashboard stayed empty even with Web
+ * Analytics enabled in the Vercel project. `/_next` is build output with the same
+ * shape. `config.matcher` skips both prefixes as well, so the middleware does not
+ * even run for them in production.
+ */
+const PLATFORM_PREFIXES = ["/_vercel", "/_next"];
+
+/** True for a platform prefix itself or anything below it, never for `/_nextfoo`. */
+function isPlatformPath(path: string): boolean {
+  return PLATFORM_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+/**
  * A root-level file is not a page, so it must never take a locale prefix.
  * Measured 2026-10-16: `/icon.svg` and `/apple-icon.png` answered 307 to
  * `/en/icon.svg`, which is a 404 — the layout advertises both links, so two of
@@ -48,7 +65,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (EXCLUDED.some((prefix) => path === prefix || path.startsWith(prefix)) || STATIC_FILE.test(path)) {
+  if (
+    isPlatformPath(path) ||
+    EXCLUDED.some((prefix) => path === prefix || path.startsWith(prefix)) ||
+    STATIC_FILE.test(path)
+  ) {
     return NextResponse.next();
   }
 
@@ -79,5 +100,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!_next/static|_next/image).*)"
+  /* `_vercel` carries the analytics and speed-insights collectors and `_next` is
+     build output; none of it is a page, so the middleware should not run at all.
+     The two `_next` asset exclusions above keep their explicit entry. */
+  matcher: "/((?!_next/static|_next/image|_next|_vercel).*)"
 };

@@ -27,6 +27,41 @@ test("a root-level static file is served, never given a locale prefix", () => {
   }
 });
 
+/**
+ * Regression (measured 2026-10-22): `/_vercel/insights/script.js` answered 307
+ * to `/en/_vercel/insights/script.js` → 404 in production. The path has three
+ * segments, so neither the root-file rule nor the excluded list caught it, and
+ * `_vercel` is not a locale — the `@vercel/analytics` collector mounted in the
+ * layout could never load, so the dashboard stayed empty even with Web Analytics
+ * enabled. Platform paths are not pages and must never take a locale prefix.
+ */
+test("a platform-owned path is served, never given a locale prefix", () => {
+  for (const path of ["/_vercel/insights/script.js", "/_vercel/speed-insights/script.js"]) {
+    const response = middleware(request(path));
+    assert.equal(redirectedTo(response), null, `${path} was redirected`);
+    assert.equal(passesThrough(response), true, `${path} did not pass through`);
+  }
+
+  // The older exemptions keep answering untouched.
+  for (const path of ["/icon.svg", "/favicon.ico", "/robots.txt", "/sitemap.xml", "/feed.rss"]) {
+    assert.equal(passesThrough(middleware(request(path))), true, path);
+  }
+
+  // The P0 locale behaviour is unchanged: permanent, Accept-Language aware, and
+  // only for paths that look like pages.
+  assert.equal(redirectedTo(middleware(request("/"))), "/en");
+  assert.equal(redirectedTo(middleware(request("/", { "accept-language": "tr-TR,tr;q=0.9" }))), "/tr");
+  assert.equal(redirectedTo(middleware(request("/news"))), "/en/news");
+  assert.equal(passesThrough(middleware(request("/en/models"))), true);
+
+  // The api branch still rate limits first and then passes through.
+  resetRateLimit();
+  const api = middleware(request("/api/feed", { "x-forwarded-for": "203.0.113.41" }));
+  assert.equal(api.status, 200);
+  assert.equal(passesThrough(api), true);
+  resetRateLimit();
+});
+
 test("a page without a locale is redirected using Accept-Language", () => {
   assert.equal(redirectedTo(middleware(request("/"))), "/en");
   assert.equal(redirectedTo(middleware(request("/", { "accept-language": "tr-TR,tr;q=0.9" }))), "/tr");
