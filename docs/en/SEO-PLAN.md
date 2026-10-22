@@ -888,6 +888,24 @@ Deviations from the plan:
 
 ---
 
+## 15.2 Implementation log — wave 1 (2026-10-22)
+
+Three rows landed together — the audit gate (P1), ten more terms and the four card routes (P2). Measured on the committed snapshot, with no deployed server.
+
+- **`npm run seo-audit` + `.github/workflows/seo.yml` (P1).** Seven checks — `meta`, `titles`, `canonical`, `alternates`, `sitemap`, `robots`, `index-policy` — running against the route modules' own `generateMetadata()`, the real `sitemap.ts`/`robots.ts` and the `lib/seo.ts` predicates. Result: **7/7 passed, 792 sitemap URLs, 38 pages** — 38 indexable pages across 11 route types × `en`/`tr`, 38 self-canonicals in 38 alternate pairs, 396 advertised paths with reciprocal `en`/`tr`/`x-default`, robots with the `/api/` disallow and the sitemap URL, and 251 indexable models against 104 indexable news.
+- **Glossary 15 → 25 (P2).** benchmark, fine-tuning, distillation, embedding, tokenizer, inference, throughput, batch-size, chat-template and license, each with an EN and a TR body plus aliases and related links; the sitemap carries **50** glossary URLs (25 × `en`/`tr`).
+- **The four OG routes (P2).** 1200×630 `ImageResponse` for the site, a model, a news item and a glossary term, all from one card in `lib/og.tsx`.
+
+Verified: `npm run typecheck` clean, `npm run lint` clean, `npm test` **213/213** (was 176: +6 glossary, +14 audit, +17 card), `npm run seo-audit` **7/7**.
+
+Deviations from the plan:
+
+- **The audit is offline, not the §10.2 crawl.** A gate that needs a build, a bound port and a round trip per URL turns a real regression into a flaky retry, so it asserts the same contract at the layer that produces the HTML: "returns 200" becomes "the path resolves to a real route, and for entity pages to a snapshot row"; "is not `noindex`" becomes `isIndexableModel` / `isIndexableNews`. JSON-LD parsing and the three-click depth stay in the P2 content rubric.
+- **Its counts are the committed snapshot's, not production's.** 915 models and 104 news resolve locally, of which 251 models and 104 news pass the index predicate — 502 + 208 + 50 + 32 = **792** URLs, against the 1 342 §15.1 measured against production (1 402 models). Same composition, smaller denominator.
+- **Static instances, not the variable fonts.** `@vercel/og` throws on the upstream variable TTFs (`Cannot read properties of undefined (reading '256')` in `parseFvarAxis`), so `public/fonts/` holds pinned instances; `tests/og.test.ts` parses each `cmap` and asserts all eleven Turkish letters are present rather than trusting the subset.
+
+---
+
 ## 16. Appendix A — implementation map
 
 | File | Change | Phase |
@@ -919,5 +937,6 @@ Deviations from the plan:
 | v1 | 2026-10-20 | Measured baseline, route/index matrix, metadata spec, structured data, sitemaps/robots/RSS, content depth, phases and verification. |
 | v2 | 2026-10-20 | Added competitor/SERP evidence (§2.1), query portfolio (§2.2), realistic SERP features (§2.3), migration runbook (§3.5), rubric (§7.7), link matrix (§8.1), instrumentation/indexing/log review (§10.4–10.6), 90-day calendar (§11.5), link acquisition (§11.6), pruning (§11.7), implementation map (§16). Corrected: Software App rich result is not achievable without ratings; FAQ/HowTo markup is not a lever; the generic VRAM calculator is conditional. |
 | v2.1 | 2026-10-21 | P0 implemented; §15.1 records the verification, the latent 500 and the three deviations (single sitemap, built-in 404 shell, owner accounts). |
+| v2.2 | 2026-10-22 | Wave 1 landed; §15.2 records the offline audit and its CI gate, the glossary at 25 terms and the four OG card routes, with the measured numbers and the three deviations (offline vs crawl, committed-snapshot counts, static font instances). |
 
 The next revision should replace §2.1's search snapshot with a recorded SERP audit (date, query, top 10 URLs, feature type) and replace the relative KPIs with the first four weeks of GSC data.

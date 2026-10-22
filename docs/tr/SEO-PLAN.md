@@ -888,6 +888,24 @@ Plandan sapmalar:
 
 ---
 
+## 15.2 Uygulama günlüğü — 1. dalga (2026-10-22)
+
+Üç satır birlikte indi — denetim kapısı (P1), on yeni terim ve dört kart rotası (P2). Dağıtılmış sunucu olmadan, commit edilmiş snapshot üzerinde ölçüldü.
+
+- **`npm run seo-audit` + `.github/workflows/seo.yml` (P1).** Yedi kontrol — `meta`, `titles`, `canonical`, `alternates`, `sitemap`, `robots`, `index-policy` — rota modüllerinin kendi `generateMetadata()` fonksiyonlarına, gerçek `sitemap.ts`/`robots.ts` dosyalarına ve `lib/seo.ts` yüklemlerine karşı çalışıyor. Sonuç: **7/7 geçti, 792 sitemap URL'si, 38 sayfa** — 11 rota tipi × `en`/`tr` üzerinde 38 dizine uygun sayfa, 38 alternate çiftinde 38 kendine canonical, karşılıklı `en`/`tr`/`x-default` taşıyan 396 ilan edilmiş yol, `/api/` yasağı ve sitemap URL'si olan robots, 104 dizine uygun habere karşı 251 dizine uygun model.
+- **Sözlük 15 → 25 (P2).** benchmark, fine-tuning, distillation, embedding, tokenizer, inference, throughput, batch-size, chat-template ve license; her biri EN ve TR gövde, takma adlar ve ilgili bağlantılarla. Sitemap **50** sözlük URL'si taşıyor (25 × `en`/`tr`).
+- **Dört OG rotası (P2).** Site, bir model, bir haber ve bir sözlük terimi için 1200×630 `ImageResponse`; hepsi `lib/og.tsx` içindeki tek karttan.
+
+Doğrulama: `npm run typecheck` temiz, `npm run lint` temiz, `npm test` **213/213** (176'ydı: +6 sözlük, +14 denetim, +17 kart), `npm run seo-audit` **7/7**.
+
+Plandan sapmalar:
+
+- **Denetim çevrimdışı, §10.2'deki tarama değil.** Derleme, bağlı port ve URL başına gidiş-dönüş isteyen bir kapı, gerçek bir gerilemeyi kararsız bir yeniden denemeye çevirir; bu yüzden aynı sözleşmeyi HTML'i üreten katmanda doğruluyor: "200 dönüyor" → "yol gerçek bir rotaya, varlık sayfalarında da bir snapshot satırına çözülüyor"; "`noindex` değil" → `isIndexableModel` / `isIndexableNews`. JSON-LD ayrıştırma ve üç tık derinliği P2 içerik rubriğinde kalıyor.
+- **Sayıları production'ın değil, commit edilmiş snapshot'ın.** Yerelde 915 model ve 104 haber çözülüyor; bunlardan 251 model ile 104 haber dizin yüklemini geçiyor — 502 + 208 + 50 + 32 = **792** URL; §15.1'in production'a (1 402 model) karşı ölçtüğü 1 342'ye karşı. Bileşim aynı, payda daha küçük.
+- **Değişken fontlar değil, statik kopyalar.** `@vercel/og` upstream değişken TTF'lerde hata veriyor (`parseFvarAxis` içinde `Cannot read properties of undefined (reading '256')`), bu yüzden `public/fonts/` sabitlenmiş kopyaları tutuyor; `tests/og.test.ts` her dosyanın `cmap` tablosunu ayrıştırıp on bir Türkçe harfin varlığını doğruluyor, alt kümeye güvenmiyor.
+
+---
+
 ## 16. Ek A — uygulama haritası
 
 | Dosya | Değişiklik | Faz |
@@ -919,5 +937,6 @@ Plandan sapmalar:
 | v1 | 2026-10-20 | Ölçülmüş başlangıç, rota/dizin matrisi, metadata şartnamesi, yapısal veri, sitemap/robots/RSS, içerik derinliği, fazlar ve doğrulama. |
 | v2 | 2026-10-20 | Rakip/SERP kanıtı (§2.1), sorgu portföyü (§2.2), gerçekçi SERP özellikleri (§2.3), taşıma runbook'u (§3.5), rubrik (§7.7), bağlantı matrisi (§8.1), enstrümantasyon/dizinleme/log incelemesi (§10.4–10.6), 90 günlük takvim (§11.5), bağlantı kazanımı (§11.6), budama (§11.7), uygulama haritası (§16) eklendi. Düzeltmeler: Software App zengin sonucu puanlama olmadan ulaşılamaz; FAQ/HowTo işaretlemesi kaldıraç değil; genel VRAM hesaplayıcı koşullu. |
 | v2.1 | 2026-10-21 | P0 uygulandı; §15.1 doğrulamayı, gizli 500 hatasını ve üç sapmayı (tek sitemap, yerleşik 404 kabuğu, sahip hesapları) kaydediyor. |
+| v2.2 | 2026-10-22 | 1. dalga indi; §15.2 çevrimdışı denetimi ve CI kapısını, sözlüğün 25 terime çıkmasını ve dört OG kart rotasını ölçülen sayılarla ve üç sapmayla (tarama yerine çevrimdışı, commit edilmiş snapshot sayıları, statik font kopyaları) kaydediyor. |
 
 Sonraki revizyon §2.1'deki arama anlık görüntüsünü kayıtlı bir SERP denetimiyle (tarih, sorgu, ilk 10 URL, özellik tipi) değiştirmeli ve göreceli KPI'ları ilk dört haftalık GSC verisiyle yenilemeli.
