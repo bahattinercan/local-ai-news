@@ -6,6 +6,7 @@ import { FEED_DEFAULTS, type FeedFilterInput } from "@/lib/query";
 import { cn } from "@/lib/format";
 import { ScrollStrip } from "../ui/ScrollStrip";
 import { dictionary, hrefFor, t, type Locale } from "@/i18n";
+import { NAV_SHORT } from "@/lib/classify/nav";
 
 /**
  * The desk nav (docs/en/DESIGN-V3.md §1 zone 5).
@@ -26,43 +27,12 @@ import { dictionary, hrefFor, t, type Locale } from "@/i18n";
  * in the masthead's disclosure below it, because the masthead replaces its live
  * snapshot block with that disclosure on small screens.
  */
-/**
- * The nav's short forms, one row per locale. The desks print ten of these plus
- * five section links, and at 1 440 px `EMBEDDING / RAG` was hard-cut mid-word
- * (measured: the strip needed ~1 375 px in a 1 280 px container), so the desk
- * nav has always printed an abbreviation where the full name is too wide.
- *
- * The English row is byte-for-byte what the nav printed before category names
- * were localized (owner decision 2026-10-22): the English UI must not change.
- * The Turkish row keeps the same shape - the abbreviation everyone actually
- * says (LLM) or the shortest true word (`Kod`, `Ses`, `Gömme`) - and its longest
- * form is 7 characters against English's 10 (`Multimodal`), so splitting the
- * table cannot make the strip wider than it already is.
- */
-export const NAV_SHORT: Record<Locale, Record<string, string>> = {
-  en: {
-    llm: "LLM",
-    image: "Image",
-    video: "Video",
-    coding: "Coding",
-    audio: "Audio",
-    multimodal: "Multimodal",
-    embedding: "Embedding",
-    vision: "Vision",
-    robotics: "Robotics"
-  },
-  tr: {
-    llm: "LLM",
-    image: "Görüntü",
-    video: "Video",
-    coding: "Kod",
-    audio: "Ses",
-    multimodal: "Çoklu",
-    embedding: "Gömme",
-    vision: "Görme",
-    robotics: "Robotik"
-  }
-};
+/* The short forms, and the comment that explains the width budget behind them,
+   now live in `src/lib/classify/nav.ts`: `scripts/check-nav-current.ts` has to
+   expect the same row this component prints, and it runs under tsx, so the table
+   cannot sit in a `.tsx`. Re-exported here for the callers that reached it
+   through `DeskNav`. */
+export { NAV_SHORT };
 
 /** The five section links, in the order they print; the key is the route segment. */
 export type DeskSection = "news" | "research" | "stats" | "compare" | "glossary";

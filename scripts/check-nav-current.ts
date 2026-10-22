@@ -16,25 +16,22 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { isLocale, type Locale } from "../src/i18n/index.ts";
+import { NAV_SHORT } from "../src/lib/classify/nav.ts";
 
 const BASE = (process.argv[2] ?? "http://localhost:3000").replace(/\/$/, "");
-const LOCALE = process.argv[3] ?? "tr";
+const requested = process.argv[3] ?? "tr";
+/* Narrowed to a real locale: a typo on the command line would otherwise read a
+   dictionary that does not exist. It falls back to the default the script had. */
+const LOCALE: Locale = isLocale(requested) ? requested : "tr";
 const dict: Record<string, string> = JSON.parse(
   readFileSync(join(process.cwd(), "src", "i18n", "dictionaries", `${LOCALE}.json`), "utf-8")
 );
 
-/** Desk labels are the English taxonomy's short forms on purpose (`DeskNav`). */
-const DESK_LABEL: Record<string, string> = {
-  llm: "LLM",
-  image: "Image",
-  video: "Video",
-  coding: "Coding",
-  audio: "Audio",
-  multimodal: "Multimodal",
-  embedding: "Embedding",
-  vision: "Vision",
-  robotics: "Robotics"
-};
+/** The desk labels are this locale's short forms: the very table the nav prints,
+    imported from `src/lib/classify/nav.ts` so the expectation cannot drift back to
+    English while the page prints Turkish. */
+const DESK_LABEL: Record<string, string> = NAV_SHORT[LOCALE];
 
 type Expectation = {
   path: string;
