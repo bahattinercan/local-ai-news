@@ -8,7 +8,7 @@
  * new one. Exits non-zero when a pair that must pass WCAG 2.x AA fails, so it can
  * gate a token change (docs/en/DESIGN-V3.md §4).
  *
- * Every ratio is WCAG 2.x relative luminance over the *rendered* colours — a
+ * Every ratio is WCAG 2.x relative luminance over the *rendered* colours - a
  * muted text colour is checked against both the page background and the panel it
  * sits on, because a colour can pass on one and fail on the other.
  */
@@ -50,7 +50,7 @@ export function contrast(foreground: string, background: string): number {
 }
 
 interface Pair {
-  /** `null` means the pair is informational — printed, never gated. */
+  /** `null` means the pair is informational - printed, never gated. */
   min: number | null;
   foreground: string;
   background: string;
@@ -92,7 +92,7 @@ for (const [theme, selector] of themes) {
     const foreground = tokens[pair.foreground];
     const background = tokens[pair.background];
     if (!foreground || !background) {
-      console.log(`  ${pair.foreground} / ${pair.background}: tokens missing — skipped`);
+      console.log(`  ${pair.foreground} / ${pair.background}: tokens missing - skipped`);
       continue;
     }
     const ratio = contrast(foreground, background);

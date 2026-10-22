@@ -8,7 +8,7 @@ import { cn } from "@/lib/format";
 /**
  * Language switch that keeps the reader on the page they are reading.
  *
- * It used to link to `hrefFor(option, "/")` — i.e. every switch dumped you on
+ * It used to link to `hrefFor(option, "/")` - i.e. every switch dumped you on
  * the home page of the other locale, which is why nobody could compare the same
  * view in two languages. `usePathname` is enough to swap the locale segment;
  * the query string is deliberately not carried over (it would need

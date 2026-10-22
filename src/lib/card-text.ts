@@ -1,7 +1,7 @@
 /**
  * The model page had no sentence about the model itself: the ingest only stored
  * structured `cardData` keys (`baseModel`, `datasets`, `languages`), which are
- * empty on most repositories — `nerkyor/Qwen3.8-27B-…-Ninfer` shipped a page of
+ * empty on most repositories - `nerkyor/Qwen3.8-27B-…-Ninfer` shipped a page of
  * numbers, a run command and no description at all.
  *
  * The Hugging Face model card body (the README behind `/{repo}/raw/main/README.md`)
@@ -9,7 +9,7 @@
  * Markdown written for a different renderer: a YAML frontmatter block, badge
  * image rows, HTML `<div align="center">` wrappers, tables of benchmark scores and
  * fenced code blocks. Republishing that raw would break the page, so this module
- * turns it into a short plain-text excerpt — a pure function, unit-testable
+ * turns it into a short plain-text excerpt - a pure function, unit-testable
  * without the network, and deliberately lossy: attribution plus a link to the
  * original, never the article.
  */
@@ -67,13 +67,13 @@ function decodeEntities(text: string): string {
  * Paper cards open with the author and affiliation block, which is not an
  * explanation of the model: `Zhengming Yu<sup>1,2</sup>, Junkun Yuan<sup>2</sup>, …`
  * plus `1Texas A&M University, 2ByteDance`. It is dropped, but only while it is
- * leading — the moment a line reads like prose, dropping stops, so a card that
+ * leading - the moment a line reads like prose, dropping stops, so a card that
  * opens with a real sentence keeps it.
  */
 function looksLikeAuthorBlock(line: string): boolean {
   if (/[.!?]$/.test(line)) return false;
   // Trailing commas are how an author list is written across lines, so the empty
-  // segment they leave behind must not disqualify the line — and a *single* name
+  // segment they leave behind must not disqualify the line - and a *single* name
   // ending in a comma is only ever a continuation of that list.
   const segments = line
     .split(",")
@@ -83,7 +83,7 @@ function looksLikeAuthorBlock(line: string): boolean {
   if (segments.length === 1) {
     // A single name is an author when it is written as a continuation of the list
     // (`Chongyang Ma 2,`) or carries the superscript marker the last one does
-    // (`Chongyang Ma 2` — the `<br/>` after it removed the comma).
+    // (`Chongyang Ma 2` - the `<br/>` after it removed the comma).
     const short = segments[0].length <= 36 && /^[A-Z0-9]/.test(segments[0]);
     return short && (/,$/.test(line) || /\s\d{1,2}$/.test(line));
   }

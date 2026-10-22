@@ -7,7 +7,7 @@ import { OG_CONTENT_TYPE, OG_SIZE, OgCardView, loadOgFonts, ogGlossaryCardBySlug
  * and the desk it belongs to. The glossary is a compiled-in object, so no
  * snapshot read is needed; an unknown term prints the generic card.
  */
-export const alt = "OpenWeight Radar glossary — a term, its one-line definition and its category";
+export const alt = "OpenWeight Radar glossary - a term, its one-line definition and its category";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

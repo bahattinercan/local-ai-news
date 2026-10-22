@@ -158,7 +158,7 @@ function withinWindow(iso: string, days: number): boolean {
  * Every display string goes through `cleanLabel`: the served snapshot contains
  * `organization: "[object Object]"` on 40 of its 185 items (measured 2026-10-18),
  * and a byline is allowed to be absent but never to be a stringified object. The
- * ingest merge now overwrites poisoned values, so new snapshots heal — this keeps
+ * ingest merge now overwrites poisoned values, so new snapshots heal - this keeps
  * the *current* one from printing them until then.
  *
  * Exported for the unit test: it is a pure function over a snapshot.
@@ -260,7 +260,7 @@ export async function getPulse(days: number, category?: string): Promise<Pulse |
  * Ordering is by `downloads`, which is the one metric present on 86 % of rows
  * (measured 2026-10-18: 1 408/1 633 > 0, p50 22, p90 299, max 119 265). The
  * printed figure is the same number that sorted the list, so the band can never
- * look unsorted — a documented blend of likes and downloads (which is what the
+ * look unsorted - a documented blend of likes and downloads (which is what the
  * `trending` sort uses, because HF's own `trendingScore` is null on every model)
  * would have to be printed to justify its order, and a blended score printed as a
  * fact is exactly the unverifiable claim this project keeps removing.
@@ -294,7 +294,7 @@ export async function getMostDownloaded(
  *
  * The hero is the newest paper that actually has a thumbnail, because the design's
  * lead slot is a printed plate and 151 of 185 news items carry one (measured
- * 2026-10-18) — picking `stories[0]` blindly would leave the biggest slot on the
+ * 2026-10-18) - picking `stories[0]` blindly would leave the biggest slot on the
  * page empty on 18 % of editions.
  */
 export interface FrontPage {
@@ -445,8 +445,8 @@ export async function getModelNews(
 /**
  * Next 16 hands a dynamic segment through **still percent-encoded**: `params.id`
  * arrived as `reddit_localllama%3At3_1x6yk1f` (length 30) for both the raw and
- * the encoded request url. Encoding is not optional on the way in — external ids
- * contain `:` and releases even a literal `/` (`release:ZhengmingYu/DMAD`) — so
+ * the encoded request url. Encoding is not optional on the way in - external ids
+ * contain `:` and releases even a literal `/` (`release:ZhengmingYu/DMAD`) - so
  * the lookup accepts both forms. A malformed escape yields just the raw value
  * instead of throwing.
  */
@@ -520,7 +520,7 @@ export async function getStatsBoard(days: number, options: { gate?: "passed" | "
  * size, license and search, with the category swapped per tab. Counting every
  * tracked model instead printed "Multimodal 153" for a page with 33 cards.
  *
- * Reuses `filterModels` on purpose — one filter definition, no second opinion —
+ * Reuses `filterModels` on purpose - one filter definition, no second opinion -
  * and one snapshot read for the whole strip.
  */
 export async function getCategoryCounts(input: FeedFilterInput): Promise<{ total: number; counts: Map<string, number> }> {
@@ -568,8 +568,8 @@ export async function getCategories(): Promise<Array<{ key: string; labelEn: str
  * The snapshot figures the glossary is allowed to print
  * (docs/en/GLOSSARY-PLAN.md G-D6).
  *
- * Ten entries used to state numbers in prose — "46 GGUF repositories", "1 633
- * models", a bytes/parameter table — and every one of them was a copy of a value
+ * Ten entries used to state numbers in prose - "46 GGUF repositories", "1 633
+ * models", a bytes/parameter table - and every one of them was a copy of a value
  * that lives somewhere else. This derives all of it from the same cached snapshot
  * the feed reads, in one pass, so a page can never print a figure the feed
  * disagrees with (and an ingest cannot silently falsify a definition).

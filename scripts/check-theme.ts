@@ -3,7 +3,7 @@
  *
  * The defect it guards (docs/en/DESIGN-V3.md §0.2.10): the theme lived only in
  * `<html data-theme>` plus a `<head>` bootstrap script, and the root layout is
- * `app/[locale]/layout.tsx` — so clicking TR/EN remounted it, React re-wrote
+ * `app/[locale]/layout.tsx` - so clicking TR/EN remounted it, React re-wrote
  * `data-theme="light"` from the RSC payload, and the inline script (rendered via
  * `dangerouslySetInnerHTML`) never executed again. The reader got paper back
  * while `localStorage` still said `dark`. `ThemeSync` now re-asserts the choice
@@ -25,7 +25,7 @@ type Page = { type: string; webSocketDebuggerUrl: string };
 async function main(): Promise<void> {
   const targets = (await (await fetch(`http://127.0.0.1:${CDP_PORT}/json`)).json()) as Page[];
   const page = targets.find((target) => target.type === "page");
-  if (!page) throw new Error("no CDP page target — start Chrome with --remote-debugging-port=9222");
+  if (!page) throw new Error("no CDP page target - start Chrome with --remote-debugging-port=9222");
 
   const ws = new WebSocket(page.webSocketDebuggerUrl);
   await new Promise<void>((resolve) => ws.addEventListener("open", () => resolve()));

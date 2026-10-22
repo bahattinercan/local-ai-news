@@ -8,7 +8,7 @@ import { Check, Copy } from "lucide-react";
  *
  * It is a `label`-register button, not a body-size one: every other action on the
  * site is an uppercase label (`AKIŞI AÇ`, `UYGULA`, `MODELİ GÖR`), and at 15 px it
- * was the loudest thing in a 275 px rail — 104 × 36 px, which is what squeezed the
+ * was the loudest thing in a 275 px rail - 104 × 36 px, which is what squeezed the
  * command it belonged to (docs/en/DESIGN-V3.md §7.1).
  *
  * The copied state swaps *both* the glyph and the wording. It used to swap the

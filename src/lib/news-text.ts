@@ -10,13 +10,13 @@
 
 const MARKDOWN_LINK = /\[([^\]]{0,120})\]\(([^)\s]+)\)/g;
 const BARE_URL = /\bhttps?:\/\/[^\s<>"')]+/gi;
-/** Commit-style issue references — "(#21752)" — also mark where a subject ends. */
+/** Commit-style issue references such as "(#21752)" also mark where a subject ends. */
 const ISSUE_REF = /\s*\((?:#|GH-)\d+\)/gi;
 const TRAILING_REF = /\s*(?:#\d+|\(#\d+\))\s*$/;
 /** A build tag such as `b11699`, `v1.2.3` or `2026.10.16` says nothing to a reader. */
 const BUILD_TAG = /^(?:[a-z]{0,3}[-_.]?)?\d{3,}(?:[-_.]\d+)*$/i;
 /** The same tag in front of a real subject: `b11700: model : Granite Switch Decision`. */
-const BUILD_TAG_PREFIX = /^(?:[a-z]{0,3}[-_.]?)?\d{3,}(?:[-_.]\d+)*\s*[:–—-]\s*/i;
+const BUILD_TAG_PREFIX = /^(?:[a-z]{0,3}[-_.]?)?\d{3,}(?:[-_.]\d+)*\s*[:–-]\s*/i;
 /** After a URL is removed, "… behind a proxy. See" is left dangling. */
 const DANGLING_LABEL = /\s*\b(?:see|source|link|ref|refs|repo|code)\s*:?\s*\.?\s*$/i;
 
@@ -47,7 +47,7 @@ export function truncateAtWord(text: string, maxChars: number): string {
   const slice = text.slice(0, maxChars);
   const boundary = slice.lastIndexOf(" ");
   const cut = boundary > maxChars * 0.6 ? slice.slice(0, boundary) : slice;
-  return `${cut.replace(/[\s,;:.\-–—/]+$/, "")}…`;
+  return `${cut.replace(/[\s,;:.\-–/]+$/, "")}…`;
 }
 
 export interface NewsTextItem {
@@ -75,7 +75,7 @@ export function subjectOf(text: string, maxChars = 120): string {
 }
 
 function tidyBody(text: string): string {
-  return collapseWhitespace(text.replace(DANGLING_LABEL, "")).replace(/^[\s:–—-]+/, "");
+  return collapseWhitespace(text.replace(DANGLING_LABEL, "")).replace(/^[\s:–-]+/, "");
 }
 
 /**
@@ -99,7 +99,7 @@ export function newsText(item: NewsTextItem, options: { titleMax?: number; bodyM
   const prefixRaw = prefixMatch?.[0] ?? null;
   const bareTitle = prefixRaw ? storedTitle.slice(prefixRaw.length).trim() : storedTitle;
   const effectiveTitle = bareTitle.length >= 12 ? bareTitle : storedTitle;
-  const buildTag = tag ?? (prefixRaw ? prefixRaw.replace(/[\s:–—-]+$/, "") : null);
+  const buildTag = tag ?? (prefixRaw ? prefixRaw.replace(/[\s:–-]+$/, "") : null);
 
   /* The subject is read before the duplicate is collapsed: the issue reference
      that marks the subject's end belongs to the *first* copy, which dedupe drops. */

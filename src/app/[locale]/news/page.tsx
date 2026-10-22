@@ -23,8 +23,8 @@ export async function generateMetadata({
   const total = await countNews({ ...query, scope: "news" });
   const title =
     locale === "tr"
-      ? "Yerel AI haberleri — sürümler, runtime'lar ve duyurular"
-      : "Local AI news — releases, runtimes and announcements";
+      ? "Yerel AI haberleri - sürümler, runtime'lar ve duyurular"
+      : "Local AI news - releases, runtimes and announcements";
   const description =
     locale === "tr"
       ? `Son ${query.windowDays} günde ${descriptionCount(total, locale)} model sürümü ve runtime güncellemesi; kaynağı ve bahsettiği modelle birlikte.`

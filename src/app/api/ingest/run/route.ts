@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: "cannot write the snapshot here — run the ingest in GitHub Actions",
+        error: "cannot write the snapshot here - run the ingest in GitHub Actions",
         detail: (error as Error).message
       },
       { status: 501 }

@@ -35,7 +35,7 @@ export function formatNumber(value: number | null | undefined): string {
 }
 
 export function formatBytes(bytes: number | null | undefined): string {
-  if (bytes === null || bytes === undefined || !Number.isFinite(bytes) || bytes <= 0) return "—";
+  if (bytes === null || bytes === undefined || !Number.isFinite(bytes) || bytes <= 0) return "-";
   if (bytes >= 1_000_000_000) return `${(bytes / 1_000_000_000).toFixed(2)} GB`;
   if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
   return `${Math.round(bytes / 1000)} kB`;
@@ -49,11 +49,11 @@ export function formatBytes(bytes: number | null | undefined): string {
  * printed as "606 of 1.5k" (docs/en/STATS-PLAN.md §4).
  */
 export function formatCount(value: number | null | undefined, locale: "en" | "tr" = "en"): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  if (value === null || value === undefined || Number.isNaN(value)) return "-";
   return new Intl.NumberFormat(locale === "tr" ? "tr-TR" : "en-US").format(value);
 }
 
-/** "39.2%" / "39,2%" — a rate, not a count. `Intl` handles the decimal comma. */
+/** "39.2%" / "39,2%" - a rate, not a count. `Intl` handles the decimal comma. */
 export function formatPercent(value: number, locale: "en" | "tr" = "en", digits = 0): string {
   const safe = Number.isFinite(value) ? value : 0;
   return new Intl.NumberFormat(locale === "tr" ? "tr-TR" : "en-US", {
@@ -64,7 +64,7 @@ export function formatPercent(value: number, locale: "en" | "tr" = "en", digits 
 }
 
 /**
- * "18 October 2026" / "18 Ekim 2026" — the dateline under the nameplate.
+ * "18 October 2026" / "18 Ekim 2026" - the dateline under the nameplate.
  *
  * The date comes from the snapshot's `generatedAt`, never from `Date.now()`: the
  * masthead has to be the same string on the server and after hydration, and the
@@ -82,7 +82,7 @@ export function formatEditionDate(iso: string | null | undefined, locale: "en" |
   }).format(date);
 }
 
-/** "09:09 UTC" — the clock in the masthead's snapshot block. */
+/** "09:09 UTC" - the clock in the masthead's snapshot block. */
 export function formatClock(iso: string | null | undefined): string {
   if (!iso) return "";
   const date = new Date(iso);

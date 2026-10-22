@@ -15,7 +15,7 @@ function model(overrides: Partial<ClassifiedModel>): ClassifiedModel {
 
 /**
  * `quantizations` mixes GGUF schemes with safetensors dtypes and is sorted
- * alphabetically, so `[0]` was regularly "AWQ", "BF16" or even "I8" — none of
+ * alphabetically, so `[0]` was regularly "AWQ", "BF16" or even "I8" - none of
  * which is a valid llama.cpp/Ollama quant tag.
  */
 test("only a GGUF quantization scheme is offered to a GGUF runner", () => {
@@ -48,7 +48,7 @@ test("the run command uses the real flag for each runner", () => {
 
 /**
  * The promo box prints one real command in the 276 px rail. It wraps at spaces
- * (`break-words`), so a repo id that does not fit one line is broken across two —
+ * (`break-words`), so a repo id that does not fit one line is broken across two -
  * which is how `huggingface-cli download QuantFunc/Minimax-H3-Quantfunc-4bit`
  * ended up as a two-line specimen plus an orphaned `t`.
  */
@@ -63,7 +63,7 @@ test("a command is measured in rail lines, not in characters", () => {
   assert.equal(railLines("llama-cli -hf mradermacher/RsEvi-8B-i1-GGUF:Q1"), 2);
 
   // The two commands the hot list actually offers at the top: a 36-character repo
-  // id is exactly the line, so the command is a clean two-line specimen — at the
+  // id is exactly the line, so the command is a clean two-line specimen - at the
   // 33 columns the box used to have it needed three lines, the last one holding a
   // single orphaned `t`.
   assert.equal(railLines(runCommand(m("QuantFunc/Minimax-H3-Quantfunc-4bit", ["ComfyUI"]))), 2);

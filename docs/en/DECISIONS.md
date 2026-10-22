@@ -3,7 +3,7 @@
 ## Locked decisions (2026-10-13)
 
 1. Next.js App Router + TypeScript.
-2. ~~Neon Postgres~~ — **reversed 2026-10-14**: no database at all. The snapshot
+2. ~~Neon Postgres~~ - **reversed 2026-10-14**: no database at all. The snapshot
    lives in Vercel Blob; see `docs/en/DATA-STORAGE.md`.
 3. Hugging Face only as a data source.
 4. TR + EN, default `en`.
@@ -25,13 +25,13 @@
   to the snapshot bundled in the repo so the site is never empty. Reversal
   condition: if relational queries or per-user state are ever needed, a
   database comes back.
-- **Rate limiter:** in-memory per-IP map. On Vercel this is per function instance, not global — acceptable for v1, replace with Upstash/Redis if abuse appears.
+- **Rate limiter:** in-memory per-IP map. On Vercel this is per function instance, not global - acceptable for v1, replace with Upstash/Redis if abuse appears.
 - **VRAM estimate:** weights + KV cache approximation (`BYTES_PER_PARAM` × params + 0.15 GB per billion params at 4096 tokens). Shown with `~` in the UI.
 - **Avatars:** `/api/users/{name}` and `/api/organizations/{name}` error without a token, so avatars come only from the trending response, with a monogram fallback.
 
 ## Filter query handling (2026-10-16)
 
-Measured on the live tree, then fixed — all six points below were reproducing on
+Measured on the live tree, then fixed - all six points below were reproducing on
 `localhost:3000` before the change:
 
 - **A blank parameter means "not set".** A GET form submits *every* named control,
@@ -48,7 +48,7 @@ Measured on the live tree, then fixed — all six points below were reproducing 
   end (`parseNewsQuery` had the same bug fixed earlier).
 - **Tab counts describe the feed they open.** `getCategoryCounts()` runs the same
   `filterModels()` as the list (default 7-day window, quality gate applied, gated
-  repos hidden), so the tab and the page total agree — `getStats` counted every
+  repos hidden), so the tab and the page total agree - `getStats` counted every
   tracked model and the tab printed "Multimodal 153" for a page with 33 cards.
 - **The pulse is scoped to the page.** `getPulse(days, category)` filters the
   tracked/passed/hot numbers by category, so a category page no longer leads with
@@ -63,8 +63,8 @@ Measured on the live tree, then fixed — all six points below were reproducing 
   neither the route params nor `searchParams`, so the old `TabBar` could not mark
   the active tab (every category page highlighted "All") and could not count the
   filtered view. It now renders inside each page: the feed pages pass their parsed
-  filters, the badge is `getCategoryCounts(filters)` — the reader's window, gate,
-  runner, size, license and search applied to each category — the links carry
+  filters, the badge is `getCategoryCounts(filters)` - the reader's window, gate,
+  runner, size, license and search applied to each category - the links carry
   those filters, so switching category keeps the view instead of silently
   resetting it, and the active tab gets `aria-current="page"`. With no filters set
   the numbers are the default 7-day, gate-on view, so a badge always equals the
@@ -76,13 +76,13 @@ Measured on the live tree, then fixed — all six points below were reproducing 
   whole track. `min-w-0` on the grid item, `min-w-0 line-clamp-2` instead of
   `break-words` on the card title (`overflow-wrap: break-word` does not lower
   min-content) and `shrink-0` on the gate chip bring every route to 0 overflow at
-  360/390/430/768/1024/1440 — the 360 px document is 345 px. See
+  360/390/430/768/1024/1440 - the 360 px document is 345 px. See
   docs/en/DESIGN-V2.md §3 D1 for the initial measurement.
 - **`scripts/check-overflow.ts` can fail now.** It emulated small widths with
   `mobile: true`, which inflates the layout viewport to the content width, so
   `scrollWidth - innerWidth` was 0 by construction (the false pass in
   DESIGN.md §6). It now uses desktop metrics, waits until the emulated width is
-  the layout width, ignores clipped decorations, and exits non-zero on overflow —
+  the layout width, ignores clipped decorations, and exits non-zero on overflow -
   proved with a 900 px fixture (+540 px, exit 1).
 
 ## Model page text (2026-10-18)
@@ -97,14 +97,14 @@ and a run command with nothing saying what the model *is*.
   ≤600-character plain-text excerpt (frontmatter, badge rows, inline HTML, tables,
   code fences and a leading author/affiliation block are dropped). It is stored on
   the row as `cardSummary` and rendered under "About this model" with a link to the
-  full card — an excerpt plus attribution, never the whole card.
+  full card - an excerpt plus attribution, never the whole card.
 - **`undefined` and `null` mean different things.** `undefined` = never fetched,
   `null` = fetched and empty, so an empty README costs one request ever, not one
   per run. The backfill (`npm run cards-backfill`, and the same pass inside
   `runIngest`) targets gate-passing models by likes, with its own request cap so
   the detail pass keeps its budget.
 - **A model page now shows the reverse link too.** `getModelNews()` asks "what
-  mentions this model" — the relation used to run one way only (news → model).
+  mentions this model" - the relation used to run one way only (news → model).
   Matching moved to `lib/model-mentions.ts` because requiring the whole repo name
   in a headline can never fire for 108-character finetune ids (6 / 104 news rows
   carried `modelSlug`), and plain word matching was measurably wrong (20 rows

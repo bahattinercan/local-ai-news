@@ -5,12 +5,12 @@
  *   npx tsx scripts/type-census.ts http://localhost:3000/tr [width]
  *
  * Why it exists: DESIGN-V2 §2 measured 484 of 517 text elements (94 %) at ≤ 14 px
- * with a 24 px maximum — a page where nothing was more important than anything
+ * with a 24 px maximum - a page where nothing was more important than anything
  * else. That is invisible in a screenshot review and not something opinion can
  * settle, so it is a number.
  *
  * The gate is deliberately *not* "most text is 15–17 px". The design puts every
- * kicker, byline, count and annotation at 11–13 px on purpose — letterspaced small
+ * kicker, byline, count and annotation at 11–13 px on purpose - letterspaced small
  * caps are the reference's signature move and its whole reason for being readable
  * at a glance. What must never happen is a *sentence* set that small, or a page
  * with several competing display sizes. So the checks are:

@@ -8,7 +8,7 @@ import type { ClassifiedModel } from "./model.ts";
  *
  *  - `firstSeenAt` spans **3 days**, so the "window" on `/stats` used to return
  *    606 for 7, 30, 90 and 180 days alike. `createdAt` spans **49 days** and is
- *    the only axis with daily resolution — hence two named axes: `tracked`
+ *    the only axis with daily resolution - hence two named axes: `tracked`
  *    (first seen by Radar, the feed's own axis) and `created` (the HF repo date).
  *  - 8 categories but 7 palette entries painted the smallest slice with the
  *    largest one's colour, so the fold lives here (`foldSlices`) rather than in
@@ -44,7 +44,7 @@ export interface StatsRow {
   share: number;
   /** Over in-view rows with `downloads > 0`; null when there are none. */
   medianDownloads: number | null;
-  /** Gate-independent, window-scoped — the gate panel (§5) reads these. */
+  /** Gate-independent, window-scoped - the gate panel (§5) reads these. */
   tracked: number;
   passed: number;
   passRate: number;
@@ -126,7 +126,7 @@ function withinWindow(iso: string | null | undefined, days: number, endMs: numbe
 
 /**
  * Median of a download list, rounded to a whole download. Null on an empty list
- * — never 0: "no row has downloads" and "the median is zero" are different facts
+ * - never 0: "no row has downloads" and "the median is zero" are different facts
  * and the table prints them differently.
  */
 export function medianOf(values: number[]): number | null {
@@ -274,7 +274,7 @@ export function buildStatsBoard(snapshot: StatsSnapshot, options: StatsOptions):
     }))
     .sort((left, right) => right.count - left.count || right.tracked - left.tracked || left.category.localeCompare(right.category));
 
-  /* The time panel: `createdAt`, not `firstSeenAt`. Gated repos are included —
+  /* The time panel: `createdAt`, not `firstSeenAt`. Gated repos are included -
      the repo exists whether or not we would show it. */
   const cadenceBuckets = new Map<string, { created: number; passed: number }>();
   for (const model of snapshot.models) {

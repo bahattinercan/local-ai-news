@@ -39,17 +39,17 @@
   --text-sm--line-height: 1.375rem;
   --text-base: 1rem;
   --text-base--line-height: 1.5rem;
-  --text-row: 1.0625rem; /* 17px — ruled row headline */
+  --text-row: 1.0625rem; /* 17px - ruled row headline */
   --text-row--line-height: 1.375rem;
-  --text-lg: 1.25rem; /* 20px — section heading */
+  --text-lg: 1.25rem; /* 20px - section heading */
   --text-lg--line-height: 1.5rem;
-  --text-xl: 1.5rem; /* 24px — column headline */
+  --text-xl: 1.5rem; /* 24px - column headline */
   --text-xl--line-height: 1.75rem;
-  --text-2xl: 1.875rem; /* 30px — page h1 */
+  --text-2xl: 1.875rem; /* 30px - page h1 */
   --text-2xl--line-height: 2.125rem;
   --text-3xl: 2.375rem; /* 38px */
   --text-3xl--line-height: 2.5rem;
-  --text-hero: 2.75rem; /* 44px — the front page headline, desktop */
+  --text-hero: 2.75rem; /* 44px - the front page headline, desktop */
   --text-hero--line-height: 2.875rem;
 }
 
@@ -121,7 +121,7 @@
 
 /* These live in Tailwind's `base` layer on purpose. Unlayered CSS outranks every
    layered rule in the cascade, so a bare `a { color: inherit }` silently beat each
-   Tailwind `text-*` utility on every anchor on the site — measured on the RSS call
+   Tailwind `text-*` utility on every anchor on the site - measured on the RSS call
    to action, which rendered light ink on a light block (invisible), and on every
    `hover:text-accent`. Layered, the utilities win and the base rule is what it was
    meant to be: a default. */
@@ -241,7 +241,7 @@
     color: var(--muted);
   }
 
-  /* `READ MORE →` / `WATCH VIDEO →` — a standalone call to action, so it is a
+  /* `READ MORE →` / `WATCH VIDEO →` - a standalone call to action, so it is a
      real target: measured 14 px tall before, i.e. below WCAG 2.2 AA (24 px). */
   .arrow-link {
     display: inline-flex;
@@ -428,7 +428,7 @@
   /*
    * Below 768 px the sheet scrolls sideways (a 148 px minimum per model column)
    * with the label column pinned. From 768 px up the table fits, so the wrapper
-   * does not clip at all — and that is deliberate: `overflow-x: auto` computes
+   * does not clip at all - and that is deliberate: `overflow-x: auto` computes
    * `overflow-y` to `hidden`, which turns the wrapper into a scroll port whose
    * vertical scroll range is zero, so `position: sticky` on the header row can
    * never reach the viewport (measured on the previous sheet: header top −31 px
@@ -587,11 +587,11 @@ summary::-webkit-details-marker {
 /* The filters disclosure sits `display: contents` in the filter row: that keeps
    its summary in the row (the button does not move when the panel opens) and
    lets the panel span a row of its own. Chrome wraps the panel in an internal
-   `::details-content` box, which would then be the flex item — a shrink-to-fit
+   `::details-content` box, which would then be the flex item - a shrink-to-fit
    one, so the four selects stayed wrapped inside a button-width box; flatten
    that wrapper too. Kept as two rules on purpose: an unsupported pseudo-element
    invalidates a whole selector *list*, and browsers without it (Safari < 18.4,
-   Firefox < 139) drop only the second rule — they have no wrapper box to
+   Firefox < 139) drop only the second rule - they have no wrapper box to
    flatten in the first place. The open/closed switch is a Tailwind
    `hidden`/`group-open:flex` pair on the panel, never the UA rule. */
 .filters-more {

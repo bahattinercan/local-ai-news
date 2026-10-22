@@ -1,8 +1,8 @@
-# Design System & Redesign Plan — OpenWeight Radar
+# Design System & Redesign Plan - OpenWeight Radar
 
 > Turkish mirror: [docs/tr/DESIGN.md](../tr/DESIGN.md)
 > Status: **implemented (Phases 0–7), verified 2026-10-14.** All numbers below were measured on 2026-10-14 against the live dev server (`localhost:3101`) and the served snapshot (`data/feed.json`, 915 models / 104 news items).
-> ⚠️ **Corrected 2026-10-16:** the §6 "horizontal overflow 0 px at 360/390" result was a false pass — the check emulated small widths with `mobile: true`, which inflates the layout viewport (`window.innerWidth` becomes 769 px), so `scrollWidth - innerWidth` was 0 by construction. The feed is in fact **769 px wide on a 390 px phone** (cards 753 px). See [DESIGN-V2.md](DESIGN-V2.md) §2.3 and §3 D1.
+> ⚠️ **Corrected 2026-10-16:** the §6 "horizontal overflow 0 px at 360/390" result was a false pass - the check emulated small widths with `mobile: true`, which inflates the layout viewport (`window.innerWidth` becomes 769 px), so `scrollWidth - innerWidth` was 0 by construction. The feed is in fact **769 px wide on a 390 px phone** (cards 753 px). See [DESIGN-V2.md](DESIGN-V2.md) §2.3 and §3 D1.
 
 ---
 
@@ -16,8 +16,8 @@
 | `/tr` page height @360px | **18030 px** (~20 screens) | same |
 | Horizontal overflow | 0 px at 360/390/768/1280/1440 | `scrollWidth - innerWidth` |
 | Text contrast | body 14.69:1, muted 7.81:1 | WCAG ratio, passes |
-| Nav coverage | `TabBar` renders **categories only** | `src/components/TabBar.tsx` — `nav.news`, `nav.stats`, `nav.compare` exist in dictionaries but are never rendered |
-| `/favicon.ico` | **200 but `text/html`** | `curl -I` — the app HTML is served as the icon |
+| Nav coverage | `TabBar` renders **categories only** | `src/components/TabBar.tsx` - `nav.news`, `nav.stats`, `nav.compare` exist in dictionaries but are never rendered |
+| `/favicon.ico` | **200 but `text/html`** | `curl -I` - the app HTML is served as the icon |
 | Stats `days` param | read by the page, **no UI control** | `src/app/[locale]/stats/page.tsx` |
 | Footer / attribution | **absent** | no footer element in layout |
 
@@ -38,7 +38,7 @@ Conclusion: the flatness is not taste, it is **1.15:1 surface separation + no hi
 | `quantizations` | 198 / 915 (22%) | Detail page only. |
 | `vramEstGb` | 74 / 915 (8%) | Detail page + compare only; never a card metric. |
 | `license` | 259 / 915 (28%) | Omit when null. |
-| `trendingScore` | **0 / 915 (all null)** | **No trending UI.** The filter bar exposes a `sort=trending` option that is a **no-op** (all values null). Either drop it or derive a score at read time (`likes + downloads / age`) — Phase 2 does the latter. "Hot now" = downloads within the active window. |
+| `trendingScore` | **0 / 915 (all null)** | **No trending UI.** The filter bar exposes a `sort=trending` option that is a **no-op** (all values null). Either drop it or derive a score at read time (`likes + downloads / age`) - Phase 2 does the latter. "Hot now" = downloads within the active window. |
 | `firstSeenAt` distinct days | **2** (2026-10-13, 2026-10-14) | Time-series chart gate: render the trend chart only if ≥ 3 distinct days; otherwise category bars only. |
 
 **Numeric gate:** any visual element whose backing field has < 50% coverage must have an explicit fallback state, and the fallback is the *default* state, not the exception.
@@ -49,13 +49,13 @@ Conclusion: the flatness is not taste, it is **1.15:1 surface separation + no hi
 
 | # | Decision | Rationale |
 |---|---|---|
-| 1 | **Identity: "radar instrument"** — deep navy, technical grid, mono numerals, cyan signal accent + amber caution | The brand is *OpenWeight Radar*; a data-instrument language is distinctive and matches a dense feed better than a generic dashboard. |
+| 1 | **Identity: "radar instrument"** - deep navy, technical grid, mono numerals, cyan signal accent + amber caution | The brand is *OpenWeight Radar*; a data-instrument language is distinctive and matches a dense feed better than a generic dashboard. |
 | 2 | **Type: Space Grotesk (display/UI) + JetBrains Mono (numbers, commands)** via `next/font`, system fallback | Mono numerals align metric columns; Grotesk reads technical without being heavy. |
 | 3 | **Dark default + working theme toggle** (localStorage + `prefers-color-scheme`) | Light tokens already exist but `data-theme="dark"` is hardcoded; a real toggle costs one client component. |
-| 4 | **Card: data-first spec sheet** | See §2 — images exist for 0.9% of models. |
+| 4 | **Card: data-first spec sheet** | See §2 - images exist for 0.9% of models. |
 | 5 | **Home gets a "live pulse" strip** (4 stats + hot-5 list), not a marketing hero | The value is freshness; a hero that shows live numbers is the product. |
 | 6 | **Charts: pure SVG**, no chart dependency | SSR-friendly, zero bundle cost, full control of the token palette. |
-| 7 | **Motion: medium** — scroll reveal, count-up, hover elevation, radar sweep in the header; all disabled under `prefers-reduced-motion` | Impressive without hurting performance or accessibility. |
+| 7 | **Motion: medium** - scroll reveal, count-up, hover elevation, radar sweep in the header; all disabled under `prefers-reduced-motion` | Impressive without hurting performance or accessibility. |
 | 8 | **No new dependencies** | Tailwind v4 + `lucide-react` (6422 icons, already installed) cover everything. |
 | 9 | **Category names stay English in both locales** | They are taxonomy terms, not UI copy: the Turkish feed showed "Görüntü · kod · Çoklu Mod" beside English library (`gguf`) and runner (`llama.cpp`) names, so the taxonomy became unreadable. `categoryLabel()` no longer takes a locale, which makes a regression a compile error. UI words (filters, buttons, headings) stay translated, and `/api/categories` still serves both `labelEn` and `labelTr`. |
 
@@ -64,7 +64,7 @@ Conclusion: the flatness is not taste, it is **1.15:1 surface separation + no hi
 ## 4. Design tokens (target values, contrast verified)
 
 ```css
-:root {                       /* dark — radar instrument */
+:root {                       /* dark - radar instrument */
   --bg:        #070a10;
   --surface:   #101623;
   --raised:    #16202f;
@@ -94,38 +94,38 @@ Type scale: 12 / 14 / 16 / 20 / 26 / 34 px. Radii: 6 / 10 / 14. Spacing unit: 4p
 
 ## 5. Per-page spec
 
-### 5.1 Shell (`layout.tsx`) — Phase 1
+### 5.1 Shell (`layout.tsx`) - Phase 1
 - Sticky header: brand mark (radar glyph) + tagline, primary nav (**Hepsi / categories / Haber / İstatistik / Karşılaştır**), theme toggle, language switch.
-- Category strip (rendered by the feed pages, not the layout — a layout never receives the route or search params, see DECISIONS.md) shows per-category counts from `getCategoryCounts`, i.e. the reader's own filters applied to each category.
+- Category strip (rendered by the feed pages, not the layout - a layout never receives the route or search params, see DECISIONS.md) shows per-category counts from `getCategoryCounts`, i.e. the reader's own filters applied to each category.
 - Footer: data-source attribution, RSS link, docs link, snapshot timestamp.
 - Real icons: `icon.svg` + `favicon.ico` + `apple-icon.png` (currently `/favicon.ico` returns HTML).
 
-### 5.2 Feed (`/`, `/c/[category]`) — Phase 2
-- **Live pulse strip**: models tracked · gate-passed · top category · last refresh (state the true cadence: ingest interval + 900s cache TTL — never "real-time"). Scoped to the active category on `/c/[category]`, where the "top category" stat is dropped because it would only repeat the heading.
+### 5.2 Feed (`/`, `/c/[category]`) - Phase 2
+- **Live pulse strip**: models tracked · gate-passed · top category · last refresh (state the true cadence: ingest interval + 900s cache TTL - never "real-time"). Scoped to the active category on `/c/[category]`, where the "top category" stat is dropped because it would only repeat the heading.
 - **Hot now**: top 5 by downloads in the active window, ranked with a mini bar.
 - Filter bar → compact chip row with an active-filter summary and a clear-all; search input with icon.
 - Card: title + category chip + metric row (♥ ⬇ storage) + runner chips + gate badge + compare button. Thumbnail 40px when available, glyph otherwise.
 - Pagination: numbered pages instead of "load more" (60 cards / 5596px is the problem).
 
-### 5.3 Model detail (`/m/[slug]`) — Phase 3
+### 5.3 Model detail (`/m/[slug]`) - Phase 3
 - Hero: name, category, gate verdict, author link to HF.
-- **Spec sheet** grid (params, storage, quantizations, runners, VRAM, license, spaces) — fields omitted when null.
+- **Spec sheet** grid (params, storage, quantizations, runners, VRAM, license, spaces) - fields omitted when null.
 - Command block: mono, copy button, syntax-tinted.
 - Related models as compact cards.
 
-### 5.4 News (`/news`) — Phase 4
+### 5.4 News (`/news`) - Phase 4
 - Day-grouped timeline, kind chips (paper/release/announcement) with distinct colors, thumbnail (97% coverage), upvotes, org.
 - ⚠️ Thumbnails are on `cdn-thumbnails.huggingface.co`, which is **not** in `next.config.ts` `remotePatterns` (only `cdn-avatars`, `cas`, `huggingface.co`). Add it before using `next/image`.
 
-### 5.5 Stats (`/stats`) — Phase 5
+### 5.5 Stats (`/stats`) - Phase 5
 - Category volume bars (SVG), share donut, and a per-day trend derived from `firstSeenAt` at read time (no schema change).
 - Gate: trend chart renders only when ≥ 3 distinct days exist; otherwise show the bars and a "not enough history yet" note.
 - Add the missing `days` control (7/30/90/180).
 
-### 5.6 Compare (`/compare`) — Phase 6
+### 5.6 Compare (`/compare`) - Phase 6
 - Sticky header table, per-row "best value" highlight, empty state that explains how to add models.
 
-### 5.7 Motion & polish — Phase 7
+### 5.7 Motion & polish - Phase 7
 - Scroll reveal (IntersectionObserver, reduced-motion safe), count-up on pulse stats, hover elevation, skeleton loaders for the feed.
 - Re-measure: `npm run verify-ui` + screenshots at 1440 and 390.
 
@@ -138,7 +138,7 @@ Type scale: 12 / 14 / 16 / 20 / 26 / 34 px. Radii: 6 / 10 / 14. Spacing unit: 4p
 | 0 | Tokens, type scale, `components/ui/` primitives | Contrast table recomputed: surface/bg ≥ 1.25, border/surface ≥ 1.5 |
 | 1 | Shell, nav, footer, theme toggle, icons | News/Stats/Compare reachable; `/favicon.ico` returns `image/vnd.microsoft.icon` |
 | 2 | Feed redesign | Page height @1440 < 3500 px for the first page; overflow = 0 at 360/390/768/1440 |
-| 3 | Model detail | No empty "—" rows in the spec sheet |
+| 3 | Model detail | No empty "-" rows in the spec sheet |
 | 4 | News | Thumbnails render (host allowlisted); no 404s |
 | 5 | Stats | SVG charts render; gate fallback verified with the 2-day snapshot |
 | 6 | Compare | Best-value cells highlighted |
@@ -163,8 +163,8 @@ Verification tool: `scripts/screenshot.ts` (CDP, 1440 + 390 viewport sweep).
 
 ## 7. Risks
 
-- `next/image` with an unallowlisted host throws at runtime — add `cdn-thumbnails.huggingface.co` first.
+- `next/image` with an unallowlisted host throws at runtime - add `cdn-thumbnails.huggingface.co` first.
 - `next/font` fetches at build time; keep the system fallback so an offline build still renders.
 - ISR + 900s cache TTL means the "live" numbers are not live; label the cadence.
-- Scroll-reveal elements screenshot as opacity 0 — verify with `--force-prefers-reduced-motion`.
+- Scroll-reveal elements screenshot as opacity 0 - verify with `--force-prefers-reduced-motion`.
 - Do not touch API routes or classification rules in these phases; this is a presentation-layer change.

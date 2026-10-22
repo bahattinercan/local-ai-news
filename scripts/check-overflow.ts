@@ -5,7 +5,7 @@
  * Two traps this avoids (see docs/en/DESIGN-V2.md §3 D2):
  *  - `mobile: true` on a small width inflates the layout viewport to the content
  *    width (`window.innerWidth` becomes 769 on a 360 px request), which made
- *    `scrollWidth - innerWidth` 0 by construction — a false pass on a page that
+ *    `scrollWidth - innerWidth` 0 by construction - a false pass on a page that
  *    was 424 px too wide.
  *  - `next dev` recompiles on save, so a measurement taken too early can belong
  *    to the previous route; wait until the emulated width is the layout width.
@@ -74,7 +74,7 @@ async function main(): Promise<void> {
     | undefined;
   if (!value) throw new Error("measurement failed");
   if (value.inner !== width) {
-    console.error(`${url} @${width}: layout viewport is ${value.inner} px, not ${width} — rerun`);
+    console.error(`${url} @${width}: layout viewport is ${value.inner} px, not ${width} - rerun`);
     process.exit(1);
   }
 

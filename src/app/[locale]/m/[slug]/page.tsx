@@ -82,7 +82,7 @@ export default async function ModelPage({
   if (model.runners.length) specs.push({ icon: Zap, label: t(dict, "card.runners"), value: model.runners.join(" · "), glossary: "runner" });
   if (model.libraryName) specs.push({ icon: Box, label: t(dict, "detail.library"), value: model.libraryName, glossary: "library" });
   if (model.vramEstGb) specs.push({ icon: Box, label: t(dict, "card.vram"), value: `~${model.vramEstGb} GB`, glossary: "vram" });
-  if (model.licenseName || model.license) specs.push({ icon: ShieldCheck, label: t(dict, "card.license"), value: model.licenseName ?? model.license ?? "—" });
+  if (model.licenseName || model.license) specs.push({ icon: ShieldCheck, label: t(dict, "card.license"), value: model.licenseName ?? model.license ?? "-" });
   specs.push({ icon: Heart, label: t(dict, "detail.popularity"), value: `♥ ${formatNumber(model.likes)} · ⬇ ${formatNumber(model.downloads)}`, glossary: "downloads" });
   specs.push({ icon: Clock, label: t(dict, "card.new"), value: `${daysSince(model.firstSeenAt)}d (${relativeTime(model.firstSeenAt)})` });
   if (model.gateReason) specs.push({ icon: ShieldCheck, label: t(dict, "detail.gateReason"), value: model.gateReason });
@@ -120,7 +120,7 @@ export default async function ModelPage({
       <section className="card p-5">
         <div className="flex flex-wrap gap-4">
           {/* `sampleImages` exists on 1.5 % of models, so the slot is the generated
-              plate first and the real sample second — the reverse of `PlateImage`,
+              plate first and the real sample second - the reverse of `PlateImage`,
               because a model page is the one place a real sample is worth the space. */}
           {model.sampleImages[0] ? (
             <Image
@@ -142,7 +142,7 @@ export default async function ModelPage({
           <div className="min-w-0 flex-1">
             <h1 className="font-display text-2xl font-bold tracking-tight break-words">{model.externalId}</h1>
             <p className="mt-1 text-sm text-muted">
-              {categoryLabel(model.primaryCategory)} · {model.libraryName ?? "—"} ·{" "}
+              {categoryLabel(model.primaryCategory)} · {model.libraryName ?? "-"} ·{" "}
               {model.paramsTotal ? `${formatParams(model.paramsTotal)} ${t(dict, "card.params")}` : t(dict, "card.paramsUnknown")}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -162,7 +162,7 @@ export default async function ModelPage({
 
       {/* The card body is the only prose most repositories have. It is printed
           before the spec grid because a reader wants to know what the model *is*
-          before how many bytes it ships — and it is an excerpt with a link, never
+          before how many bytes it ships - and it is an excerpt with a link, never
           the whole card (`lib/card-text.ts`). */}
       {model.cardSummary ? (
         <section className="mt-4">

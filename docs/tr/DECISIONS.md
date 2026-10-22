@@ -3,7 +3,7 @@
 ## Sabit kararlar (13 Ekim 2026)
 
 1. Next.js App Router + TypeScript.
-2. ~~Neon Postgres~~ — **14 Ekim 2026'de geri alındı**: veritabanı yok. Snapshot
+2. ~~Neon Postgres~~ - **14 Ekim 2026'de geri alındı**: veritabanı yok. Snapshot
    Vercel Blob'da duruyor; bkz. `docs/tr/DATA-STORAGE.md`.
 3. Kaynak yalnızca Hugging Face.
 4. TR + EN, varsayılan `en`.
@@ -24,13 +24,13 @@
   (`SNAPSHOT_URL` ya da `BLOB_READ_WRITE_TOKEN`'dan keşfediliyor) ve repo'daki
   snapshot'a fallback yapıyor, böylece site hiçbir zaman boş kalmıyor. Geri
   dönüş koşulu: ilişkisel sorgu ya da kullanıcı bazlı durum gerekirse DB geri gelir.
-- **Rate limit:** IP başına in-memory harita. Vercel'de bu fonksiyan instance'ı başınadır, global değildir — v1 için kabul edilebilir; kötüye kullanım çıkarsa Upstash/Redis'e taşınır.
+- **Rate limit:** IP başına in-memory harita. Vercel'de bu fonksiyan instance'ı başınadır, global değildir - v1 için kabul edilebilir; kötüye kullanım çıkarsa Upstash/Redis'e taşınır.
 - **VRAM tahmini:** ağırlıklar + KV cache yaklaşımı (`BYTES_PER_PARAM` × param sayısı + 4096 token'da milyar param başına 0.15 GB). UI'da `~` ile gösterilir.
 - **Avatarlar:** `/api/users/{name}` ve `/api/organizations/{name}` token'sız error döndürüyor; avatarlar yalnızca trending yanıtından, monogram fallback ile.
 
 ## Filtre sorgusu işleme (2026-10-16)
 
-Canlı ağaçta ölçüldü, sonra düzeltildi — aşağıdaki altı maddenin hepsi değişiklikten
+Canlı ağaçta ölçüldü, sonra düzeltildi - aşağıdaki altı maddenin hepsi değişiklikten
 önce `localhost:3000` üzerinde yeniden üretildi:
 
 - **Boş parametre "ayarlanmamış" demektir.** GET formu *her* isimli kontrolü
@@ -63,8 +63,8 @@ görünüyor.
 ne de `searchParams` alıyor; bu yüzden eski `TabBar` aktif sekmeyi işaretleyemiyordu
 (her kategori sayfası "Hepsi"'yi vurguluyordu) ve filtrelenmiş görünümü
 sayamıyordu. Şerit artık her sayfada: feed sayfaları parse edilmiş filtrelerini
-veriyor, rozet `getCategoryCounts(filters)` — okuyanın pencere, kapı, runner,
-boyut, lisans ve arama filtreleri her kategoriye uygulanmış hali — linkler bu
+veriyor, rozet `getCategoryCounts(filters)` - okuyanın pencere, kapı, runner,
+boyut, lisans ve arama filtreleri her kategoriye uygulanmış hali - linkler bu
 filtreleri taşıyor (kategori değiştirmek görünümü sessizce sıfırlamıyor) ve aktif
 sekme `aria-current="page"` alıyor. Filtre kurulmamışsa sayılar varsayılan 7
 günlük, kapı açık görünüm; yani rozet her zaman açtığı sayfanın sayfalama
@@ -75,13 +75,13 @@ toplamına eşit (altı kategoride, filtreli ve filtresiz doğrulandı).
 track'i şişiriyordu. Grid item'da `min-w-0`, kart başlığında `break-words` yerine
 `min-w-0 line-clamp-2` (`overflow-wrap: break-word` min-content'i düşürmüyor) ve
 gate chip'inde `shrink-0` ile her route 360/390/430/768/1024/1440'da 0 taşmaya
-indi — 360 px'de doküman 345 px. İlk ölçüm için bkz. docs/tr/DESIGN-V2.md §3 D1.
+indi - 360 px'de doküman 345 px. İlk ölçüm için bkz. docs/tr/DESIGN-V2.md §3 D1.
 - **`scripts/check-overflow.ts` artık başarısız olabiliyor.** Küçük genişlikleri
 `mobile: true` ile taklit ediyordu; bu yerleşim viewport'unu içerik genişliğine
 şişiriyor ve `scrollWidth - innerWidth` tanım gereği 0 çıkıyordu (DESIGN.md
 §6'daki yanlış GEÇTİ). Artık masaüstü metrikleri kullanıyor, emüle edilen
 genliğin yerleşim genişliği olmasını bekliyor, kırpılan süsleri yok sayıyor ve
-taşmada non-zero ile çıkıyor — 900 px'lik bir fixture ile kanıtlandı (+540 px,
+taşmada non-zero ile çıkıyor - 900 px'lik bir fixture ile kanıtlandı (+540 px,
 exit 1).
 
 ## Model sayfası metni (18 Ekim 2026)
@@ -89,7 +89,7 @@ exit 1).
 Model sayfası metinsiz bir teknik föydü: ingest yalnızca `cardData` saklıyordu ve
 gösterilen üç anahtar (`baseModel`, `datasets`, `languages`) GGUF repolarının
 çoğunda boş, bu yüzden `nerkyor/Qwen3.8-27B-…-NInfer` sayfası numaralar, VRAM
-kutusu ve çalıştırma komutundan ibaretti — modelin *ne olduğunu* söyleyen tek cümle
+kutusu ve çalıştırma komutundan ibaretti - modelin *ne olduğunu* söyleyen tek cümle
 yoktu.
 
 - **Model kartı gövdesi bir kez okunuyor.** `HfClient.getModelCard()`
@@ -97,14 +97,14 @@ yoktu.
   fazla 600 karakterlik düz metne çevirir (frontmatter, rozet satırları, satır içi
   HTML, tablolar, kod blokları ve baştaki yazar/afiliasyon bloğu atılır). Satırda
   `cardSummary` olarak saklanır ve "Bu model hakkında" başlığı altında kartın
-  tamamına bağlantıyla gösterilir — özet + atıf, kartın bütünü asla.
+  tamamına bağlantıyla gösterilir - özet + atıf, kartın bütünü asla.
 - **`undefined` ile `null` farklı şeyler.** `undefined` = hiç çekilmedi,
   `null` = çekildi ve boş; böylece boş bir README her koşuda değil, ömründe bir kez
   istek harcar. Backfill (`npm run cards-backfill` ve `runIngest` içindeki aynı
   geçiş) kapıyı geçen modelleri beğeni sırasına göre hedefler ve kendi istek
   tavanıyla çalışır ki detay geçişinin bütçesi bozulmasın.
 - **Model sayfası artık ters bağlantıyı da gösteriyor.** `getModelNews()` "bu
-  modelden nerede bahsedilmiş" diye sorar — ilişki eskiden tek yönlüydü (haber →
+  modelden nerede bahsedilmiş" diye sorar - ilişki eskiden tek yönlüydü (haber →
   model). Eşleştirme `lib/model-mentions.ts`'e taşındı: başlıkta tam repo adını
   aramak 108 karakterlik finetune id'lerinde hiç tutmuyordu (104 haberin 6'sında
   `modelSlug` vardı) ve düz kelime eşleştirmesi ölçülebilir şekilde yanlıştı ("prompt"
@@ -129,8 +129,8 @@ ve ölçülmüş uygulama kaydı [STATS-PLAN.md](STATS-PLAN.md) içinde.
   `/stats` paneli hangi ekseni saydığını basar; envanter panelleri `firstSeenAt`'te
   kalır (sayıları akış sekmeleriyle eşit kalsın diye), zaman paneli `createdAt`'e
   taşınır.
-- **Tek pencere sözlüğü.** `/stats` artık `?window=24h|7d|30d|90d` alır — akışın
-  kendi `WINDOWS`'u — ve `?days=` takma ad olarak ayrıştırılır (30 → 30d, 180 →
+- **Tek pencere sözlüğü.** `/stats` artık `?window=24h|7d|30d|90d` alır - akışın
+  kendi `WINDOWS`'u - ve `?days=` takma ad olarak ayrıştırılır (30 → 30d, 180 →
   90d). Eski sayfa 7 / 30 / 90 / 180 gün sunuyordu ve hiçbiri farklı olamıyordu.
 - **Karar 9'un belgelenmiş tek gevşetmesi.** "Her şeyi göster" 30 günle sınırlı
   kalır ve akış hâlâ kategori ister; *toplu* bir yüzey

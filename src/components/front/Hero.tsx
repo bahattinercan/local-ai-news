@@ -18,13 +18,13 @@ import type { SnapshotNews } from "@/lib/store";
  *    one; 34 do not, and those still render the generated plate);
  *  - the headline is the paper's own title (p50 70, max 124 characters, measured)
  *    clamped to two lines, and the deck is the first sentence of the abstract
- *    rather than the abstract — summaries average 1 484 characters, which is a
+ *    rather than the abstract - summaries average 1 484 characters, which is a
  *    wall of text, not a standfirst.
  *
  * The two route-dependent bits are props, not branches: `kicker` (the front page
  * says "lead story", the wire desk says the same) and `trail` (the front page
  * links to the papers desk, the news desk to the rest of that kind). `sizes` is a
- * prop because the column the hero sits in is the caller's decision — passing a
+ * prop because the column the hero sits in is the caller's decision - passing a
  * wrong hint here is what let a 720 px image outgrow its 600 px track before.
  */
 export function Hero({

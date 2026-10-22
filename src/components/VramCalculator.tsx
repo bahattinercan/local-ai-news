@@ -88,7 +88,7 @@ export function VramCalculator({
       <div className="mt-4 flex flex-wrap items-baseline gap-3">
         <span className="text-xs uppercase tracking-wide text-muted">{labels.result}</span>
         <span className="font-mono text-2xl text-accent" data-testid="vram-result">
-          {estimate === null ? "—" : `~${estimate} GB`}
+          {estimate === null ? "-" : `~${estimate} GB`}
         </span>
         {params ? <span className="font-mono text-xs text-muted">{formatParams(params)}</span> : null}
       </div>

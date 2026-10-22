@@ -28,7 +28,7 @@ import { dictionary, hrefFor, t, type Locale } from "@/i18n";
  */
 /**
  * The nav's short forms. The taxonomy keeps its full English name everywhere else
- * (`categoryLabel`), because category names are terms rather than UI copy — but a
+ * (`categoryLabel`), because category names are terms rather than UI copy - but a
  * nav row has to fit ten of them plus five sections, and at 1 440 px
  * `EMBEDDING / RAG` was hard-cut mid-word (measured: the strip needed ~1 375 px
  * in a 1 280 px container). These are the same English terms, abbreviated only
@@ -67,7 +67,7 @@ export async function DeskNav({
   section?: DeskSection;
   /** `false` on a child page (a model, a news item, a glossary term): the marked
       item is then the *ancestor* the reader came through, so it carries
-      `aria-current="true"` — the ARIA value for "current item in a set" — instead
+      `aria-current="true"` - the ARIA value for "current item in a set" - instead
       of claiming to be this exact page. Defaults to `true`, so a flag a page
       forgets can only understate the claim, never overstate it. */
   exact?: boolean;
@@ -116,7 +116,7 @@ export async function DeskNav({
   const suffix = params.size > 0 ? `?${params.toString()}` : "";
 
   /* The search form posts to whichever list owns the current desk **or section**, so
-     a search from inside a category — or from News — stays inside it. `/models` is
+     a search from inside a category - or from News - stays inside it. `/models` is
      the full index, and the fallback for the pages that cannot answer `?q=`. */
   const owningSection = sections.find((entry) => entry.key === section && entry.search);
   const searchAction =
@@ -174,7 +174,7 @@ export async function DeskNav({
           {sections.map((entry) => {
             const Icon = entry.icon;
             /* Sections used to render with no state at all, so the only thing the
-               nav ever marked was a desk — News/Research/Stats/Compare/Glossary
+               nav ever marked was a desk - News/Research/Stats/Compare/Glossary
                could never be "where am I" (docs/en/DESIGN-V3.md §0.2.9). */
             const isActive = entry.key === section;
             return (

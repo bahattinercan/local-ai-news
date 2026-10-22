@@ -110,7 +110,7 @@ export const SOURCES: SourceDefinition[] = [
     tier: 4,
     enabled: false,
     format: "rss",
-    note: "404 — no RSS feed exists"
+    note: "404 - no RSS feed exists"
   },
   {
     key: "hf_users",

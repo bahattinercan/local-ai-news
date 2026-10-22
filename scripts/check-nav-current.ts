@@ -4,7 +4,7 @@
  *
  * The defect it guards (docs/en/DESIGN-V3.md §0.2.9): `active` was passed by
  * `/c/[category]` alone, and the desk predicate was `desk.key === (active ?? "")`
- * — so an undefined `active` matched the empty key and **All** carried the ink
+ * - so an undefined `active` matched the empty key and **All** carried the ink
  * underline on News, Research, Stats, Compare, Glossary and every detail page,
  * while the section links had no state to carry at all. Fifteen items, one of
  * which was always underlined for the wrong reason.
@@ -169,7 +169,7 @@ async function main(): Promise<void> {
     for (const failure of failures) console.error(`  - ${failure}`);
     process.exit(1);
   }
-  console.log(`${expectations.length} routes: each marks this page's own item — or nothing, on a dead end.`);
+  console.log(`${expectations.length} routes: each marks this page's own item - or nothing, on a dead end.`);
 }
 
 main();

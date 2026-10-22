@@ -22,8 +22,8 @@ const DEFAULT_WINDOW = "7d";
  *
  * The three selects used to be content-sized boxes in a wrapping flex row, so
  * they landed on two ragged lines (WINDOW+KIND, then CATEGORY+Apply) and no two
- * edges lined up. Each field is now its own ruled line — label, then a control
- * that takes the rest of the line — at every width, so all three selects share
+ * edges lined up. Each field is now its own ruled line - label, then a control
+ * that takes the rest of the line - at every width, so all three selects share
  * one column and the slip cannot re-flow per label length. (A responsive
  * `grid-cols-2` + `col-span-2` pairing was tried for phones: the spanning item
  * grows the implicit grid to two columns, the label column then inherits `auto`
@@ -31,7 +31,7 @@ const DEFAULT_WINDOW = "7d";
  *
  * Between the label and the control there used to be a dotted leader. With a
  * 9.5rem box pinned to the right it left ~180px of dots in the middle of the
- * rail, which read as a broken ellipsis rather than as typography — so the
+ * rail, which read as a broken ellipsis rather than as typography - so the
  * leader is gone and the control now spans the rest of the line instead.
  */
 function FilterRow({
@@ -79,8 +79,8 @@ function FilterRow({
 /**
  * The slip itself: three ruled lines and the action footer.
  *
- * Rendered twice on purpose — once inside the phone disclosure, once in the
- * desktop rail — because "collapse below `lg`, always open above it" cannot be
+ * Rendered twice on purpose - once inside the phone disclosure, once in the
+ * desktop rail - because "collapse below `lg`, always open above it" cannot be
  * expressed in one DOM: a `<details>` keeps its body out of the tab order while
  * closed, and the two CSS-only escapes (forcing `display` on the body, or
  * swapping `open` per breakpoint) either break `Tab` on desktop or need client
@@ -88,11 +88,11 @@ function FilterRow({
  * filter nobody can reach by keyboard is not.
  *
  * A GET form with no `action`: the filter state is the URL, and every untouched
- * select submits `""` — `cleanSearch` drops those upstream.
+ * select submits `""` - `cleanSearch` drops those upstream.
  *
  * The `key` is not decoration: `Clear`, the lead's desk link and pagination are
  * all client-side navigations, and an uncontrolled `<select defaultValue>`
- * ignores a changed `defaultValue` on the same element — measured, `Clear`
+ * ignores a changed `defaultValue` on the same element - measured, `Clear`
  * emptied the URL while the slip went on printing `30d / release / video`.
  * Remounting on a change of the query is what keeps the printed state and the
  * URL the same thing.
@@ -137,7 +137,7 @@ function FilterSlip({
             name="kind"
             label={t(dict, "news.kind")}
             value={kind}
-            options={[["", "—"], ...kindOptions]}
+            options={[["", "-"], ...kindOptions]}
             active={kind !== ""}
           />
         ) : null}
@@ -146,7 +146,7 @@ function FilterSlip({
           name="category"
           label={t(dict, "filters.category")}
           value={category}
-          options={[["", "—"], ...CATEGORY_RULES.map((rule) => [rule.key, locale === "tr" ? rule.labelTr : rule.labelEn])]}
+          options={[["", "-"], ...CATEGORY_RULES.map((rule) => [rule.key, locale === "tr" ? rule.labelTr : rule.labelEn])]}
           active={category !== ""}
         />
       </div>
@@ -189,7 +189,7 @@ export type NewsListQuery = NewsQuery & { scope: NewsScope; page: number };
  * This is the front page's language applied to a query surface: one lead story in
  * the hero slot, then the rest of the page filed into desks by `kind`, each desk
  * on its own section rule and every row a `StoryRow`. Nothing here is a rounded
- * card — a printed page separates with hairlines, not with boxes (DESIGN-V3 D8).
+ * card - a printed page separates with hairlines, not with boxes (DESIGN-V3 D8).
  *
  * The scope decides which kinds the surface owns and the kind filter offers only
  * those, so a paper can never show up on /news or vice versa. The lead is only

@@ -4,14 +4,14 @@
  * Model photography is not available: `sampleImages` is non-empty on **25 of
  * 1 633 models (1.5 %)** in the served snapshot (measured 2026-10-18), so any
  * layout that leans on model images has 98.5 % of its slots empty. This draws one
- * instead — a deterministic halftone monogram, the way a small paper sets a
+ * instead - a deterministic halftone monogram, the way a small paper sets a
  * photograph it does not have.
  *
  * Deterministic matters: the same slug must produce the same plate on the server
  * and after hydration, on every page, forever. So the only input is the slug.
  *
  * Cheap by construction: a 6 px dot `<pattern>` masked by one radial gradient is
- * three SVG elements per plate, not a loop of a hundred circles — a front page
+ * three SVG elements per plate, not a loop of a hundred circles - a front page
  * prints twenty of these.
  */
 const FOCUS_POINTS = [

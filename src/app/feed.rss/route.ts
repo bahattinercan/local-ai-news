@@ -9,14 +9,14 @@ export async function GET(request: NextRequest) {
   const lang = request.nextUrl.searchParams.get("lang") ?? "en";
   const category = request.nextUrl.searchParams.get("category") ?? undefined;
   /* One origin for the whole site: the RSS channel link must never disagree with
-     the canonical host (docs/en/SEO-PLAN.md §14 Q1, v3 — no custom domain). */
+     the canonical host (docs/en/SEO-PLAN.md §14 Q1, v3 - no custom domain). */
   const base = SITE_URL;
 
   // The feed mirrors /news, which excludes papers since the two surfaces split.
   const items = await getNews({ windowDays: 7, scope: "news", category, limit: 50 });
 
   const xml = buildRss({
-    title: `OpenWeight Radar${category ? ` — ${category}` : ""}`,
+    title: `OpenWeight Radar${category ? ` - ${category}` : ""}`,
     link: `${base}/${lang}/news`,
     description: "New open-weight models you can run locally",
     language: lang,

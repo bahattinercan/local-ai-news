@@ -11,7 +11,7 @@
 
 /**
  * Categorical fills, ordered so the biggest slice is the accent and the second is
- * ink — the printed page's two real colours (docs/en/DESIGN-V3.md D8). The rest
+ * ink - the printed page's two real colours (docs/en/DESIGN-V3.md D8). The rest
  * are the status tokens, which `scripts/contrast.ts` keeps verifiable rather than
  * hand-picked per chart.
  *
@@ -40,7 +40,7 @@ export const FOLDED_COLOR = "var(--muted)";
 /**
  * Share donut with a legend.
  *
- * Colours without labels are unreadable — the reader could see eight arcs and
+ * Colours without labels are unreadable - the reader could see eight arcs and
  * match none of them to a category. The legend carries the swatch, the label,
  * the count and the share; a folded slice names the categories it holds, because
  * "Other 44" alone is a number nobody can check.

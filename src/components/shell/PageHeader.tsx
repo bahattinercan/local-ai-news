@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
  *
  * One shape for all of them: a 3 px ink rule, an optional kicker, the route's
  * `h1` set in the display face, and one sentence. The nameplate above already
- * carries the site's display size, so this is a *strap line* — 24 px, not 38 —
+ * carries the site's display size, so this is a *strap line* - 24 px, not 38 -
  * and the rule is what makes it read as a section head rather than a heading
  * floating on a page.
  *

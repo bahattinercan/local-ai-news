@@ -1,8 +1,8 @@
-# SEO planı — 252 ilan edilen URL'den bulunabilir bir arşive
+# SEO planı - 252 ilan edilen URL'den bulunabilir bir arşive
 
 > İngilizce kaynak: [docs/en/SEO-PLAN.md](../en/SEO-PLAN.md)
 > Durum: **plan**, 2026-10-20'de yazıldı. §11'deki hiçbir madde henüz uygulanmadı.
-> Üretim dağıtımına (`https://local-ai-news.vercel.app`, uygulamanın kendi ilan ettiği origin) ve `:3000`'deki yerel `next dev` sunucusuna karşı ölçüldü; sunulan snapshot `generatedAt 2026-10-20T20:42:42Z` — **1 402 model, 529'u kalite kapısını geçmiş, 210 haber** (repodaki yedek: 915 / 347 / 104).
+> Üretim dağıtımına (`https://local-ai-news.vercel.app`, uygulamanın kendi ilan ettiği origin) ve `:3000`'deki yerel `next dev` sunucusuna karşı ölçüldü; sunulan snapshot `generatedAt 2026-10-20T20:42:42Z` - **1 402 model, 529'u kalite kapısını geçmiş, 210 haber** (repodaki yedek: 915 / 347 / 104).
 > Kapsam: taranabilirlik, dizin politikası, metadata, yapısal veri, içerik derinliği, talebi yakalama. Kapsam dışı: ücretli reklam, bağlantı satın alma, CMS taşıma, 1 400 varlık sayfasının makine çevirisi.
 >
 > **Revizyon 2 (2026-10-20):** rakip/SERP kanıtı (§2.1), kazanma koşullarıyla sorgu portföyü (§2.2), gerçekçi SERP özellikleri listesi (§2.3), alan adı taşıma runbook'u (§3.5), içerik kalite rubriği (§7.7), iç bağlantı matrisi (§8.1), olay enstrümantasyonu ve dizin hızlandırıcıları (§10.4–10.6), 90 günlük takvim (§11.5), bağlantı kazanımı (§11.6), budama (§11.7) ve dosya düzeyinde uygulama haritası (§16) eklendi. Üç önceki varsayım düzeltildi: bir model sayfası puanlama olmadan Software App zengin sonucu kazanamaz; FAQ/HowTo işaretlemesi zengin sonuç kaldıracı değildir; genel bir VRAM hesaplayıcı P2 farklılaştırıcısı olamayacak kadar kalabalıktır.
@@ -13,13 +13,13 @@
 
 Ürünün zor kısmı zaten var: benzersiz bir veri kümesi, dokuz kategori masası, sözlük, istatistik masası, haber, RSS, JSON-LD ve iki dil. Tarayıcının bunu okuyabilmesini sağlayan tesisat ise yok.
 
-- **Ölçtüğümüz her içerik rotası aynı `<title>` ve aynı açıklamayı döndürüyor.** Üretimde (2026-10-20) `/`, `/models`, `/c/llm`, `/m/…`, `/news`, `/glossary/gguf` ve `/stats` ölçüldü: yedisi de `OpenWeight Radar — New open-weight models you can run locally` döndürüyor. Rota düzeyinde `generateMetadata` yalnızca `/compare`'da var (`[locale]` layout'u site geneli tek değeri sağlıyor); TR'de yalnızca kabuk tagline'ı değişiyor.
+- **Ölçtüğümüz her içerik rotası aynı `<title>` ve aynı açıklamayı döndürüyor.** Üretimde (2026-10-20) `/`, `/models`, `/c/llm`, `/m/…`, `/news`, `/glossary/gguf` ve `/stats` ölçüldü: yedisi de `OpenWeight Radar - New open-weight models you can run locally` döndürüyor. Rota düzeyinde `generateMetadata` yalnızca `/compare`'da var (`[locale]` layout'u site geneli tek değeri sağlıyor); TR'de yalnızca kabuk tagline'ı değişiyor.
 - **Hiçbir rotada canonical, hreflang, Open Graph veya Twitter card yok.** Ölçüm: `/en` üzerinde 0 `rel="canonical"`, 0 `hreflang`, 0 `property="og:*"`.
-- **Sitemap 252 URL ilan ediyor ve sıfır model sayfası içeriyor.** Locale başına 1 402 model sayfası var — **2 804 URL yapısal olarak görünmez**. Haber listesi ayrıca 200'de sabitlenmiş, oysa sunulan snapshot'ta 210 öğe var; yani en az 10 sayfa hiç ilan edilemiyor.
-- **Var olmayan model, haber ve kategori URL'leri `200` dönüyor** — GSC'nin "soft 404" olarak raporlayacağı üç sınıf.
+- **Sitemap 252 URL ilan ediyor ve sıfır model sayfası içeriyor.** Locale başına 1 402 model sayfası var - **2 804 URL yapısal olarak görünmez**. Haber listesi ayrıca 200'de sabitlenmiş, oysa sunulan snapshot'ta 210 öğe var; yani en az 10 sayfa hiç ilan edilemiyor.
+- **Var olmayan model, haber ve kategori URL'leri `200` dönüyor** - GSC'nin "soft 404" olarak raporlayacağı üç sınıf.
 - **Locale yönlendirmeleri `307`**, `308` değil; hem `/` hem de prefix'siz yollar için.
 - **Her HTML yanıtı `Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate`.** ISR yok, CDN isabeti yok, tarayıcı ve okur için en kötü TTFB.
-- **Sunulan snapshot'ta 0 model kartı özeti var.** Modellerin %7,5'i parametre, %31'i lisans, %18'i dosya bildiriyor. Model sayfalarının çoğu birkaç `—` satırlı spec ızgarası ve model hakkında tek cümle değil.
+- **Sunulan snapshot'ta 0 model kartı özeti var.** Modellerin %7,5'i parametre, %31'i lisans, %18'i dosya bildiriyor. Model sayfalarının çoğu birkaç `-` satırlı spec ızgarası ve model hakkında tek cümle değil.
 - **RSS öğeleri site dışına bağlanıyor** (`huggingface.co`, `github.com`); yem, sitenin zaten ürettiği 210 kanonik detay sayfasından okuru ve bağlantı değerini uzaklaştırıyor.
 - **Kodun kendi varsayılanındaki marka alan adı (`openweightradar.com`) NXDOMAIN.** Üretim yalnızca `NEXT_PUBLIC_SITE_URL` `vercel.app` hostunu gösterdiği için çalışıyor.
 
@@ -45,20 +45,20 @@ Plan bilinçli olarak URL sayısına göre değil, kaldıraca göre sıralı: **
 
 | Rota | Doküman başlığı | Canonical | hreflang | OG/Twitter | Durum |
 |---|---|---|---|---|---|
-| `/` | site başlığı | — | — | — | `307 → /en` |
-| `/en` | site başlığı | — | — | — | 200 |
-| `/en/models` | site başlığı | — | — | — | 200 |
-| `/en/c/llm` | site başlığı | — | — | — | 200 |
-| `/en/m/realrebelai-MOSS-Imagine_ComfyUI` | site başlığı | — | — | — | 200 |
-| `/en/news` | site başlığı | — | — | — | 200 |
-| `/en/glossary/gguf` | site başlığı | — | — | — | 200 |
-| `/en/stats` | site başlığı | — | — | — | 200 |
-| `/en/compare?ids=…` | ikili başlığı | var | — | — | 200, `noindex` |
-| `/en/m/does-not-exist` | site başlığı | — | — | — | **200 (soft 404)** |
-| `/en/n/does-not-exist` | site başlığı | — | — | — | **200 (soft 404)** |
-| `/en/c/notacategory` | site başlığı | — | — | — | **200 (soft 404)** |
-| `/en/glossary/nope` | 404 sayfası | — | — | — | 404 ✓ |
-| `/models` (locale'siz) | — | — | — | — | `307 → /en/models` |
+| `/` | site başlığı | - | - | - | `307 → /en` |
+| `/en` | site başlığı | - | - | - | 200 |
+| `/en/models` | site başlığı | - | - | - | 200 |
+| `/en/c/llm` | site başlığı | - | - | - | 200 |
+| `/en/m/realrebelai-MOSS-Imagine_ComfyUI` | site başlığı | - | - | - | 200 |
+| `/en/news` | site başlığı | - | - | - | 200 |
+| `/en/glossary/gguf` | site başlığı | - | - | - | 200 |
+| `/en/stats` | site başlığı | - | - | - | 200 |
+| `/en/compare?ids=…` | ikili başlığı | var | - | - | 200, `noindex` |
+| `/en/m/does-not-exist` | site başlığı | - | - | - | **200 (soft 404)** |
+| `/en/n/does-not-exist` | site başlığı | - | - | - | **200 (soft 404)** |
+| `/en/c/notacategory` | site başlığı | - | - | - | **200 (soft 404)** |
+| `/en/glossary/nope` | 404 sayfası | - | - | - | 404 ✓ |
+| `/models` (locale'siz) | - | - | - | - | `307 → /en/models` |
 
 ### 1.3 Ölçülmüş kusurlar
 
@@ -80,7 +80,7 @@ Plan bilinçli olarak URL sayısına göre değil, kaldıraca göre sıralı: **
 | **D14** | Doğrulama, analitik veya OG görseli yok | `google-site-verification` yok, Bing token'ı yok, analitik betiği yok, `opengraph-image` rotası yok | Aksiyon alınacak veri yok; ölçüm döngüsü yok | P0 |
 | **D15** | Marka alan adı çözümlenmiyor | `openweightradar.com` → NXDOMAIN; üretim `local-ai-news.vercel.app` kullanıyor | Otorite paylaşılan bir `*.vercel.app` hostunda birikir, üründe değil | P0 (sahip) |
 
-### 1.4 Zaten doğru olanlar — bozmayın
+### 1.4 Zaten doğru olanlar - bozmayın
 
 - Locale önekli rotalar ve `<html lang>`; sözlükler tek string kaynağı.
 - Rota başına bir `<h1>`; gerçek sayfa tipleri (ön sayfa, dizin, kategori, model, haber, sözlük, istatistik, karşılaştırma).
@@ -152,9 +152,9 @@ Hiçbir anahtar kelime hacmi iddia edilmiyor; hiçbiri bir anahtar kelime aracı
 | 5 | Tanım | "what is quantization", "Q4_K_M", "gguf vs safetensors" / "quantization nedir" | `/glossary/*` | Bloglar, dokümanlar | Tanım + snapshot'tan canlı kanıt + hesaplayıcı + model bağlantıları | P1–P2 |
 | 6 | Kategori | "open weight video models", "local image generation models", "open embedding models" | `/c/*` | Genel listeler | Kategori başına sayı, runner kapsamı, kapı, medyan VRAM | P2 |
 | 7 | Veri / istatistik | "open weight model statistics", "how many open models released" | `/stats` + aylık çalışma | Güçlü kimse yok | CSV'li ve aylık bulgulu atıflanabilir veri kümesi | P3 |
-| 8 | Marka / navigasyon | "OpenWeight Radar" | `/`, `/about` | — | Tutarlı `Organization`, `sameAs`, about/method sayfaları | P0–P1 |
+| 8 | Marka / navigasyon | "OpenWeight Radar" | `/`, `/about` | - | Tutarlı `Organization`, `sameAs`, about/method sayfaları | P0–P1 |
 
-### 2.3 Beklenen SERP özellikleri — ve alamayacaklarımız
+### 2.3 Beklenen SERP özellikleri - ve alamayacaklarımız
 
 | Özellik | Gerçekçi mi? | Neden / eylem |
 |---|---|---|
@@ -172,7 +172,7 @@ Hiçbir anahtar kelime hacmi iddia edilmiyor; hiçbiri bir anahtar kelime aracı
 
 ---
 
-## 3. Dizin politikası — sözleşme
+## 3. Dizin politikası - sözleşme
 
 ### 3.1 Rota matrisi
 
@@ -193,8 +193,8 @@ Hiçbir anahtar kelime hacmi iddia edilmiyor; hiçbiri bir anahtar kelime aracı
 | `/{locale}/compare` (idsiz) | evet | kendisi | evet | araç açılış sayfası |
 | `/{locale}/compare?ids=…` | **hayır** | tekilleştirilmiş, sıra korunmuş | hayır | zaten uygulanmış; koru |
 | `/{locale}/guides/*`, `/tools/*` (P2) | evet | kendisi | evet | yalnızca küratörlü |
-| `/api/*` | hayır | — | hayır | robots'ta `Disallow: /api/` |
-| 404 / not-found | hayır | — | hayır | gerçek 404 durumu + `noindex` |
+| `/api/*` | hayır | - | hayır | robots'ta `Disallow: /api/` |
+| 404 / not-found | hayır | - | hayır | gerçek 404 durumu + `noindex` |
 
 ### 3.2 Model yüklemi (ölçülmüş hacim)
 
@@ -218,7 +218,7 @@ export function isIndexableModel(model: ClassifiedModel): boolean {
 | **`qualityPassed && (specCount ≥ 4 \|\| summary ≥ 200)`** | **430** | **860** |
 | `qualityPassed && specCount ≥ 5` | 324 | 648 |
 
-430 ile başla; kart doldurma gelince aynı yüklem otomatik olarak 529'un tamamına genişler (§7.1). Kapıyı geçmeyen modeller `noindex, follow` kalır ama erişilebilir, karşılaştırılabilir ve bağlantılanabilir olur — kapı bir kalite sinyali olarak kalır, duvar olmaz.
+430 ile başla; kart doldurma gelince aynı yüklem otomatik olarak 529'un tamamına genişler (§7.1). Kapıyı geçmeyen modeller `noindex, follow` kalır ama erişilebilir, karşılaştırılabilir ve bağlantılanabilir olur - kapı bir kalite sinyali olarak kalır, duvar olmaz.
 
 ### 3.3 Sorgu dizesi politikası
 
@@ -226,7 +226,7 @@ export function isIndexableModel(model: ClassifiedModel): boolean {
 - `page` istisnadır: ayrı bir dokümandır ve kendine canonical'dır.
 - Filtreli sayfalar `robots: { index: false, follow: true }` ve çıplak rotaya işaret eden `alternates.canonical` döndürür. `follow` önemli: filtreli sayfalar model sayfalarına bağlanır.
 - `/compare?ids=…` mevcut `noindex` + tekilleştirilmiş canonical'ını korur (sitedeki bugünkü tek doğru uygulama).
-- Sitemap'e sorgu URL'si koyma ve `noindex` taşıyan bir URL'yi `Disallow` etme — tarayıcı direktifi görebilmelidir.
+- Sitemap'e sorgu URL'si koyma ve `noindex` taşıyan bir URL'yi `Disallow` etme - tarayıcı direktifi görebilmelidir.
 
 ### 3.4 404'ler ve yönlendirmeler
 
@@ -247,7 +247,7 @@ Next 404 durumunu yalnızca **streaming başlamadan önce** döndürür; sonras�
 
 Site bugün `local-ai-news.vercel.app` üzerinde canlı, kodun varsayılanı ise NXDOMAIN olan `openweightradar.com`. Dizinleme başladıktan sonra taşımak, şimdi taşımaktan daha pahalıdır.
 
-1. **Tek host seç** — apex (`https://openweightradar.com`) veya `www` — diğerini kalıcı olarak 308'le ona yönlendir. İkisini birden asla sunma.
+1. **Tek host seç** - apex (`https://openweightradar.com`) veya `www` - diğerini kalıcı olarak 308'le ona yönlendir. İkisini birden asla sunma.
 2. Vercel'de alan adını ekle, bastığı DNS kayıtlarını gir, TLS'i bekle. Alan adı çözülmeden duyuru yapma.
 3. `NEXT_PUBLIC_SITE_URL`'i Production/Preview'da son origin yap, yeniden dağıt ve sitemap, robots, RSS, canonical ve OG URL'lerinin **aynı** hostu bastığını doğrula.
 4. `local-ai-news.vercel.app/*` → özel host 308'ini platform seviyesinde, Next'ten önce kur. En az 12 ay tut.
@@ -268,7 +268,7 @@ const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://openweightradar.com";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: {
-    default: "OpenWeight Radar — open-weight models you can run locally",
+    default: "OpenWeight Radar - open-weight models you can run locally",
     template: "%s · OpenWeight Radar"
   },
   description: "Track new open-weight AI models you can run locally: params, VRAM, quantization, runners and license, updated every 10 minutes.",
@@ -303,19 +303,19 @@ Dinamik rotalarda başlıklar mutlaktır; marka soneki varlığı ~60 karakterin
 
 | Rota | Başlık | Açıklama |
 |---|---|---|
-| `/` | `OpenWeight Radar — open-weight models you can run locally` | `1 402 open-weight models tracked, 529 pass the quality gate. New LLM, image, video, audio and coding models you can run locally, updated every 10 minutes.` |
-| `/models` | `All open-weight models — OpenWeight Radar` | `Browse every tracked model: filter by window, runner, params and license. 430 pages with full specs, 9 categories, updated hourly.` |
-| `/c/{category}` | `New {label} models you can run locally — OpenWeight Radar` | `{N} new {label} models first seen in the last {window}. Filter by runner, params and license; sorted by downloads, likes or recency.` |
-| `/m/{slug}` | `{repoId} — {params?} local {category} model` (60'a kısalt) | `{repoId}: {params} {category} model first seen {date}. {quantizations} · {runners} · ~{vram} GB VRAM · {license}. Run command and file list.` |
-| `/n/{id}` | `{temiz başlık} — {kind} · OpenWeight Radar` | `newsText(...).body`'nin ilk 155 karakteri, URL'lerden arındırılmış. |
-| `/news` | `Local AI news — releases, runtimes and announcements` | `{N} model releases and runtime updates from the last {window}, with the source and the model each one mentions.` |
-| `/research` | `Open-weight AI papers — daily research feed` | `{N} papers from the Hugging Face daily feed, filtered to work that ships open weights you can run.` |
-| `/glossary` | `Local AI glossary — quantization, VRAM, GGUF, MoE` | `{15} terms behind the spec sheets, each with the numbers from the current snapshot and a VRAM calculator.` |
+| `/` | `OpenWeight Radar - open-weight models you can run locally` | `1 402 open-weight models tracked, 529 pass the quality gate. New LLM, image, video, audio and coding models you can run locally, updated every 10 minutes.` |
+| `/models` | `All open-weight models - OpenWeight Radar` | `Browse every tracked model: filter by window, runner, params and license. 430 pages with full specs, 9 categories, updated hourly.` |
+| `/c/{category}` | `New {label} models you can run locally - OpenWeight Radar` | `{N} new {label} models first seen in the last {window}. Filter by runner, params and license; sorted by downloads, likes or recency.` |
+| `/m/{slug}` | `{repoId} - {params?} local {category} model` (60'a kısalt) | `{repoId}: {params} {category} model first seen {date}. {quantizations} · {runners} · ~{vram} GB VRAM · {license}. Run command and file list.` |
+| `/n/{id}` | `{temiz başlık} - {kind} · OpenWeight Radar` | `newsText(...).body`'nin ilk 155 karakteri, URL'lerden arındırılmış. |
+| `/news` | `Local AI news - releases, runtimes and announcements` | `{N} model releases and runtime updates from the last {window}, with the source and the model each one mentions.` |
+| `/research` | `Open-weight AI papers - daily research feed` | `{N} papers from the Hugging Face daily feed, filtered to work that ships open weights you can run.` |
+| `/glossary` | `Local AI glossary - quantization, VRAM, GGUF, MoE` | `{15} terms behind the spec sheets, each with the numbers from the current snapshot and a VRAM calculator.` |
 | `/glossary/{slug}` | `{term}: {kısa tanım}` (≤ 60) | `{summary} Definition, evidence from {N} tracked models, and a VRAM calculator.` |
-| `/stats` | `Open-weight model statistics — the Data Desk` | `1 402 models tracked, 529 pass the gate, {median} median downloads. Category share, runner coverage, gate pass rate and daily cadence.` |
+| `/stats` | `Open-weight model statistics - the Data Desk` | `1 402 models tracked, 529 pass the gate, {median} median downloads. Category share, runner coverage, gate pass rate and daily cadence.` |
 | `/compare` | `Compare open-weight models side by side` | `Two to four models on one sheet: params, VRAM, quantization, runners, license, downloads per day and the differences that matter.` |
 
-`{params?}` segmentin `null` veya `—` basmadan temizce atlandığı anlamına gelir. Her başlık `src/lib/seo.ts` içinde saf bir fonksiyonla üretilir ve tüm alanları dolu bir model, hiç alanı olmayan bir model ve yalnızca özeti olan bir modelle birim testine bağlanır.
+`{params?}` segmentin `null` veya `-` basmadan temizce atlandığı anlamına gelir. Her başlık `src/lib/seo.ts` içinde saf bir fonksiyonla üretilir ve tüm alanları dolu bir model, hiç alanı olmayan bir model ve yalnızca özeti olan bir modelle birim testine bağlanır.
 
 ### 4.3 hreflang kuralları
 
@@ -338,13 +338,13 @@ Dinamik rotalarda başlıklar mutlaktır; marka soneki varlığı ~60 karakterin
 
 | Sayfa | Tipler | Gerekli / önerilen alanlar | Kural |
 |---|---|---|---|
-| Site geneli (`layout`) | `WebSite`, `Organization` | `name`, `url`, `inLanguage`, `publisher.logo`, `sameAs` (varsa GitHub, Hugging Face org, X) | `SearchAction` yok — Google sitelinks arama kutusunu kaldırdı; grafiği dürüst tut. |
-| Model | `SoftwareApplication` + `BreadcrumbList` | `name`, `applicationCategory: "DeveloperApplication"`, `applicationSubCategory` (kategori etiketi), `operatingSystem`, `offers: { price: 0, priceCurrency: "USD" }`, `license`, `datePublished`, `dateModified`, `url` (iç), `sameAs` (HF), `keywords`, `isPartOf` | HF URL'sini asla `url`'e koyma; `sameAs`'e gider. Lisans ticari kullanımı yasaklıyorsa `offers`'ı çıkarma? Hayır — fiyat 0 hâlâ doğru; kısıt `license` içinde. |
+| Site geneli (`layout`) | `WebSite`, `Organization` | `name`, `url`, `inLanguage`, `publisher.logo`, `sameAs` (varsa GitHub, Hugging Face org, X) | `SearchAction` yok - Google sitelinks arama kutusunu kaldırdı; grafiği dürüst tut. |
+| Model | `SoftwareApplication` + `BreadcrumbList` | `name`, `applicationCategory: "DeveloperApplication"`, `applicationSubCategory` (kategori etiketi), `operatingSystem`, `offers: { price: 0, priceCurrency: "USD" }`, `license`, `datePublished`, `dateModified`, `url` (iç), `sameAs` (HF), `keywords`, `isPartOf` | HF URL'sini asla `url`'e koyma; `sameAs`'e gider. Lisans ticari kullanımı yasaklıyorsa `offers`'ı çıkarma? Hayır - fiyat 0 hâlâ doğru; kısıt `license` içinde. |
 | Haber | `NewsArticle` + `BreadcrumbList` | `headline`, `datePublished`, `dateModified`, `mainEntityOfPage` (iç), `url` (iç), `image` (varsa küçük resim), `publisher` = Radar + logo, `author` = biliniyorsa kaynak kuruluş, `isBasedOn` = kaynak URL, `articleSection` | Sayfa gövdeyi yeniden yayınlamıyor; `isBasedOn` kaynağa dürüst bağdır. Google'ın Article yönergeleri headline, image, datePublished, author ve publisher ister; kaynak kuruluş bilinmiyorsa grafiği geçerli tut ve yazar uydurmak yerine öğenin zengin sonuç kazanamayabileceğini kabul et. |
 | Listeler (`/models`, `/c/*`, `/news`, `/research`) | `ItemList` + `BreadcrumbList` | **iç** URL'lerle `itemListElement`, `numberOfItems`, `itemListOrder` | Yalnızca o sayfada gerçekten çizilen öğeleri kullan. |
 | Sözlük dizini/terimi | `DefinedTermSet` / `DefinedTerm` + `BreadcrumbList` | mevcut alanlar | Koru; metin değişince `dateModified` ekle. |
 | İstatistik | `Dataset` (opsiyonel) | `name`, `description`, `temporalCoverage`, `creator`, `isAccessibleForFree`, `distribution` → `/api/stats` | Yalnızca sahibi veri kümesini lisanslamaya razıysa; aksi hâlde düz `WebPage`. |
-| Id'li karşılaştırma | yok (`noindex`) | — | Dizine uygun olmayan sayfada yapısal veri boşa giden bayttır. |
+| Id'li karşılaştırma | yok (`noindex`) | - | Dizine uygun olmayan sayfada yapısal veri boşa giden bayttır. |
 
 Mevcut kodda ölçülen tuzaklar:
 - Model sayfasının `CreativeWork.url` değeri Hugging Face URL'si, haber `NewsArticle.url` değeri dış kaynak. İkisi de Google'a "bu sayfa site dışı bir dokümanın kopyası" der. §4 ile aynı commit'te düzelt.
@@ -394,7 +394,7 @@ Sitemap: https://<kanonik-host>/sitemap.xml
 ```
 
 - `/api/` JSON'dur, içerik değil; tarama bütçesini sayfalarda tutmak için yasakla.
-- Filtreleri, `?page=`'i veya `/compare?ids=`'i `Disallow` etme — bunlar `noindex` taşır ve tarayıcı direktifi okuyabilmelidir.
+- Filtreleri, `?page=`'i veya `/compare?ids=`'i `Disallow` etme - bunlar `noindex` taşır ve tarayıcı direktifi okuyabilmelidir.
 - AI tarayıcılarına izin vermek bir ürün kararıdır (atıf ve yönlendirme mi, eğitim kullanımı mı). `DECISIONS.md`'ye yaz; yukarıdaki blok öneridir.
 - `Host:` direktifi yok (yalnızca Yandex, kullanımdan kalkmış).
 
@@ -411,7 +411,7 @@ Mevcut yem: 50 öğe, `<link>` dış kaynağa gidiyor, `atom:link rel="self"` ye
 
 ---
 
-## 7. İçerik derinliği — asıl sıralanan kısım
+## 7. İçerik derinliği - asıl sıralanan kısım
 
 ### 7.1 Model sayfaları
 
@@ -435,7 +435,7 @@ Sonra: özeti olmayan ve spec sayısı 4'ün altında olan model sayfasını diz
 | Bölüm | Kaynak | Bugün var | Kural |
 |---|---|---|---|
 | Nedir | `cardSummary` (README özeti, ≤ 600 karakter) | %0 | Dizin için zorunlu; atıf + HF bağlantısı |
-| Spec'ler | params, depolama, quant'lar, runner'lar, kütüphane, VRAM, lisans, popülerlik | %7,5–74,9 | Yalnızca dolu satırları bas; `—` ızgarası yok |
+| Spec'ler | params, depolama, quant'lar, runner'lar, kütüphane, VRAM, lisans, popülerlik | %7,5–74,9 | Yalnızca dolu satırları bas; `-` ızgarası yok |
 | Çalıştır | `runCommand(model)` + runner başına komutlar | %100 (türetilmiş) | Tespit edildiğinde `llama.cpp`, `Ollama`, `MLX` varyantlarını göster |
 | VRAM tablosu | 4/8/16/24 GB ve 4k/8k bağlamda `estimateVramGb` | params %7,5 | Parametre yoksa tabloyu gizle, hesaplayıcıyı göster |
 | Dosyalar | `files` | %18,1 | Koru; repo başına benzersiz |
@@ -474,7 +474,7 @@ Sitenin zaten en iyi içeriği. Baştan yazma, genişlet:
 - Metin değişince `DefinedTerm`'e `dateModified` ekle.
 - Sözlük dizini `?q=`'yi zaten yanıtlıyor; `noindex` kalsın ama sonuçlar terimlere bağlansın.
 
-### 7.5 Talep yüzeyleri (P2 — en fazla 12; `/best/*` P3'e ertelendi)
+### 7.5 Talep yüzeyleri (P2 - en fazla 12; `/best/*` P3'e ertelendi)
 
 | URL | Sorgu niyeti | Neden sıralanabilir | İhtiyaç duyduğu veri |
 |---|---|---|---|
@@ -653,7 +653,7 @@ Beş sayıyı `docs/en/SEO-LOG.md`'ye (yeni, haftada bir satır) yaz; böylece s
 
 ## 11. Fazlar
 
-### P0 — taranabilir ve ölçülebilir (1–3 gün)
+### P0 - taranabilir ve ölçülebilir (1–3 gün)
 
 | Görev | Dosyalar | Kabul |
 |---|---|---|
@@ -667,7 +667,7 @@ Beş sayıyı `docs/en/SEO-LOG.md`'ye (yeni, haftada bir satır) yaz; böylece s
 | robots: `/api/` yasak, sitemap listesi, AI tarayıcı politikası | `robots.ts` | metin §6.2 ile aynı |
 | GSC + Bing doğrulaması, sitemap gönderimi, analitik | env + platform | property'ler doğrulandı, sitemap "Success" |
 
-### P1 — dizin politikası ve yapısal veri (3–5 gün)
+### P1 - dizin politikası ve yapısal veri (3–5 gün)
 
 | Görev | Dosyalar | Kabul |
 |---|---|---|
@@ -679,25 +679,25 @@ Beş sayıyı `docs/en/SEO-LOG.md`'ye (yeni, haftada bir satır) yaz; böylece s
 | ISR + önbellekli snapshot, `no-store`'u kaldır | rota dosyaları, `lib/store.ts` | yanıt `s-maxage` taşır |
 | `seo-audit.ts` + `npm run seo-audit` + CI | `scripts/`, workflow | test dalında bilerek bozulan başlıkta düşer |
 
-### P2 — içerik derinliği (1–2 hafta)
+### P2 - içerik derinliği (1–2 hafta)
 
 | Görev | Dosyalar | Kabul |
 |---|---|---|
 | Kart doldurma açlığını gider (bütçe ayır veya ayrı workflow adımı) | `lib/ingest.ts`, `.github/workflows/ingest.yml` | sunulan snapshot: 5 turda geçen modellerin ≥ %80'inde ≥ 200 karakter özet |
-| Model sayfası: veriden türeyen bölümler, boş başlık yok, benzer modeller, provenance | `m/[slug]/page.tsx` | dizine uygun modellerde ≥ 150 kelime benzersiz düzyazı; yalnızca `—` ızgarası yok |
+| Model sayfası: veriden türeyen bölümler, boş başlık yok, benzer modeller, provenance | `m/[slug]/page.tsx` | dizine uygun modellerde ≥ 150 kelime benzersiz düzyazı; yalnızca `-` ızgarası yok |
 | Kategori girişi + SSS metni iki sözlükte | `i18n/*.json`, `c/[category]/page.tsx` | 9 × 2 sayfa, 150–250 kelime ve snapshot sayıları |
 | Haber → model çözümü ingest'te | `lib/ingest.ts`, `lib/model-mentions.ts` | repo adı geçen haberlerin > %50'sinde `modelSlug` |
 | 7 rehber; VRAM aracı yalnızca §7.5 koşulu tutarsa (9 `/best/*` sayfası P3'te, yalnızca her biri farklıysa) | yeni rotalar | her biri benzersiz veri tablosu + ≥ 150 kelime |
 | Sözlük 15 → 25 terim, TR tanımlarla | `lib/glossary.ts`, sözlükler | 50 dizine uygun terim sayfası |
 | OG görsel rotaları | segment başına `opengraph-image.tsx` | `og:image` 200, 1200×630, Türkçe glifler çizilir |
 
-### P3 — otorite ve iterasyon (sürekli)
+### P3 - otorite ve iterasyon (sürekli)
 
 - `/stats`'tan ayda bir veri çalışması yayınla (ör. "1 400 açık ağırlıklı sürüm VRAM ve indirme hakkında ne söylüyor"), atıf bloğu ve CSV indirmesiyle; bu bağlantı mıknatısıdır.
-- Çalışmayı bültenlere/topluluklara duyur (r/LocalLLaMA, Hacker News, TLDR AI) — ücretli bağlantı yok.
+- Çalışmayı bültenlere/topluluklara duyur (r/LocalLLaMA, Hacker News, TLDR AI) - ücretli bağlantı yok.
 - En iyi 20 model çifti için küratörlü karşılaştırmalar; `?ids=` permütasyonları `noindex` kalsın.
 - Üç aylık içerik tazeleme: hiç gösterim kazanmayan `noindex` sayfaları buda, kopyaları birleştir, kategori metnini güncelle.
-- Deney günlüğü: başlık formülleri, açıklama formülleri, OG varyantları — her seferinde tek değişiklik, 28 günlük pencereler.
+- Deney günlüğü: başlık formülleri, açıklama formülleri, OG varyantları - her seferinde tek değişiklik, 28 günlük pencereler.
 
 ### 11.5 90 günlük takvim
 
@@ -720,10 +720,10 @@ Beş sayıyı `docs/en/SEO-LOG.md`'ye (yeni, haftada bir satır) yaz; böylece s
 
 Bağlantılanabilir varlıklar, güç sırasına göre:
 
-1. **Aylık veri çalışması** — `/stats`'tan, CSV ve atıf bloğuyla ("1 400 açık ağırlıklı sürüm VRAM ve indirme hakkında ne söylüyor"). Bir gazetecinin veya bültenin atıflayabileceği tek varlık bu.
-2. **Uyum tabloları** ("8 GB'a sığan modeller, gerçek dosya boyutlarıyla") — hiçbir genel hesaplayıcıda yok.
+1. **Aylık veri çalışması** - `/stats`'tan, CSV ve atıf bloğuyla ("1 400 açık ağırlıklı sürüm VRAM ve indirme hakkında ne söylüyor"). Bir gazetecinin veya bültenin atıflayabileceği tek varlık bu.
+2. **Uyum tabloları** ("8 GB'a sığan modeller, gerçek dosya boyutlarıyla") - hiçbir genel hesaplayıcıda yok.
 3. **Canlı kanıtlı sözlük** (15–25 terim, her biri snapshot sayılarıyla).
-4. **Açık snapshot/API** (`/api/stats`, `/api/feed`) — araştırmacılar ve küçük araçlar için.
+4. **Açık snapshot/API** (`/api/stats`, `/api/feed`) - araştırmacılar ve küçük araçlar için.
 
 Hedefler ve kurallar:
 
@@ -809,16 +809,16 @@ P0/P1 sonrası beklenen: 7/7 farklı başlık, 3 canonical/hreflang çifti, 3/3 
 
 ---
 
-## 14. Açık sorular (sahibin kararı) — altısı da 2026-10-22'de yanıtlandı
+## 14. Açık sorular (sahibin kararı) - altısı da 2026-10-22'de yanıtlandı
 
 Her soru başlığını koruyor; yanıt ve tek satırlık sonucu altında duruyor. Uygulama §15.3'te.
 
-1. **Özel alan adı şimdi mi?** — **Özel alan adı yok.** `src/lib/seo.ts` içindeki `FALLBACK_SITE_URL` ile `.env.example` içindeki `NEXT_PUBLIC_SITE_URL` artık `https://local-ai-news.vercel.app` diyor; `src/app/feed.rss/route.ts` kendi kopyasını taşımak yerine ortak `SITE_URL`'i kullanıyor. Sonuç: tek kanonik origin `vercel.app` hostu; §3.5'teki taşıma runbook'u uygulanmıyor, S1'in "gerçek alan adı" yarısı ertelenmiş değil, aleyhine karar verilmiş durumda.
-2. **AI tarayıcı politikası:** — **Yalnızca aramaya izin.** `robots.ts` `*` için `Allow: /` + `Disallow: /api/` kuralını ve sitemap'i koruyor, üstüne GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai ve Diffbot için tek bir ret grubu (`Disallow: /`) ekliyor. Sonuç: eğitim ve fetch ajanları okuyacak bir şey bulamıyor; `PerplexityBot` ile `OAI-SearchBot` atıf ve bağlantıyla yanıt verdikleri için izinli kalıyor — tek yargı kararı, tek satırla çevrilebilir.
-3. **Veri kümesi lisansı:** — **Atıflanabilir veri kümesi olarak yayınlanamaz.** Sonuç: `Dataset` şeması yok (§5'teki opsiyonel satır inşa edilmiyor), CSV dışa aktarımı yok ve `/stats`'tan aylık veri çalışması yok (§11.5 satır 9, §11.6).
-4. **TR varlık sayfaları:** — **Çevriliyor.** `category.<desk>.intro` ve masa başına üç yanıtlı SSS artık iki sözlükte de var (9 masa) ve `c/[category]` üzerinde çiziliyor. Sonuç: TR kategori sayfaları, Türkçe kabuk altındaki İngilizce metin yerine kendi 150–250 kelimelik girişini ve SSS'ini taşıyor.
-5. **Kapıyı geçmeyen modeller:** — **≥ 6 spec'i olanlar dizine giriyor.** Sekiz spec alanından altısını veya fazlasını bildiren model, kalite kapısı ne derse desin dizine uygun. Sonuç: `data/feed.json` üzerinde ölçüldü, dizine uygun model 251 → 252, sitemap 792 → 794 URL.
-6. **Analitik:** — **Vercel Analytics.** `@vercel/analytics` 2.0.1 locale kök layout'una bir kez monte edildi; çereksiz, dolayısıyla onay banner'ı yok. Sonuç: sahip Vercel projesinde Web Analytics'i açana kadar toplayıcı boş kalıyor.
+1. **Özel alan adı şimdi mi?** - **Özel alan adı yok.** `src/lib/seo.ts` içindeki `FALLBACK_SITE_URL` ile `.env.example` içindeki `NEXT_PUBLIC_SITE_URL` artık `https://local-ai-news.vercel.app` diyor; `src/app/feed.rss/route.ts` kendi kopyasını taşımak yerine ortak `SITE_URL`'i kullanıyor. Sonuç: tek kanonik origin `vercel.app` hostu; §3.5'teki taşıma runbook'u uygulanmıyor, S1'in "gerçek alan adı" yarısı ertelenmiş değil, aleyhine karar verilmiş durumda.
+2. **AI tarayıcı politikası:** - **Yalnızca aramaya izin.** `robots.ts` `*` için `Allow: /` + `Disallow: /api/` kuralını ve sitemap'i koruyor, üstüne GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai ve Diffbot için tek bir ret grubu (`Disallow: /`) ekliyor. Sonuç: eğitim ve fetch ajanları okuyacak bir şey bulamıyor; `PerplexityBot` ile `OAI-SearchBot` atıf ve bağlantıyla yanıt verdikleri için izinli kalıyor - tek yargı kararı, tek satırla çevrilebilir.
+3. **Veri kümesi lisansı:** - **Atıflanabilir veri kümesi olarak yayınlanamaz.** Sonuç: `Dataset` şeması yok (§5'teki opsiyonel satır inşa edilmiyor), CSV dışa aktarımı yok ve `/stats`'tan aylık veri çalışması yok (§11.5 satır 9, §11.6).
+4. **TR varlık sayfaları:** - **Çevriliyor.** `category.<desk>.intro` ve masa başına üç yanıtlı SSS artık iki sözlükte de var (9 masa) ve `c/[category]` üzerinde çiziliyor. Sonuç: TR kategori sayfaları, Türkçe kabuk altındaki İngilizce metin yerine kendi 150–250 kelimelik girişini ve SSS'ini taşıyor.
+5. **Kapıyı geçmeyen modeller:** - **≥ 6 spec'i olanlar dizine giriyor.** Sekiz spec alanından altısını veya fazlasını bildiren model, kalite kapısı ne derse desin dizine uygun. Sonuç: `data/feed.json` üzerinde ölçüldü, dizine uygun model 251 → 252, sitemap 792 → 794 URL.
+6. **Analitik:** - **Vercel Analytics.** `@vercel/analytics` 2.0.1 locale kök layout'una bir kez monte edildi; çereksiz, dolayısıyla onay banner'ı yok. Sonuç: sahip Vercel projesinde Web Analytics'i açana kadar toplayıcı boş kalıyor.
 
 ---
 
@@ -842,7 +842,7 @@ Her soru başlığını koruyor; yanıt ve tek satırlık sonucu altında duruyo
 - [ ] HTML ISR önbellekli; tek `no-store` yüzeyi `/api`.
 - [ ] Kart doldurma her ingest'te çalışıyor; kapıyı geçen modellerin ≥ %80'inde özet var.
 - [x] Kategori sayfalarında 150–250 kelime çevrilmiş giriş + SSS var.
-  - *(2. dalga, §15.3)* Q4: `category.<desk>.intro` ve masa başına üç yanıtlı SSS iki sözlükte de var — 9 masa × `en`/`tr`. Ölçülen: EN girişler 184–223 kelime, TR girişler 173–198, yanıtlar 50–81 kelime; `tests/i18n.test.ts` 150–250 ve 40–90 sınırlarını denetliyor.
+  - *(2. dalga, §15.3)* Q4: `category.<desk>.intro` ve masa başına üç yanıtlı SSS iki sözlükte de var - 9 masa × `en`/`tr`. Ölçülen: EN girişler 184–223 kelime, TR girişler 173–198, yanıtlar 50–81 kelime; `tests/i18n.test.ts` 150–250 ve 40–90 sınırlarını denetliyor.
 - [ ] Yedi rehber yayınlandı; VRAM hesaplayıcı yalnızca gerçek GGUF dosya boyutlarını okuyup model sayfalarına bağlanıyorsa yayınlandı (§7.5).
 - [ ] Her dizine uygun sayfa içerik rubriğinde ≥ 8/12 alıyor; < 6 sayfalar `noindex`.
 - [ ] IndexNow anahtarı sunuluyor ve her yayında değişen model/haber URL'leri pingleniyor.
@@ -857,19 +857,19 @@ Her soru başlığını koruyor; yanıt ve tek satırlık sonucu altında duruyo
 
 ---
 
-## 15.1 Uygulama günlüğü — P0 (2026-10-21)
+## 15.1 Uygulama günlüğü - P0 (2026-10-21)
 
 Tamamlananlar:
 
-- `src/lib/seo.ts` — canonical/alternate üreticileri, `specCount`/`isIndexableModel`/`isIndexableNews`, model/haber başlık ve açıklama üreticileri, liste yüzeyleri için `listMetadata`.
-- `[locale]/layout.tsx` — `metadataBase`, başlık şablonu, varsayılan açıklama, OG/Twitter varsayılanları, robots direktifleri, env'den GSC/Bing doğrulaması.
+- `src/lib/seo.ts` - canonical/alternate üreticileri, `specCount`/`isIndexableModel`/`isIndexableNews`, model/haber başlık ve açıklama üreticileri, liste yüzeyleri için `listMetadata`.
+- `[locale]/layout.tsx` - `metadataBase`, başlık şablonu, varsayılan açıklama, OG/Twitter varsayılanları, robots direktifleri, env'den GSC/Bing doğrulaması.
 - Ön sayfa, `/models`, `/c/*`, `/m/*`, `/n/*`, `/news`, `/research`, `/glossary`, `/glossary/*`, `/stats` ve `/compare` üzerinde `generateMetadata`.
 - Her dizine uygun rotada canonical + `en`/`tr`/`x-default`. Filtreli görünümler `noindex, follow` ve çıplak rotaya canonical; yalnızca `?page=N` `/models` ve `/c/*` üzerinde kendine canonical.
 - Bilinmeyen model/haber/kategori için `notFound()`; 3/3 probda gerçek 404. Next 16.4.0 HTML gövdesinde hâlâ kendi yerleşik 404 kabuğunu çiziyor (iç içe `not-found.tsx` dosyaları derleniyor ama kabuk tarafından kullanılmıyor); durum ve `noindex` doğru, gövde takip işi.
-- `/` ve locale'siz yollar için `308`, `Vary: Accept-Language` ile — CDN TR yönlendirmesini EN okura sunamasın.
+- `/` ve locale'siz yollar için `308`, `Vary: Accept-Language` ile - CDN TR yönlendirmesini EN okura sunamasın.
 - Sitemap: **1 342 URL** (32 çekirdek + 30 sözlük + 860 model + 420 haber), sorgu dizesi yok, `noindex` URL yok, gerçek `lastModified`, `x-default` ve snapshot'ta varsa görsel kayıtları.
 - `robots.txt`: `Disallow: /api/`, sitemap, açık AI tarayıcı izin listesi.
-- Sitemap taramasının bulduğu gizli 500 düzeltildi: `getNewsItem` ham satırı döndürüyordu; `organization` alanı nesne olan 40 makalenin detay sayfası (`{_id, name, fullname, avatar}`) çöküyordu — iki locale'de **80 URL**. Detay yolu artık listenin kullandığı `normalizeNews` korumasını kullanıyor.
+- Sitemap taramasının bulduğu gizli 500 düzeltildi: `getNewsItem` ham satırı döndürüyordu; `organization` alanı nesne olan 40 makalenin detay sayfası (`{_id, name, fullname, avatar}`) çöküyordu - iki locale'de **80 URL**. Detay yolu artık listenin kullandığı `normalizeNews` korumasını kullanıyor.
 
 Doğrulama, üretim derlemesi ve kanonik host yerel sunucuya eşlenerek:
 
@@ -895,11 +895,11 @@ Plandan sapmalar:
 
 ---
 
-## 15.2 Uygulama günlüğü — 1. dalga (2026-10-22)
+## 15.2 Uygulama günlüğü - 1. dalga (2026-10-22)
 
-Üç satır birlikte indi — denetim kapısı (P1), on yeni terim ve dört kart rotası (P2). Dağıtılmış sunucu olmadan, commit edilmiş snapshot üzerinde ölçüldü.
+Üç satır birlikte indi - denetim kapısı (P1), on yeni terim ve dört kart rotası (P2). Dağıtılmış sunucu olmadan, commit edilmiş snapshot üzerinde ölçüldü.
 
-- **`npm run seo-audit` + `.github/workflows/seo.yml` (P1).** Yedi kontrol — `meta`, `titles`, `canonical`, `alternates`, `sitemap`, `robots`, `index-policy` — rota modüllerinin kendi `generateMetadata()` fonksiyonlarına, gerçek `sitemap.ts`/`robots.ts` dosyalarına ve `lib/seo.ts` yüklemlerine karşı çalışıyor. Sonuç: **7/7 geçti, 792 sitemap URL'si, 38 sayfa** — 11 rota tipi × `en`/`tr` üzerinde 38 dizine uygun sayfa, 38 alternate çiftinde 38 kendine canonical, karşılıklı `en`/`tr`/`x-default` taşıyan 396 ilan edilmiş yol, `/api/` yasağı ve sitemap URL'si olan robots, 104 dizine uygun habere karşı 251 dizine uygun model.
+- **`npm run seo-audit` + `.github/workflows/seo.yml` (P1).** Yedi kontrol - `meta`, `titles`, `canonical`, `alternates`, `sitemap`, `robots`, `index-policy` - rota modüllerinin kendi `generateMetadata()` fonksiyonlarına, gerçek `sitemap.ts`/`robots.ts` dosyalarına ve `lib/seo.ts` yüklemlerine karşı çalışıyor. Sonuç: **7/7 geçti, 792 sitemap URL'si, 38 sayfa** - 11 rota tipi × `en`/`tr` üzerinde 38 dizine uygun sayfa, 38 alternate çiftinde 38 kendine canonical, karşılıklı `en`/`tr`/`x-default` taşıyan 396 ilan edilmiş yol, `/api/` yasağı ve sitemap URL'si olan robots, 104 dizine uygun habere karşı 251 dizine uygun model.
 - **Sözlük 15 → 25 (P2).** benchmark, fine-tuning, distillation, embedding, tokenizer, inference, throughput, batch-size, chat-template ve license; her biri EN ve TR gövde, takma adlar ve ilgili bağlantılarla. Sitemap **50** sözlük URL'si taşıyor (25 × `en`/`tr`).
 - **Dört OG rotası (P2).** Site, bir model, bir haber ve bir sözlük terimi için 1200×630 `ImageResponse`; hepsi `lib/og.tsx` içindeki tek karttan.
 
@@ -908,33 +908,33 @@ Doğrulama: `npm run typecheck` temiz, `npm run lint` temiz, `npm test` **213/21
 Plandan sapmalar:
 
 - **Denetim çevrimdışı, §10.2'deki tarama değil.** Derleme, bağlı port ve URL başına gidiş-dönüş isteyen bir kapı, gerçek bir gerilemeyi kararsız bir yeniden denemeye çevirir; bu yüzden aynı sözleşmeyi HTML'i üreten katmanda doğruluyor: "200 dönüyor" → "yol gerçek bir rotaya, varlık sayfalarında da bir snapshot satırına çözülüyor"; "`noindex` değil" → `isIndexableModel` / `isIndexableNews`. JSON-LD ayrıştırma ve üç tık derinliği P2 içerik rubriğinde kalıyor.
-- **Sayıları production'ın değil, commit edilmiş snapshot'ın.** Yerelde 915 model ve 104 haber çözülüyor; bunlardan 251 model ile 104 haber dizin yüklemini geçiyor — 502 + 208 + 50 + 32 = **792** URL; §15.1'in production'a (1 402 model) karşı ölçtüğü 1 342'ye karşı. Bileşim aynı, payda daha küçük.
+- **Sayıları production'ın değil, commit edilmiş snapshot'ın.** Yerelde 915 model ve 104 haber çözülüyor; bunlardan 251 model ile 104 haber dizin yüklemini geçiyor - 502 + 208 + 50 + 32 = **792** URL; §15.1'in production'a (1 402 model) karşı ölçtüğü 1 342'ye karşı. Bileşim aynı, payda daha küçük.
 - **Değişken fontlar değil, statik kopyalar.** `@vercel/og` upstream değişken TTF'lerde hata veriyor (`parseFvarAxis` içinde `Cannot read properties of undefined (reading '256')`), bu yüzden `public/fonts/` sabitlenmiş kopyaları tutuyor; `tests/og.test.ts` her dosyanın `cmap` tablosunu ayrıştırıp on bir Türkçe harfin varlığını doğruluyor, alt kümeye güvenmiyor.
 
 ---
 
-## 15.3 Uygulama günlüğü — 2. dalga (2026-10-22)
+## 15.3 Uygulama günlüğü - 2. dalga (2026-10-22)
 
 Sahip altı §14 sorusunu tek geçişte yanıtladı ve çalışma ağacı yanıtları aldı. Commit edilmiş snapshot ile bu çalışma ağacı üzerinde, dağıtılmış sunucu olmadan ölçüldü; hiçbir şey push edilmedi ve kendine ait bir alan adı bağlanmadı.
 
 - **Tek host, o da Vercel'in hostu (Q1).** `src/lib/seo.ts` içindeki `FALLBACK_SITE_URL` artık `https://local-ai-news.vercel.app`, `.env.example` da aynısını söylüyor; böylece kodun varsayılanı ile üretim nihayet anlaşıyor. `src/app/feed.rss/route.ts` artık `process.env` aramasını ve kendi fallback'ini tekrarlamak yerine ortak `SITE_URL`'i import ediyor. `grep -R openweightradar.com src/ tests/ scripts/ .github/` hiçbir şey döndürmüyor; OG kartı `SITE_URL`'den türeyen `OG_HOST`'u bastığı için dört 1200×630 kart ikinci bir düzenlemeye gerek kalmadan yeni hostu gösteriyor.
-- **Yalnızca arama (Q2).** `src/app/robots.ts` `*` kuralını (`Allow: /`, `Disallow: /api/`) ve sitemap'i koruyor, üstüne tek bir ret grubu ekliyor — `Disallow: /`, yanında `Allow: /` yok, çünkü eşit uzunlukta `Allow` beraberliği kazanır — GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai ve Diffbot için. `PerplexityBot` ile `OAI-SearchBot` bilerek joker davranışta kalıyor: atıf ve bağlantıyla yanıt veriyorlar, ki bir arama motorunun yaptığı budur. İki liste `lib/seo.ts` içinde `TRAINING_CRAWLERS` ve `ANSWER_ENGINE_CRAWLERS` olarak duruyor; böylece rota, denetim ve testler üç kopya yerine tek diziyi doğruluyor.
-- **Dizin politikası (Q5).** `isIndexableModel`, sekiz spec alanından altısını veya fazlasını bildiren her model için `qualityPassed` ne derse desin true dönüyor; kapıyı geçenlerin `specCount ≥ 4 || cardSummary ≥ 200` tabanı değişmedi. `data/feed.json` üzerinde ölçüldü: dizine uygun model **251 → 252**, iki locale boyunca sitemap **792 → 794** URL — yedi spec bildiren, kapıyı geçememiş tek satır.
-- **Çevrilmiş masa metni (Q4).** `category.<desk>.intro` ve masa başına üç yanıtlı SSS (`vram`, `run`, `pick`) artık iki sözlükte de var — 9 masa × `en`/`tr` — ve `c/[category]` üzerinde çiziliyor: giriş yemin üstünde, SSS altında tanım listesi olarak. Metnin andığı sayılar (`{count}`, `{passed}`, `{days}`) snapshot'tan sayılıyor, böylece bir ingest cümlenin listeyle çelişmesine yol açamıyor. Ölçülen giriş uzunlukları 184–223 kelime (EN) ve 173–198 (TR), yanıtlar 50–81 kelime; `tests/i18n.test.ts` 150–250 ile 40–90 sınırlarını ve dokuz masayı doğruluyor.
+- **Yalnızca arama (Q2).** `src/app/robots.ts` `*` kuralını (`Allow: /`, `Disallow: /api/`) ve sitemap'i koruyor, üstüne tek bir ret grubu ekliyor - `Disallow: /`, yanında `Allow: /` yok, çünkü eşit uzunlukta `Allow` beraberliği kazanır - GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai ve Diffbot için. `PerplexityBot` ile `OAI-SearchBot` bilerek joker davranışta kalıyor: atıf ve bağlantıyla yanıt veriyorlar, ki bir arama motorunun yaptığı budur. İki liste `lib/seo.ts` içinde `TRAINING_CRAWLERS` ve `ANSWER_ENGINE_CRAWLERS` olarak duruyor; böylece rota, denetim ve testler üç kopya yerine tek diziyi doğruluyor.
+- **Dizin politikası (Q5).** `isIndexableModel`, sekiz spec alanından altısını veya fazlasını bildiren her model için `qualityPassed` ne derse desin true dönüyor; kapıyı geçenlerin `specCount ≥ 4 || cardSummary ≥ 200` tabanı değişmedi. `data/feed.json` üzerinde ölçüldü: dizine uygun model **251 → 252**, iki locale boyunca sitemap **792 → 794** URL - yedi spec bildiren, kapıyı geçememiş tek satır.
+- **Çevrilmiş masa metni (Q4).** `category.<desk>.intro` ve masa başına üç yanıtlı SSS (`vram`, `run`, `pick`) artık iki sözlükte de var - 9 masa × `en`/`tr` - ve `c/[category]` üzerinde çiziliyor: giriş yemin üstünde, SSS altında tanım listesi olarak. Metnin andığı sayılar (`{count}`, `{passed}`, `{days}`) snapshot'tan sayılıyor, böylece bir ingest cümlenin listeyle çelişmesine yol açamıyor. Ölçülen giriş uzunlukları 184–223 kelime (EN) ve 173–198 (TR), yanıtlar 50–81 kelime; `tests/i18n.test.ts` 150–250 ile 40–90 sınırlarını ve dokuz masayı doğruluyor.
 - **Analitik (Q6).** `@vercel/analytics` 2.0.1, locale kök layout'unda footer'ın yanında `<Analytics />` olarak bir kez monte edildi. Çerez yazmıyor, dolayısıyla onay banner'ı gemide yok; etiket, sahip Vercel projesinde Web Analytics'i açana kadar hiçbir şey raporlamıyor.
 - **İşi ortadan kaldıran yanıt: Q3.** Veri kümesi atıflanabilir bir veri kümesi olarak lisanslanamıyor; bu yüzden `Dataset` şeması yok (§5'teki opsiyonel satır inşa edilmiyor), CSV dışa aktarımı yok ve `/stats`'tan aylık veri çalışması yok (§11.5 satır 9, §11.6). §15'in listesi bu üçünü hiç vaat etmemişti, bu yüzden onun için hiçbir kutu değişmiyor.
 
-Son ağaçta doğrulandı: `npm run typecheck` temiz, `npm run lint` temiz, `npm test` **226/226** (213'tü), `npm run seo-audit` **7/7** — 794 sitemap URL'si, 38 sayfa, 252 dizine uygun model, 104 dizine uygun haber, 397 ilan edilmiş yol ve 11 eğitim tarayıcısı ret, 2 yanıt motoru izinli olmak üzere 3 kurallı robots.
+Son ağaçta doğrulandı: `npm run typecheck` temiz, `npm run lint` temiz, `npm test` **226/226** (213'tü), `npm run seo-audit` **7/7** - 794 sitemap URL'si, 38 sayfa, 252 dizine uygun model, 104 dizine uygun haber, 397 ilan edilmiş yol ve 11 eğitim tarayıcısı ret, 2 yanıt motoru izinli olmak üzere 3 kurallı robots.
 
 Plandan sapmalar:
 
-- **`PerplexityBot` ve `OAI-SearchBot` hâlâ izinli — ölçümle değil, yargıyla.** Snapshot'ta bir yanıt motorundan gelen atfın dönüşüp dönüşmediğine dair hiçbir veri yok; planın Q2 ifadesi yalnızca "eğitim" ya da "arama" sunuyordu ve bu ikisi mührün üstünde duruyor. İki addan birini `TRAINING_CRAWLERS` içine taşımak kararı çevirir, denetim de diziyi izler.
+- **`PerplexityBot` ve `OAI-SearchBot` hâlâ izinli - ölçümle değil, yargıyla.** Snapshot'ta bir yanıt motorundan gelen atfın dönüşüp dönüşmediğine dair hiçbir veri yok; planın Q2 ifadesi yalnızca "eğitim" ya da "arama" sunuyordu ve bu ikisi mührün üstünde duruyor. İki addan birini `TRAINING_CRAWLERS` içine taşımak kararı çevirir, denetim de diziyi izler.
 - **RSS rotasındaki ikinci fallback'i plan değil, bir worker buldu.** Eski hostu grep'lerken bir worker `feed.rss/route.ts` dosyasının origin'i ve kendi `openweightradar.com` fallback'ini tekrarladığını gördü; kanal bağlantısı kanonik hostla çelişebilirdi. Ayrı bir satır olarak kaydedilmek yerine Q1 altında düzeltildi; §16'nın o dosyayı hâlâ P1 altında anlatmasının nedeni bu.
 - **Denetim hâlâ çevrimdışı, §10.2'deki tarama değil.** §15.2'den değişmedi ve artık Q2 için yük taşıyor: `robots` kontrolü HTTP üzerinden `robots.txt` çekmek yerine rotanın çizdiği politika dizilerini doğruluyor; yani yanıta hiç ulaşmayan bir ret grubu yine yakalanır, ama platform düzeyinde bir geçersiz kılma yakalanmaz.
 
 ---
 
-## 16. Ek A — uygulama haritası
+## 16. Ek A - uygulama haritası
 
 | Dosya | Değişiklik | Faz |
 |---|---|---|
@@ -958,7 +958,7 @@ Plandan sapmalar:
 | `docs/en/SEO-LOG.md`, `docs/tr/SEO-LOG.md` (yeni) | haftalık beş sayı günlüğü | P1 |
 | `docs/en/REDIRECTS.md`, `docs/tr/REDIRECTS.md` (yeni) | budanan/birleştirilen sayfalar için redirect haritası | P3 |
 
-## 17. Ek B — revizyon günlüğü
+## 17. Ek B - revizyon günlüğü
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
@@ -966,6 +966,6 @@ Plandan sapmalar:
 | v2 | 2026-10-20 | Rakip/SERP kanıtı (§2.1), sorgu portföyü (§2.2), gerçekçi SERP özellikleri (§2.3), taşıma runbook'u (§3.5), rubrik (§7.7), bağlantı matrisi (§8.1), enstrümantasyon/dizinleme/log incelemesi (§10.4–10.6), 90 günlük takvim (§11.5), bağlantı kazanımı (§11.6), budama (§11.7), uygulama haritası (§16) eklendi. Düzeltmeler: Software App zengin sonucu puanlama olmadan ulaşılamaz; FAQ/HowTo işaretlemesi kaldıraç değil; genel VRAM hesaplayıcı koşullu. |
 | v2.1 | 2026-10-21 | P0 uygulandı; §15.1 doğrulamayı, gizli 500 hatasını ve üç sapmayı (tek sitemap, yerleşik 404 kabuğu, sahip hesapları) kaydediyor. |
 | v2.2 | 2026-10-22 | 1. dalga indi; §15.2 çevrimdışı denetimi ve CI kapısını, sözlüğün 25 terime çıkmasını ve dört OG kart rotasını ölçülen sayılarla ve üç sapmayla (tarama yerine çevrimdışı, commit edilmiş snapshot sayıları, statik font kopyaları) kaydediyor. |
-| v3 | 2026-10-22 | §14 kapandı — özel alan adı yok (`local-ai-news.vercel.app` kanonik), yalnızca aramaya izin veren tarayıcı politikası, atıflanabilir veri kümesi yok, çevrilmiş TR masa metni, ≥ 6 spec dizin maddesi, Vercel Analytics. 2. dalga indi; §15.3 251 → 252 dizine uygun modeli, 792 → 794 sitemap URL'sini, 226/226 testi ve 7/7 denetimi, üç sapmayla (yanıt motoru yargı kararı, yolda bulunan RSS fallback'i, denetim hâlâ çevrimdışı) kaydediyor. |
+| v3 | 2026-10-22 | §14 kapandı - özel alan adı yok (`local-ai-news.vercel.app` kanonik), yalnızca aramaya izin veren tarayıcı politikası, atıflanabilir veri kümesi yok, çevrilmiş TR masa metni, ≥ 6 spec dizin maddesi, Vercel Analytics. 2. dalga indi; §15.3 251 → 252 dizine uygun modeli, 792 → 794 sitemap URL'sini, 226/226 testi ve 7/7 denetimi, üç sapmayla (yanıt motoru yargı kararı, yolda bulunan RSS fallback'i, denetim hâlâ çevrimdışı) kaydediyor. |
 
 Sonraki revizyon §2.1'deki arama anlık görüntüsünü kayıtlı bir SERP denetimiyle (tarih, sorgu, ilk 10 URL, özellik tipi) değiştirmeli ve göreceli KPI'ları ilk dört haftalık GSC verisiyle yenilemeli.

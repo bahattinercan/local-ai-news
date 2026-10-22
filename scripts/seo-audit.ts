@@ -1,5 +1,5 @@
 /**
- * Offline SEO audit — docs/en/SEO-PLAN.md §10.2, P1 row "seo-audit.ts + CI".
+ * Offline SEO audit - docs/en/SEO-PLAN.md §10.2, P1 row "seo-audit.ts + CI".
  *
  * §10.2 describes the contract against a running server: crawl every sitemap
  * URL, read its `<title>`, its canonical, its hreflang links and its `noindex`
@@ -8,7 +8,7 @@
  * regression into a retry. So this script asserts the *same* contract at the
  * layer that produces the HTML:
  *
- *  - the route modules' own `generateMetadata()` (imported and called offline —
+ *  - the route modules' own `generateMetadata()` (imported and called offline -
  *    no JSX is rendered), so the titles and descriptions checked here are the
  *    ones the pages emit, not a copy maintained in this file;
  *  - `src/app/sitemap.ts` and `src/app/robots.ts` themselves, not a replica;
@@ -551,7 +551,7 @@ function page(routeType: string, path: string, locale: Locale, raw: RawMetadata)
  * The store is forced offline before the first read: with `SNAPSHOT_URL` or a
  * Blob token in the environment `loadSnapshot()` would fetch the deployed
  * snapshot, and the gate would then depend on the network and on whatever was
- * published last — exactly what this script must not do.
+ * published last - exactly what this script must not do.
  */
 export async function loadAuditInput(): Promise<AuditInput> {
   delete process.env.SNAPSHOT_URL;

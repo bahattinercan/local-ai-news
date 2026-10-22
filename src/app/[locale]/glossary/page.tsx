@@ -21,7 +21,7 @@ import { PageHeader } from "@/components/shell/PageHeader";
 import { SITE_NAME, canonicalUrl, listMetadata } from "@/lib/seo";
 
 /**
- * The glossary index — an Almanac page (docs/en/DESIGN-V3.md §7.1, GLOSSARY-PLAN.md).
+ * The glossary index - an Almanac page (docs/en/DESIGN-V3.md §7.1, GLOSSARY-PLAN.md).
  *
  * Three things changed from the card grid this page used to be:
  *  1. one alphabetical list instead of four category sections, split into two
@@ -47,7 +47,7 @@ export async function generateMetadata({
   const locale = pickLocale((await params).locale);
   const raw = await searchParams;
   const title =
-    locale === "tr" ? "Yerel AI sözlüğü — kuantizasyon, VRAM, GGUF, MoE" : "Local AI glossary — quantization, VRAM, GGUF, MoE";
+    locale === "tr" ? "Yerel AI sözlüğü - kuantizasyon, VRAM, GGUF, MoE" : "Local AI glossary - quantization, VRAM, GGUF, MoE";
   const description =
     locale === "tr"
       ? `${GLOSSARY.length} terim, spec sheet'lerin arkasındaki kavramlar; her biri güncel snapshot sayıları, kanıt ve VRAM hesaplayıcı ile.`
@@ -139,7 +139,7 @@ export default async function GlossaryPage({
         {filtered ? <GhostLink href={hrefFor(locale, "/glossary")} label={t(dict, "filters.clear")} /> : null}
       </form>
 
-      {/* Taxonomy as type, not as pills — the same device the desk nav uses. */}
+      {/* Taxonomy as type, not as pills - the same device the desk nav uses. */}
       <nav aria-label={t(dict, "glossary.categories")} className="mb-2">
         <ul className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-1">
           <li>

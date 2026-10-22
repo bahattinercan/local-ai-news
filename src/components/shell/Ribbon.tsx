@@ -8,7 +8,7 @@ import { dictionary, hrefFor, t, type Locale } from "@/i18n";
  * The ribbon (docs/en/DESIGN-V3.md §1 zone 4).
  *
  * One horizontal ticker of the window's most downloaded models, each with its
- * figure set as a superscript — the reference's `Apies 9.1 · The Godfather 9.4`
+ * figure set as a superscript - the reference's `Apies 9.1 · The Godfather 9.4`
  * line, which turns a list into a *ranked* list without spending a table on it.
  *
  * What the superscript is, and why: `downloads` is the one metric present on 86 %

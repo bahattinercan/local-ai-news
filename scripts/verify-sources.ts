@@ -40,13 +40,13 @@ async function checkOne(source: SourceDefinition, client: HfClient): Promise<Row
       // A feed that answers 200 with zero items is not usable (gate G4).
       return items.length > 0
         ? { key: source.key, status: 200, items: items.length, note }
-        : { key: source.key, status: "empty", items: 0, note: `${note} — 200 but no items` };
+        : { key: source.key, status: "empty", items: 0, note: `${note} - 200 but no items` };
     } catch (error) {
       return { key: source.key, status: "fail", items: 0, note: (error as Error).message };
     }
   }
 
-  return { key: source.key, status: "unchecked", items: 0, note: `${note} — no check implemented (format: ${source.format})` };
+  return { key: source.key, status: "unchecked", items: 0, note: `${note} - no check implemented (format: ${source.format})` };
 }
 
 async function live(): Promise<Row[]> {
@@ -62,10 +62,10 @@ async function live(): Promise<Row[]> {
   }
 
   // Reddit rate-limits bursts, so a single 429 fail should not be read as
-  // "the feed is gone" — print the caveat next to its row.
+  // "the feed is gone" - print the caveat next to its row.
   return rows.map((row) =>
     row.key === "reddit_localllama" && row.status !== 200
-      ? { ...row, note: `${row.note} — Reddit returns 429 on bursts; retry after a pause` }
+      ? { ...row, note: `${row.note} - Reddit returns 429 on bursts; retry after a pause` }
       : row
   );
 }

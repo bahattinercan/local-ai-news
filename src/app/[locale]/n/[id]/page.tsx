@@ -58,7 +58,7 @@ export async function generateMetadata({
 /**
  * News detail. Decision D1 of docs/en/NEWS-PLAN.md: this page shows the stored
  * summary (median 1526 chars, so it is worth its own page) and links out to the
- * source. The body is never republished — attribution plus a link only.
+ * source. The body is never republished - attribution plus a link only.
  */
 export default async function NewsItemPage({
   params

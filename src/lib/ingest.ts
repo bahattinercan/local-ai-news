@@ -79,7 +79,7 @@ export function releaseToNews(model: ClassifiedModel): SnapshotNews {
   return {
     externalId: `release:${model.externalId}`,
     kind: "release",
-    title: `${model.name} — new ${model.primaryCategory} model`,
+    title: `${model.name} - new ${model.primaryCategory} model`,
     summary: `${model.libraryName ?? "unknown"} · ${model.runners.join(", ") || "no runner detected"}`,
     thumbnail: model.sampleImages[0],
     url: model.url,
@@ -99,7 +99,7 @@ export function releaseToNews(model: ClassifiedModel): SnapshotNews {
  * and never appears in a headline), and plain word matching was measurably wrong
  * (20 news rows were attributed to one model via the word "prompt"). A
  * version-shaped token that names exactly one tracked model is the only loosening
- * allowed here — a wrong `modelSlug` is printed on the news page as a fact.
+ * allowed here - a wrong `modelSlug` is printed on the news page as a fact.
  */
 function matchModel(text: string, models: ClassifiedModel[], index?: ModelNameIndex): ClassifiedModel | undefined {
   return matchModelInText(text, models, index);
@@ -214,7 +214,7 @@ export async function backfillDetails(
 /**
  * The reader-facing gap this closes: `nerkyor/Qwen3.8-27B-…-NInfer` had a page of
  * numbers, a VRAM box and a run command, and not one sentence about the model.
- * The card body (README) was never fetched — only `cardData`, whose three rendered
+ * The card body (README) was never fetched - only `cardData`, whose three rendered
  * keys (`baseModel`, `datasets`, `languages`) are empty on most GGUF repos.
  *
  * Ordered by likes so the pages people actually open fill first, and keyed on
@@ -269,7 +269,7 @@ function loadExistingSnapshot(): Snapshot | null {
  * The poisoned case is not hypothetical: 40 of the 185 news items in the served
  * snapshot carry `"[object Object]"` as `organization`. Because the merge only
  * fills what the older record *lacks*, that string would otherwise survive every
- * future ingest — a wrong value is worse than a missing one, so it counts as
+ * future ingest - a wrong value is worse than a missing one, so it counts as
  * missing here.
  */
 function isEmpty(value: unknown): boolean {
@@ -291,7 +291,7 @@ function mergeRecord<T extends object>(older: T, newer: T): T {
 
 /**
  * The site serves whatever `npm run publish` uploaded last, but the ingest job
- * merged into the copy `actions/checkout` put on disk — a file nobody ever
+ * merged into the copy `actions/checkout` put on disk - a file nobody ever
  * re-commits. So every run rebuilt "repo baseline + this run's newest pages" and
  * silently dropped whatever earlier runs had discovered once it fell out of the
  * listing window.
@@ -301,7 +301,7 @@ function mergeRecord<T extends object>(older: T, newer: T): T {
  *
  * Union the published snapshot with the repo copy, keep the earliest
  * `firstSeenAt` per model, and let the newer record fill fields the older one is
- * missing — history accumulates instead of regressing.
+ * missing - history accumulates instead of regressing.
  */
 export function mergeSnapshotBases(published: Snapshot | null, repo: Snapshot | null): Snapshot | null {
   if (!published && !repo) return null;

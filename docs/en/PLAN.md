@@ -1,8 +1,8 @@
-# Local AI News — Detailed Plan v2 (EN)
+# Local AI News - Detailed Plan v2 (EN)
 
 > Turkish mirror: [docs/tr/PLAN.md](../tr/PLAN.md)
 >
-> **Update 2026-10-14:** decision 2 (Neon Postgres) was reversed — there is no
+> **Update 2026-10-14:** decision 2 (Neon Postgres) was reversed - there is no
 > database. See [DATA-STORAGE.md](DATA-STORAGE.md).
 
 **Product:** a public website that tracks newly released **locally runnable (open-weight) AI models** by category tabs, with a news feed that updates on a schedule.
@@ -52,13 +52,13 @@ Brand rules: name in English (decision 7), TR UI uses the same brand name untran
 
 ---
 
-## 3. Scope definition — what counts as a "local AI model"
+## 3. Scope definition - what counts as a "local AI model"
 
 A record enters the feed only if:
 
 1. Weights are downloadable → `gated: false` (field confirmed present).
 2. At least one local runner can serve it: `llama.cpp`, `Ollama`, `MLX`, `vLLM`, `transformers`, `diffusers/ComfyUI`, `koboldcpp`, `ExLlama`, `llamafile`.
-3. Closed-API models (OpenAI/Google closed) are **not** listed as models — they only appear in news.
+3. Closed-API models (OpenAI/Google closed) are **not** listed as models - they only appear in news.
 
 Shown in the UI as a **"Runs locally"** badge, filterable.
 
@@ -142,7 +142,7 @@ text-to-image, sort=createdAt
                           React UI (tabs, feed, detail, news)
 ```
 
-**Ingest runs outside the web app** because of Vercel function timeouts + the HF budget. Single writer only — the public site never proxies HF.
+**Ingest runs outside the web app** because of Vercel function timeouts + the HF budget. Single writer only - the public site never proxies HF.
 
 **Request budget per run (must stay under 500/300s):**
 
@@ -273,7 +273,7 @@ Gate passes if any of:
 
 Behaviour:
 - `quality_passed` + `gate_reason` are stored, so the UI can show **why** a model is in the feed.
-- UI toggle **"Show everything" / "Her şeyi göster"** — default off. When on, it shows gate-failed rows with a muted badge.
+- UI toggle **"Show everything" / "Her şeyi göster"** - default off. When on, it shows gate-failed rows with a muted badge.
 - "Show everything" is restricted to windows ≤ 30 days and requires `category` to be set, otherwise result sets explode.
 - Gate-failed models are **not stored raw** unless they at least have `likes ≥ 1` or `downloads ≥ 10` or a curated author. Otherwise skipped entirely.
 
@@ -288,9 +288,9 @@ Behaviour:
 
 Three kinds, all HF-only:
 
-1. **`paper`** — `daily_papers` (50/day), upserted so `upvotes`/discussion changes are reflected.
-2. **`release`** — derived from the model feed: `first_seen_at` inside the window **and** `quality_passed` **and** (`trending_score ≥ 100` **or** `likes ≥ 50` **or** curated org).
-3. **`announcement`** — daily papers whose `organization` is in the curated org list, or a model that spikes in `trendingScore` between two runs.
+1. **`paper`** - `daily_papers` (50/day), upserted so `upvotes`/discussion changes are reflected.
+2. **`release`** - derived from the model feed: `first_seen_at` inside the window **and** `quality_passed` **and** (`trending_score ≥ 100` **or** `likes ≥ 50` **or** curated org).
+3. **`announcement`** - daily papers whose `organization` is in the curated org list, or a model that spikes in `trendingScore` between two runs.
 
 Rules:
 - A paper and a derived release for the same model are separate rows but share `model_id` → the news card links to the model detail page.
@@ -298,7 +298,7 @@ Rules:
 - Cadence: every 10 min, cron-job.org → `workflow_dispatch` (GitHub's own `schedule` cron is throttled).
 - `/news` shows "updated X min ago"; ISR 300s.
 - The site also **produces** `/feed.rss` per category and per language.
-- External blogs (marktechpost, JetBrains) are out of v1 — that would break decision 3.
+- External blogs (marktechpost, JetBrains) are out of v1 - that would break decision 3.
 
 ---
 
@@ -307,7 +307,7 @@ Rules:
 - **SEO:** hreflang pairs per page (`/en/...` + `/tr/...`), canonical URLs, `sitemap.xml` per locale, `robots.txt` allowing crawlers.
 - **Structured data:** JSON-LD `Article` for news, `CreativeWork` for model pages (name, author, url, datePublished = `created_at`, image = first sample).
 - **OG images:** use `cardData.widget` output image when present, otherwise a generated card.
-- **Attribution:** every model card links to its HF page and shows the author. Avatar is only obtainable from the trending response (`authorData.avatarUrl`) — `/api/users/{name}` and `/api/organizations/{name}` return errors without a token, so use a monogram fallback.
+- **Attribution:** every model card links to its HF page and shows the author. Avatar is only obtainable from the trending response (`authorData.avatarUrl`) - `/api/users/{name}` and `/api/organizations/{name}` return errors without a token, so use a monogram fallback.
 - **Abuse protection:** our own API routes are rate-limited per IP (Vercel middleware, ~60 req/min), DB-only reads, no HF proxying.
 - **License display:** `license` + `license_name` shown per model; models with `license: other` get a warning badge.
 - **Analytics:** Plausible or Vercel Analytics. KPIs: DAU, feed CTR, category distribution, RSS subscriber count, gate-pass rate.
@@ -412,7 +412,7 @@ openweight-radar/            (repo name; product name in docs)
 
 ## 15. Conventions
 
-- **Code in English** — identifiers, comments, JSON keys, test names, commit messages.
+- **Code in English** - identifiers, comments, JSON keys, test names, commit messages.
 - **Commits:** Conventional Commits, English subject + body.
   `feat(classify): add coding-category regex rules`
 - **Docs bilingual:** every doc as `docs/en/x.md` + `docs/tr/x.md`; EN is source of truth.
@@ -422,32 +422,32 @@ openweight-radar/            (repo name; product name in docs)
 
 ## 16. Phases
 
-### F0 — Scaffold + source verification (1 day)
+### F0 - Scaffold + source verification (1 day)
 - Next.js + TS + Tailwind v4, `next-intl`, Drizzle + Neon.
 - `scripts/verify-sources.ts` → SOURCE HEALTH table for the 5 working endpoints + the 2 known-broken ones (blog.rss, users/organizations).
 - **Acceptance:** `npm run sources-check` green on working endpoints, `--dry` works offline with fixtures.
 
-### F1 — Ingest core (2 days)
+### F1 - Ingest core (2 days)
 - HF adapter (pagination, cursor, backoff, budget guard, caps), schema, dedup, quality gate, classifier, runner detection, VRAM.
 - **Acceptance:** one run inserts ≥150 gate-passing models; category distribution printed; second run `items_new = 0`; requests used < 100.
 
-### F2 — Feed UI + tabs (2 days)
+### F2 - Feed UI + tabs (2 days)
 - Tab bar, cards, filters incl. the gate toggle, empty states, skeletons, dark mode, dictionaries.
 - **Acceptance:** headless Chrome screenshots at 375/768/1280 px show no horizontal overflow; 11 tabs render in both languages; gate toggle changes the result set.
 
-### F3 — Model detail (2 days)
+### F3 - Model detail (2 days)
 - `/m/[slug]`, quant files, copyable run command, VRAM, samples, spaces, gate reason.
 - **Acceptance:** 10 sampled models have correct runner/quant/VRAM fields; widget previews render.
 
-### F4 — News pipeline (2 days)
+### F4 - News pipeline (2 days)
 - Daily papers ingest + upsert, derived `release` announcements, news page with kind filter, model linking, generated RSS, cron wiring.
 - **Acceptance:** a paper appears within 10 min; re-run updates `upvotes` without duplicating rows; derived releases appear for a spike; `/feed.rss` validates.
 
-### F5 — Deploy + public-site plumbing (1 day)
+### F5 - Deploy + public-site plumbing (1 day)
 - Vercel, ISR, per-IP rate limit, sitemap/hreflang/JSON-LD, analytics, GitHub Actions ingest job, health report committed.
 - **Acceptance:** production deploy, cron fires on schedule, `/stats` shows weekly per-category counts, Lighthouse SEO score > 95.
 
-### F6 — v2 extras
+### F6 - v2 extras
 Comparison page, weekly charts, saved filters, admin override panel, local Ollama integration (`localhost:11434/api/tags`), email digest, external news sources (needs a decision to break decision 3).
 
 ---
@@ -456,26 +456,26 @@ Comparison page, weekly charts, saved filters, admin override panel, local Ollam
 
 - **Unit:** classifier rules, quality gate, VRAM formula, dedup, RSS generation, hreflang/sitemap generation.
 - **Integration:** `verify-sources.ts --dry` against fixtures (no network).
-- **Regression gate:** `npm run classify-check` — 40 fixture models → expected categories.
+- **Regression gate:** `npm run classify-check` - 40 fixture models → expected categories.
 - **UI:** headless Chrome screenshots (viewport sweep + mobile widths).
 
 ---
 
 ## 18. Risks / pitfalls (measured)
 
-1. **HF limit 500 req / 300 s per IP** — a browser-side SPA would be blocked on launch day. Server-side ingest + cache is mandatory.
-2. **`pipeline_tag` can be null** — observed as a `KeyError` in a live probe.
-3. **Noise** — personal LoRA sellers dominate `sort=createdAt`; without the gate the feed is unusable.
-4. **No HF blog RSS (404)** — news relies on daily papers + derived releases.
-5. **`/api/users/{name}` and `/api/organizations/{name}` error without token** — avatars only from the trending response.
-6. **`safetensors` is not in the list response** — needs one detail request per gate-passing model.
-7. **Cursor pagination** — base64 blob, opaque string, never parse.
-8. **"New" definition** — `first_seen_at`, not `created_at`.
-9. **Gated models** — excluded from the feed, keep a filter toggle.
-10. **Category rules drift** — curated org list goes stale; `category_overrides` is the escape hatch.
-11. **Public-site growth** — cap ingest to 90 days and 200 items/category/run, or "Show everything" bloats Neon.
-12. **Vercel cron limits** — use cron-job.org + `workflow_dispatch`, not GitHub's `schedule`.
-13. **Domain availability is a snapshot** — RDAP 404 today can be registered tomorrow; `.news` has registrar restrictions.
+1. **HF limit 500 req / 300 s per IP** - a browser-side SPA would be blocked on launch day. Server-side ingest + cache is mandatory.
+2. **`pipeline_tag` can be null** - observed as a `KeyError` in a live probe.
+3. **Noise** - personal LoRA sellers dominate `sort=createdAt`; without the gate the feed is unusable.
+4. **No HF blog RSS (404)** - news relies on daily papers + derived releases.
+5. **`/api/users/{name}` and `/api/organizations/{name}` error without token** - avatars only from the trending response.
+6. **`safetensors` is not in the list response** - needs one detail request per gate-passing model.
+7. **Cursor pagination** - base64 blob, opaque string, never parse.
+8. **"New" definition** - `first_seen_at`, not `created_at`.
+9. **Gated models** - excluded from the feed, keep a filter toggle.
+10. **Category rules drift** - curated org list goes stale; `category_overrides` is the escape hatch.
+11. **Public-site growth** - cap ingest to 90 days and 200 items/category/run, or "Show everything" bloats Neon.
+12. **Vercel cron limits** - use cron-job.org + `workflow_dispatch`, not GitHub's `schedule`.
+13. **Domain availability is a snapshot** - RDAP 404 today can be registered tomorrow; `.news` has registrar restrictions.
 
 ---
 
@@ -485,7 +485,7 @@ Comparison page, weekly charts, saved filters, admin override panel, local Ollam
 - Added: quality gate as a user-facing filter with `quality_passed` / `gate_reason` columns and storage caps.
 - Added: derived `release` announcements + `kind` filter + upsert requirement.
 - Added: public-site section (SEO, JSON-LD, hreflang, attribution, per-IP rate limit, analytics, legal).
-- Corrected: `safetensors` is **not** returned by the list endpoint even with `?full=true` — only `siblings` is. Runner detection is free, param count costs one request.
+- Corrected: `safetensors` is **not** returned by the list endpoint even with `?full=true` - only `siblings` is. Runner detection is free, param count costs one request.
 - Corrected: avatar endpoints do not work without a token.
 - Removed from v1 scope: Ollama scrape, OpenRouter, GitHub releases (decision 3).
 - Confirmed still valid: rate limit numbers, sort values, tag filter, cursor pagination, daily papers date param, `pipeline_tag` nullability, blog.rss 404.

@@ -15,7 +15,7 @@ import { dictionary, hrefFor, t, type Locale } from "@/i18n";
  *
  *  - `table-layout: fixed` with a fixed 88 px / 140 px label column. The old sheet
  *    let the browser distribute width, so the label column fell to 77 px with
- *    three models and 60 px with six — the labels that explain the numbers were
+ *    three models and 60 px with six - the labels that explain the numbers were
  *    the first thing to go.
  *  - `overflow-x: auto` **with `overflow-y: clip`** on the wrapper. A plain
  *    `overflow-x: auto` computes `overflow-y: auto` and turns the wrapper into a
@@ -159,7 +159,7 @@ export function CompareSheet({
                         )}
                       >
                         {cell.text === null ? (
-                          <span title={t(dict, "compare.notReported")}>—</span>
+                          <span title={t(dict, "compare.notReported")}>-</span>
                         ) : cell.href ? (
                           <a href={cell.href} className="hover:text-accent">
                             {cell.text}

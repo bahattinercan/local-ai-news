@@ -1,8 +1,8 @@
-# Local AI News — Detaylı Plan v2 (TR)
+# Local AI News - Detaylı Plan v2 (TR)
 
 > İngilizce eşdeğer: [docs/en/PLAN.md](../en/PLAN.md)
 >
-> **Güncelleme 14 Ekim 2026:** karar 2 (Neon Postgres) geri alındı — veritabanı
+> **Güncelleme 14 Ekim 2026:** karar 2 (Neon Postgres) geri alındı - veritabanı
 > yok. Bkz. [DATA-STORAGE.md](DATA-STORAGE.md).
 
 **Ürün:** Yeni çıkan **yerelde çalıştırılabilir (open-weight) AI modellerini** kategori sekmeleriyle takip eden, haber akışı düzenli güncellenen **public** bir website.
@@ -52,13 +52,13 @@ Marka kuralları: ad İngilizce (karar 7); TR arayüzde marka adı çevrilmeden 
 
 ---
 
-## 3. Kapsam çizgisi — "local AI modeli" ne demek?
+## 3. Kapsam çizgisi - "local AI modeli" ne demek?
 
 Bir kayıt ancak şu şartlarla feed'e girer:
 
 1. Ağırlıklar indirilebilir → `gated: false` (alan API yanıtında doğrulandı).
 2. En az bir yerel runner çalıştırabiliyor: `llama.cpp`, `Ollama`, `MLX`, `vLLM`, `transformers`, `diffusers/ComfyUI`, `koboldcpp`, `ExLlama`, `llamafile`.
-3. Kapalı API modelleri (OpenAI/Google closed) model olarak listelenmez — yalnızca haberde görünür.
+3. Kapalı API modelleri (OpenAI/Google closed) model olarak listelenmez - yalnızca haberde görünür.
 
 UI'da **"Runs locally"** rozeti olarak gösterilir ve filtrelenebilir.
 
@@ -142,7 +142,7 @@ text-to-image, sort=createdAt
                           React UI (tabs, feed, detail, news)
 ```
 
-**İngest web uygulamasının dışında çalışır:** Vercel fonksiyon timeout'ları + HF bütçesi. Tek yazar vardır — public site asla HF'ye proxy olmaz.
+**İngest web uygulamasının dışında çalışır:** Vercel fonksiyon timeout'ları + HF bütçesi. Tek yazar vardır - public site asla HF'ye proxy olmaz.
 
 **Run başına istek bütçesi (500/300s altında kalmalı):**
 
@@ -162,9 +162,9 @@ text-to-image, sort=createdAt
 
 Şema İngilizce ve `docs/en/PLAN.md`'de. Kolonlar:
 
-- `sources` — kaynak envanteri (tier, enabled, last_status, last_run_at)
-- `categories` — `label_en`, `label_tr`, `match_rules` JSONB, `sort_order`
-- `models` — `external_id`, `slug`, `name`, `author`, `author_avatar`, `primary_category`, `pipeline_tag` (nullable), `library_name`, `license`, `license_name`, `created_at`, `updated_at`, `first_seen_at`, `downloads`, `likes`, `trending_score`, `gated`, **`quality_passed`**, **`gate_reason`**, `params_total`, `param_dtypes`, `storage_bytes`, `quantizations`, `runners`, `vram_est_gb`, `sample_images`, `spaces`, `url`; `UNIQUE(source_key, external_id)`
+- `sources` - kaynak envanteri (tier, enabled, last_status, last_run_at)
+- `categories` - `label_en`, `label_tr`, `match_rules` JSONB, `sort_order`
+- `models` - `external_id`, `slug`, `name`, `author`, `author_avatar`, `primary_category`, `pipeline_tag` (nullable), `library_name`, `license`, `license_name`, `created_at`, `updated_at`, `first_seen_at`, `downloads`, `likes`, `trending_score`, `gated`, **`quality_passed`**, **`gate_reason`**, `params_total`, `param_dtypes`, `storage_bytes`, `quantizations`, `runners`, `vram_est_gb`, `sample_images`, `spaces`, `url`; `UNIQUE(source_key, external_id)`
 - `model_categories`, `model_tags`, `news` (`kind IN ('paper','release','announcement')`), `category_overrides`, `ingest_runs` (`items_gate_passed` dahil)
 - İndeksler: `(primary_category, first_seen_at DESC)`, `(primary_category, quality_passed, first_seen_at DESC)`, `(primary_category, trending_score DESC)`, `news(published_at DESC)`, `news(kind, published_at DESC)`, `model_tags(tag)`
 
@@ -182,7 +182,7 @@ Kap şu şartlardan biriyle geçer:
 
 Davranış:
 - `quality_passed` + `gate_reason` saklanır → UI bir modelin feed'de **neden** olduğunu gösterebilir.
-- UI toggle **"Show everything" / "Her şeyi göster"** — varsayılan kapalı. Açılınca kapıyı geçmeyen satırlar soluk rozetle gelir.
+- UI toggle **"Show everything" / "Her şeyi göster"** - varsayılan kapalı. Açılınca kapıyı geçmeyen satırlar soluk rozetle gelir.
 - "Show everything" yalnızca ≤ 30 gün penceresinde ve kategori seçiliyken çalışır; aksi halde sonuç küpleri patlar.
 - Kapıyı geçmeyen modeller **ham olarak sakılmaz**; ancak `likes ≥ 1` veya `downloads ≥ 10` veya curated yazar varsa saklanır. Yoksa tamamen atlanır.
 
@@ -197,9 +197,9 @@ Davranış:
 
 Üç tür, hepsi HF-only:
 
-1. **`paper`** — `daily_papers` (günde 50), upsert edilir ki `upvotes`/tartışma değişimi yansısın.
-2. **`release`** — model feed'inden türetilir: pencere içinde `first_seen_at` **ve** `quality_passed` **ve** (`trending_score ≥ 100` **veya** `likes ≥ 50` **veya** curated org).
-3. **`announcement`** — `organization` alanı curated org listesinde olan daily papers, ya da iki run arasında `trendingScore` sıçraması yapan model.
+1. **`paper`** - `daily_papers` (günde 50), upsert edilir ki `upvotes`/tartışma değişimi yansısın.
+2. **`release`** - model feed'inden türetilir: pencere içinde `first_seen_at` **ve** `quality_passed` **ve** (`trending_score ≥ 100` **veya** `likes ≥ 50` **veya** curated org).
+3. **`announcement`** - `organization` alanı curated org listesinde olan daily papers, ya da iki run arasında `trendingScore` sıçraması yapan model.
 
 Kurallar:
 - Aynı model için paper ve türetilmiş release ayrı satırlardır ama aynı `model_id`'yi paylaşır → haber kartı model detayına bağlanır.
@@ -207,7 +207,7 @@ Kurallar:
 - Sıklık: her 10 dk, cron-job.org → `workflow_dispatch` (GitHub'un kendi `schedule` cron'u throttled).
 - `/news` "updated X min ago" gösterir; ISR 300s.
 - Site `feed.rss` de **üretir** (kategori + dil bazında).
-- Harici bloglar (marktechpost, JetBrains) v1 dışı — karar 3'ü deler.
+- Harici bloglar (marktechpost, JetBrains) v1 dışı - karar 3'ü deler.
 
 ---
 
@@ -216,7 +216,7 @@ Kurallar:
 - **SEO:** sayfa başına hreflang çifti (`/en/...` + `/tr/...`), canonical URL, locale bazlı `sitemap.xml`, crawler'lara açık `robots.txt`.
 - **Structured data:** haber için JSON-LD `Article`, model sayfası için `CreativeWork` (name, author, url, datePublished = `created_at`, image = ilk sample).
 - **OG görselleri:** `cardData.widget` çıktısı varsa o, yoksa üretilen kart.
-- **Atıf:** her model kartı HF sayfasına link verir ve yazarı gösterir. Avatar yalnızca trending yanıtından (`authorData.avatarUrl`) alınabilir — `/api/users/{name}` ve `/api/organizations/{name}` token'sız error döndürüyor, bu yüzden monogram fallback kullanılacak.
+- **Atıf:** her model kartı HF sayfasına link verir ve yazarı gösterir. Avatar yalnızca trending yanıtından (`authorData.avatarUrl`) alınabilir - `/api/users/{name}` ve `/api/organizations/{name}` token'sız error döndürüyor, bu yüzden monogram fallback kullanılacak.
 - **Abuse koruması:** kendi API route'larımız IP başına sınırlı (Vercel middleware, ~60 req/dk), salt-okunur DB erişimi, HF proxy yok.
 - **Lisans gösterimi:** model başına `license` + `license_name`; `license: other` için uyarı rozeti.
 - **Analitik:** Plausible veya Vercel Analytics. KPI'lar: DAU, feed CTR, kategori dağılımı, RSS abone sayısı, kapıyı geçme oranı.
@@ -331,32 +331,32 @@ openweight-radar/            (repo adı; ürün adı dokümanlarda)
 
 ## 16. Fazlar
 
-### F0 — İskelet + kaynak doğrulama (1 gün)
+### F0 - İskelet + kaynak doğrulama (1 gün)
 - Next.js + TS + Tailwind v4, `next-intl`, Drizzle + Neon.
 - `scripts/verify-sources.ts` → çalışan 5 endpoint + bilinen 2 bozuk endpoint (blog.rss, users/organizations) için SOURCE HEALTH tablosu.
 - **Kabul:** `npm run sources-check` çalışan endpoint'lerde yeşil; `--dry` network'süz fixture ile çalışır.
 
-### F1 — İngest çekirdeği (2 gün)
+### F1 - İngest çekirdeği (2 gün)
 - HF adaptörü (pagination, cursor, backoff, bütçe koruması, sınırlar), şema, dedup, kalite kapısı, sınıflandırıcı, runner algılama, VRAM.
 - **Kabul:** tek run ≥150 kapıyı geçen model; kategori dağılımı yazdırılır; ikinci run `items_new = 0`; kullanılan istek < 100.
 
-### F2 — Feed UI + sekmeler (2 gün)
+### F2 - Feed UI + sekmeler (2 gün)
 - Tab bar, kartlar, kapı toggle'ı dahil filtreler, boş durumlar, skeleton, dark mode, sözlükler.
 - **Kabul:** headless Chrome screenshot'ta 375/768/1280 px'te yatay taşma yok; 11 sekme iki dilde render; kapı toggle'ı sonuç kümesini değiştirir.
 
-### F3 — Model detay (2 gün)
+### F3 - Model detay (2 gün)
 - `/m/[slug]`, quant dosyaları, kopyalanabilir komut, VRAM, önizlemeler, spaces, kapı sebebi.
 - **Kabul:** 10 örnek modelde runner/quant/VRAM alanları doğru; widget görselleri render.
 
-### F4 — Haber pipeline'ı (2 gün)
+### F4 - Haber pipeline'ı (2 gün)
 - Daily papers ingest + upsert, türetilmiş `release` duyuruları, kind filtreli haber sayfası, model bağı, RSS üretimi, cron bağlantısı.
 - **Kabul:** paper 10 dakika içinde görünür; yeniden run `upvotes`'ı günceller ama satır çoğaltmaz; sıçramada türetilmiş release oluşur; `/feed.rss` doğrulanır.
 
-### F5 — Deploy + public site donanımı (1 gün)
+### F5 - Deploy + public site donanımı (1 gün)
 - Vercel, ISR, IP başına rate limit, sitemap/hreflang/JSON-LD, analitik, GitHub Actions ingest job'u, sağlık raporu commit'e.
 - **Kabul:** production deploy, cron zamanında tetiklenir, `/stats` haftalık kategori sayılarını gösterir, Lighthouse SEO skoru > 95.
 
-### F6 — v2 ekstralar
+### F6 - v2 ekstralar
 Karşılaştırma sayfası, haftalık grafikler, kaydedilmiş filtreler, admin override paneli, yerel Ollama entegrasyonu (`localhost:11434/api/tags`), e-posta özeti, harici haber kaynakları (karar 3'ü delen bir karar gerektirir).
 
 ---
@@ -365,26 +365,26 @@ Karşılaştırma sayfası, haftalık grafikler, kaydedilmiş filtreler, admin o
 
 - **Birim:** sınıflandırıcı kuralları, kalite kapısı, VRAM formülü, dedup, RSS üretimi, hreflang/sitemap üretimi.
 - **Entegrasyon:** `verify-sources.ts --dry` fixture'a karşı (network yok).
-- **Regresyon kapısı:** `npm run classify-check` — 40 fixture model → beklenen kategori.
+- **Regresyon kapısı:** `npm run classify-check` - 40 fixture model → beklenen kategori.
 - **UI:** headless Chrome screenshot (viewport sweep + mobil genişlikler).
 
 ---
 
 ## 18. Riskler / tuzaklar (ölçülmüş)
 
-1. **HF limiti 500 istek / 300 sn / IP** — tarayıcıdan direkt çağırırsan yayın günü bloklanır. Sunucu tarafı ingest + cache zorunlu.
-2. **`pipeline_tag` null olabilir** — canlı probe'da `KeyError` olarak gözlendi.
-3. **Gürültü** — kişisel LoRA sellerları `sort=createdAt`'ı domine eder; kapı olmadan feed kullanılamaz.
-4. **HF blog RSS yok (404)** — haber daily papers + türetilmiş release'e dayanır.
-5. **`/api/users/{name}` ve `/api/organizations/{name}` token'sız error** — avatarlar yalnızca trending yanıtından.
-6. **`safetensors` list yanıtında yok** — kapıyı geçen model başına bir detay isteği gerekir.
-7. **Pagination cursor** — base64 blob, opak string, parse edilmez.
-8. **"Yeni" tanımı** — `createdAt` değil `first_seen_at`.
-9. **Gated modeller** — feed'e girmez ama filtre anahtarı olmalı.
-10. **Kategori kuralları bayatlar** — curated org listesi için `category_overrides` kaçış kapısıdır.
-11. **Public site büyümesi** — ingest 90 güne ve kategori/run başına 200 kayda sınırlanmazsa "Show everything" Neon'u şişirir.
-12. **Vercel cron limitleri** — GitHub `schedule` değil, cron-job.org + `workflow_dispatch`.
-13. **Domain uygunluğu anlıktır** — bugün RDAP 404 olan domain yarın kaydedilebilir; `.news` TLD'sinde registrar kısıtları vardır.
+1. **HF limiti 500 istek / 300 sn / IP** - tarayıcıdan direkt çağırırsan yayın günü bloklanır. Sunucu tarafı ingest + cache zorunlu.
+2. **`pipeline_tag` null olabilir** - canlı probe'da `KeyError` olarak gözlendi.
+3. **Gürültü** - kişisel LoRA sellerları `sort=createdAt`'ı domine eder; kapı olmadan feed kullanılamaz.
+4. **HF blog RSS yok (404)** - haber daily papers + türetilmiş release'e dayanır.
+5. **`/api/users/{name}` ve `/api/organizations/{name}` token'sız error** - avatarlar yalnızca trending yanıtından.
+6. **`safetensors` list yanıtında yok** - kapıyı geçen model başına bir detay isteği gerekir.
+7. **Pagination cursor** - base64 blob, opak string, parse edilmez.
+8. **"Yeni" tanımı** - `createdAt` değil `first_seen_at`.
+9. **Gated modeller** - feed'e girmez ama filtre anahtarı olmalı.
+10. **Kategori kuralları bayatlar** - curated org listesi için `category_overrides` kaçış kapısıdır.
+11. **Public site büyümesi** - ingest 90 güne ve kategori/run başına 200 kayda sınırlanmazsa "Show everything" Neon'u şişirir.
+12. **Vercel cron limitleri** - GitHub `schedule` değil, cron-job.org + `workflow_dispatch`.
+13. **Domain uygunluğu anlıktır** - bugün RDAP 404 olan domain yarın kaydedilebilir; `.news` TLD'sinde registrar kısıtları vardır.
 
 ---
 
@@ -394,7 +394,7 @@ Karşılaştırma sayfası, haftalık grafikler, kaydedilmiş filtreler, admin o
 - Eklendi: kalite kapısı kullanıcı filtresi olarak (`quality_passed` / `gate_reason` kolonları) + saklama sınırları.
 - Eklendi: türetilmiş `release` duyuruları + `kind` filtresi + upsert zorunluluğu.
 - Eklendi: public site bölümü (SEO, JSON-LD, hreflang, atıf, IP başına rate limit, analitik, hukuki).
-- Düzeltme: `safetensors` list endpoint'inde `?full=true` ile bile **dönmüyor** — yalnızca `siblings` dönüyor. Runner algılama bedava, param sayısı istek maliyetli.
+- Düzeltme: `safetensors` list endpoint'inde `?full=true` ile bile **dönmüyor** - yalnızca `siblings` dönüyor. Runner algılama bedava, param sayısı istek maliyetli.
 - Düzeltme: avatar endpoint'leri token'sız çalışmıyor.
 - v1 kapsamından çıkarıldı: Ollama scrape, OpenRouter, GitHub releases (karar 3).
 - Hâlâ geçerli: rate limit sayıları, sort değerleri, tag filtresi, cursor pagination, daily papers date paramı, `pipeline_tag` nullability, blog.rss 404.

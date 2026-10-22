@@ -4,7 +4,7 @@ import { slugify, type ClassifiedModel } from "./model.ts";
 import { formatParams } from "./runner/vram.ts";
 
 /**
- * The compare sheet's data model — reading, resolving and laying out
+ * The compare sheet's data model - reading, resolving and laying out
  * (docs/en/COMPARE-PLAN.md).
  *
  * Everything here is pure: no snapshot, no `fetch`, no `Date.now()` that the
@@ -13,7 +13,7 @@ import { formatParams } from "./runner/vram.ts";
  *
  *  1. a row exists only when at least one compared model reports it (C5), because
  *     `paramsTotal` is present on 17.7 % of the served rows and `vramEstGb` on
- *     17.2 % — an 8-row sheet is mostly dashes;
+ *     17.2 % - an 8-row sheet is mostly dashes;
  *  2. "best" is a *fact about the printed numbers*, computed with a stated
  *     direction, marked on every tie, and never assigned when fewer than two
  *     models report the value (C7/C8).
@@ -536,7 +536,7 @@ export function topDifferences(groups: CompareGroup[], limit = 3): CompareDiffer
 
 /**
  * One pair per category, preferring categories where both models carry params and
- * a VRAM estimate so the FIT rows are not empty — the sheet's own lesson, applied
+ * a VRAM estimate so the FIT rows are not empty - the sheet's own lesson, applied
  * to its suggestions.
  */
 export function suggestPairs(pool: ClassifiedModel[], limit = 3): Array<{ category: string; models: ClassifiedModel[] }> {

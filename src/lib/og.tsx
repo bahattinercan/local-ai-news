@@ -12,10 +12,10 @@
  * 1. **The text selection is pure.** `ogModelCard`, `ogNewsCard`,
  *    `ogGlossaryCard` and `ogSiteCard` take snapshot data and return the exact
  *    strings a card prints. Tests pin them (`tests/og.test.ts`) because
- *    `ImageResponse` cannot run in a unit test — Satori needs a WASM resvg.
+ *    `ImageResponse` cannot run in a unit test - Satori needs a WASM resvg.
  * 2. **The font is a committed file, read from disk.** `next/font/google`
  *    returns CSS objects Satori cannot consume, so the card reads TTFs from
- *    `public/fonts/` with `readFile` — never `fetch`, so the route works in
+ *    `public/fonts/` with `readFile` - never `fetch`, so the route works in
  *    CI with no network and on any runtime with a filesystem. See
  *    `public/fonts/README.md` for provenance and licence (OFL 1.1).
  *
@@ -43,7 +43,7 @@ export const OG_SIZE: { width: number; height: number } = { width: 1200, height:
 /** Satori emits PNG through resvg; `ImageResponse` sets no other type. */
 export const OG_CONTENT_TYPE = "image/png";
 
-/** docs/en/DESIGN-V3.md §4 — paper ramp, ink, one rose accent. */
+/** docs/en/DESIGN-V3.md §4 - paper ramp, ink, one rose accent. */
 export const OG_PALETTE = {
   paper: "#f2efe6",
   surface: "#fdfcf8",
@@ -118,7 +118,7 @@ export interface OgCard {
   kicker: string;
   /** The headline: entity name, term, cleaned news title or the brand. */
   title: string;
-  /** One supporting line — author, standfirst, definition. `null` when absent. */
+  /** One supporting line - author, standfirst, definition. `null` when absent. */
   deck: string | null;
   /** At most three label/value columns; empty means the card prints none. */
   facts: OgFact[];
@@ -141,8 +141,8 @@ function footer(locale: Locale): string {
 /**
  * The unknown-slug card. A shared file convention can be requested directly, so
  * `/en/m/does-not-exist/opengraph-image` must answer a picture rather than a
- * 500. It prints the nameplate, the brand and the tagline — all from the
- * dictionary, so the fallback needs no new copy — and no entity row at all,
+ * 500. It prints the nameplate, the brand and the tagline - all from the
+ * dictionary, so the fallback needs no new copy - and no entity row at all,
  * which is the honest thing to show when the entity does not exist.
  *
  * The masthead word (`MODEL`, `NEWS`, `GLOSSARY`) is the segment name the site
@@ -164,7 +164,7 @@ function genericCard(kind: string, locale: Locale): OgCard {
 /* ------------------------------------------------------------- site card -- */
 
 export interface SiteCardInput {
-  /** Snapshot `generatedAt` — the edition the numbers come from. */
+  /** Snapshot `generatedAt` - the edition the numbers come from. */
   generatedAt: string | null;
   tracked: number;
   passed: number;
@@ -203,9 +203,9 @@ function repoName(model: ClassifiedModel): string {
 
 /**
  * `src/app/[locale]/m/[slug]/opengraph-image.tsx`: model name, author, category
- * and up to three facts the snapshot actually reports — params, licence, VRAM
+ * and up to three facts the snapshot actually reports - params, licence, VRAM
  * estimate, then the first quantizations. A fact whose field is null is absent,
- * never printed as `—` or `unknown` (§4.2's rule for descriptions, applied to
+ * never printed as `-` or `unknown` (§4.2's rule for descriptions, applied to
  * the image so the card cannot advertise a spec the page does not show).
  */
 export function ogModelCard(model: ClassifiedModel | null, localeInput?: Locale | string | null): OgCard {
@@ -337,7 +337,7 @@ const root: CSSProperties = {
   fontFamily: TEXT_FONT
 };
 
-/** Letterspaced small caps — the masthead and every label on the page share it. */
+/** Letterspaced small caps - the masthead and every label on the page share it. */
 const strap: CSSProperties = {
   fontSize: 17,
   letterSpacing: "0.18em",

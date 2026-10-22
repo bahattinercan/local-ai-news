@@ -4,7 +4,7 @@
  * A full `npm run ingest` spends its request budget on the category listings
  * first, so the 1 000-odd rows already in `data/feed.json` would wait several runs
  * for their model-card text. This reads the snapshot, fills the cards that are
- * still missing (`cardSummary === undefined`), and writes it back — the same write
+ * still missing (`cardSummary === undefined`), and writes it back - the same write
  * `runIngest` performs, so the app and the publish job see one shape.
  *
  *   npm run cards-backfill -- --limit=40 [--dry] [--all] [--refresh]

@@ -39,13 +39,13 @@ export function FilterBar({
       termSlug: "quality-gate",
       options: [["passed", t(dict, "filters.passedOnly")], ["all", t(dict, "filters.showEverything")]]
     },
-    { name: "runner", label: t(dict, "filters.runner"), defaultValue: "", options: [["", "—"], ...RUNNERS.map((r) => [r, r])], termSlug: "runner" },
-    { name: "maxParams", label: t(dict, "filters.size"), defaultValue: "", options: [["", "—"], ...SIZES.map((s) => [String(s), `≤${s}B`])] },
-    { name: "license", label: t(dict, "filters.license"), defaultValue: "", options: [["", "—"], ["apache-2.0", "apache-2.0"], ["mit", "mit"], ["other", "other"]] }
+    { name: "runner", label: t(dict, "filters.runner"), defaultValue: "", options: [["", "-"], ...RUNNERS.map((r) => [r, r])], termSlug: "runner" },
+    { name: "maxParams", label: t(dict, "filters.size"), defaultValue: "", options: [["", "-"], ...SIZES.map((s) => [String(s), `≤${s}B`])] },
+    { name: "license", label: t(dict, "filters.license"), defaultValue: "", options: [["", "-"], ["apache-2.0", "apache-2.0"], ["mit", "mit"], ["other", "other"]] }
   ];
 
   /* Window and sort decide what the list *is*; the other four narrow it. Only
-     the first two (plus search and Apply) stay on the first screen — the rest
+     the first two (plus search and Apply) stay on the first screen - the rest
      live in the disclosure with the saved-filter control. */
   const primary = fields.slice(0, 2);
   const secondary = fields.slice(2);
@@ -90,8 +90,8 @@ export function FilterBar({
         </label>
         <SubmitButton label={t(dict, "filters.apply")} />
 
-        {/* `.filters-more` (globals.css) keeps the summary in the row above — the
-            button does not move — while the panel becomes a flex row of its own,
+        {/* `.filters-more` (globals.css) keeps the summary in the row above - the
+            button does not move - while the panel becomes a flex row of its own,
             so its four selects sit side by side across the full width instead of
             wrapping inside a button-width box. */}
         <details className="filters-more group">

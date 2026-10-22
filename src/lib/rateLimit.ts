@@ -1,4 +1,4 @@
-/** In-memory per-IP limiter. Single instance only — on Vercel this is per-function instance. */
+/** In-memory per-IP limiter. Single instance only - on Vercel this is per-function instance. */
 const hits = new Map<string, { count: number; windowStart: number }>();
 
 export const RATE_LIMIT_MAX = 60;

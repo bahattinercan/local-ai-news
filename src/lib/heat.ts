@@ -1,11 +1,11 @@
 import type { ClassifiedModel } from "./model.ts";
 
 /**
- * Growth, measured — not guessed.
+ * Growth, measured - not guessed.
  *
  * `downloads` in the snapshot is a point-in-time total, so nothing in the data
  * says how much of it arrived *inside the window*: the snapshot keeps no history.
- * `trendingScore` cannot fill the gap either — it is `null` on every model in the
+ * `trendingScore` cannot fill the gap either - it is `null` on every model in the
  * served snapshot (measured 1 633/1 633), which is why `lib/store.ts` derives its
  * `trending` sort from likes and downloads instead of trusting the field.
  *
@@ -13,7 +13,7 @@ import type { ClassifiedModel } from "./model.ts";
  * count **on the run that first saw the model**, so a later subtraction is a real
  * in-window delta rather than a labelled total. The field can only exist for
  * models first seen after that change, so the UI must treat `null` as the normal
- * case — hence `growthCoverage`/`hasGrowthSignal` instead of a bare subtraction.
+ * case - hence `growthCoverage`/`hasGrowthSignal` instead of a bare subtraction.
  */
 export function growthOf(model: ClassifiedModel): number | null {
   const base = model.downloadsAtFirstSeen;
@@ -42,7 +42,7 @@ export function hasGrowthSignal(models: ClassifiedModel[]): boolean {
   return models.length >= 4 && growthCoverage(models) >= GROWTH_COVERAGE_GATE;
 }
 
-/** "+119k" / "0" — what the band prints when `hasGrowthSignal` is true. */
+/** "+119k" / "0" - what the band prints when `hasGrowthSignal` is true. */
 export function formatGrowth(value: number): string {
   if (value >= 1_000_000) return `+${(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `+${(value / 1_000).toFixed(1)}k`;

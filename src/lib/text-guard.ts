@@ -2,7 +2,7 @@
  * Guards for text that came from a JSON snapshot nobody validates.
  *
  * Measured 2026-10-18 on the served Blob snapshot: **40 of 185 news items** carry
- * the literal string `"[object Object]"` as `organization` — a stringified object
+ * the literal string `"[object Object]"` as `organization` - a stringified object
  * that reached a text field somewhere upstream (all 40 are `paper` entries, and
  * they are baked into both the published blob and the repo copy).
  *
@@ -14,7 +14,7 @@
  */
 const POISONED_TEXT = /^\[object [a-z0-9]+\]$/i;
 
-/** `"[object Object]"`, `"[object Promise]"`, … — a stringified object, never a label. */
+/** `"[object Object]"`, `"[object Promise]"`, … - a stringified object, never a label. */
 export function isPoisonedText(value: unknown): boolean {
   return typeof value === "string" && POISONED_TEXT.test(value.trim());
 }

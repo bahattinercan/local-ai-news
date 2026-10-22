@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n";
  *
  * Measured before: the old `TrendChart` put three points on a 1 200-unit viewBox
  * that rendered at 1 248×208 on a desktop and 343×57 on a phone, with **zero**
- * `<text>` nodes — no y scale, no x labels, no values. Scaling the box is what
+ * `<text>` nodes - no y scale, no x labels, no values. Scaling the box is what
  * makes SVG text unusable at small widths, so the bars are plain divs: the axis
  * labels stay 11 px at every viewport, the tokens apply, and the print sheet gets
  * the same chart.

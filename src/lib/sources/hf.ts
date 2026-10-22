@@ -185,7 +185,7 @@ export class HfClient {
   /**
    * The model card body (the repository README) as raw Markdown.
    *
-   * The JSON API only exposes `cardData` — the frontmatter keys — so the prose a
+   * The JSON API only exposes `cardData` - the frontmatter keys - so the prose a
    * reader wants was never fetched at all (`grep -rni readme src` returned nothing
    * before this). `null` means "there is no card to read" (404 on a repo without a
    * README, or a gated/private repo answering 401/403); a hard failure still throws

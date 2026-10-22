@@ -2,7 +2,7 @@
 
 [English](README.md) | **Türkçe**
 
-Yerelde çalıştırabileceğin **açık ağırlıklı AI modellerini** — LLM, görüntü, video, ses, kod, çoklu mod, embedding, görü ve robotik modelleri — ve zamanlanmış olarak güncellenen bir haber akışını takip eder.
+Yerelde çalıştırabileceğin **açık ağırlıklı AI modellerini** - LLM, görüntü, video, ses, kod, çoklu mod, embedding, görü ve robotik modelleri - ve zamanlanmış olarak güncellenen bir haber akışını takip eder.
 
 Ürün adı **OpenWeight Radar**. Depo ve dağıtım projesi hâlâ `local-ai-news` adını taşıyor; herkese açık kaynak `https://local-ai-news.vercel.app` (özel alan adı kullanılmama kararı alındı).
 
@@ -63,7 +63,7 @@ npm run ingest -- --dry
 
 ## Ortam değişkenleri
 
-`.env.example` dosyasını `.env` olarak kopyalayın. Next.js dosyayı otomatik yükler. `npm run publish` dosyayı kendisi okur; diğer betikler değişkenleri süreç ortamından okur — env dosyasıyla çalıştırın (`npx tsx --env-file=.env scripts/ingest.ts`) veya değerleri kabukta verin (`HF_TOKEN=... npm run ingest`).
+`.env.example` dosyasını `.env` olarak kopyalayın. Next.js dosyayı otomatik yükler. `npm run publish` dosyayı kendisi okur; diğer betikler değişkenleri süreç ortamından okur - env dosyasıyla çalıştırın (`npx tsx --env-file=.env scripts/ingest.ts`) veya değerleri kabukta verin (`HF_TOKEN=... npm run ingest`).
 
 | Değişken | Gerekli | Amaç |
 |---|---|---|
@@ -206,7 +206,7 @@ interface Snapshot {
 | `primaryCategory`, `categories` | Sekme kategorisi ve eşleşen tüm kategoriler |
 | `pipelineTag`, `libraryName`, `license`, `licenseName` | Hub meta verisi |
 | `createdAt`, `updatedAt` | Hugging Face repo tarihleri |
-| `firstSeenAt` | Radar'ın satırı ilk gördüğü an — “yeni” bunu ifade eder |
+| `firstSeenAt` | Radar'ın satırı ilk gördüğü an - “yeni” bunu ifade eder |
 | `downloads`, `likes`, `trendingScore` | Hub metrikleri; `trendingScore` pratikte null |
 | `downloadsAtFirstSeen` | Pencere içi büyüme için başlangıç değeri; `null` = bilinmiyor |
 | `gated` | Gated repolar akıştan çıkarılır |
@@ -243,10 +243,10 @@ Yazıcı anlık görüntüyü **2.000 model** ve **1.000 haber satırı** ile s�
 
 **Hugging Face** model kaynağıdır:
 
-- `GET /api/models` — `pipeline_tag`, arama terimi ve oluşturma tarihine göre listeleme; cursor sayfalaması opak kabul edilir.
-- `GET /api/models/{id}?full=true` — `cardData`, `safetensors`, `siblings`, `spaces`, `usedStorage`, `gated`.
-- `GET /api/trending?type=model` — `authorData.avatarUrl` içeren tek yanıt.
-- `GET /api/daily_papers` — günde yaklaşık 50 makale.
+- `GET /api/models` - `pipeline_tag`, arama terimi ve oluşturma tarihine göre listeleme; cursor sayfalaması opak kabul edilir.
+- `GET /api/models/{id}?full=true` - `cardData`, `safetensors`, `siblings`, `spaces`, `usedStorage`, `gated`.
+- `GET /api/trending?type=model` - `authorData.avatarUrl` içeren tek yanıt.
+- `GET /api/daily_papers` - günde yaklaşık 50 makale.
 
 **Haber feed'leri** (karar 3, 2026-10-15'te revize edildi):
 
@@ -426,8 +426,8 @@ Derleme sırasında veri çekmek zorunlu değildir: depodaki `data/feed.json` ye
 
 Depo sırları:
 
-- `BLOB_READ_WRITE_TOKEN` — `npm run publish` için zorunlu.
-- `HF_TOKEN` — isteğe bağlı, Hugging Face limitini yükseltir.
+- `BLOB_READ_WRITE_TOKEN` - `npm run publish` için zorunlu.
+- `HF_TOKEN` - isteğe bağlı, Hugging Face limitini yükseltir.
 
 `ingest` iş akışı `sources-check` → `ingest` → `classify-check` → `publish` çalıştırır. `seo` iş akışı `main` üzerinde ve rota, SEO kodu, anlık görüntü veya `package.json` değiştiren PR'larda typecheck, lint, birim testleri ve çevrimdışı SEO denetimini çalıştırır.
 
@@ -542,7 +542,7 @@ Tam planlar, ölçümler ve karar günlüğü `docs/` altındadır. İngilizce k
 
 | Doküman | İngilizce | Türkçe |
 |---|---|---|
-| Dokümantasyon dizini | [docs/README.md](docs/README.md) | — |
+| Dokümantasyon dizini | [docs/README.md](docs/README.md) | - |
 | Ürün planı | [PLAN.md](docs/en/PLAN.md) | [PLAN.md](docs/tr/PLAN.md) |
 | Karar günlüğü | [DECISIONS.md](docs/en/DECISIONS.md) | [DECISIONS.md](docs/tr/DECISIONS.md) |
 | Veri depolama (Postgres yok) | [DATA-STORAGE.md](docs/en/DATA-STORAGE.md) | [DATA-STORAGE.md](docs/tr/DATA-STORAGE.md) |
@@ -564,7 +564,7 @@ Tam planlar, ölçümler ve karar günlüğü `docs/` altındadır. İngilizce k
 - Yönetici override paneli (`data/overrides.json` kaçış yolu var, UI yok).
 - E-posta özeti.
 - Yerel Ollama entegrasyonu (`localhost:11434/api/tags`).
-- Mevcut runtime/topluluk feed'lerinin ötesinde yeni dış haber kaynakları — bu, rastlantısal ekleme değil açık bir karar gerektirir.
+- Mevcut runtime/topluluk feed'lerinin ötesinde yeni dış haber kaynakları - bu, rastlantısal ekleme değil açık bir karar gerektirir.
 
 ---
 

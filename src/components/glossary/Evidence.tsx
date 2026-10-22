@@ -1,5 +1,5 @@
 /**
- * "In this snapshot" — the one figure a definition is allowed to quote.
+ * "In this snapshot" - the one figure a definition is allowed to quote.
  *
  * Numbers are derived by `getGlossaryEvidence()` from the same cached snapshot the
  * feed reads (docs/en/GLOSSARY-PLAN.md G-D6), and the block always prints its
@@ -18,7 +18,7 @@ export function Evidence({
   note?: string;
   /** Already formatted: "198 of 915 models list a quantization". */
   coverage: string;
-  /** Value distribution — label and count, most common first. */
+  /** Value distribution - label and count, most common first. */
   rows: Array<[string, number]>;
   caption?: string;
 }) {

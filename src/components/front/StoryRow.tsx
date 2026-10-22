@@ -21,7 +21,7 @@ const KIND_LABEL_KEY: Record<string, string> = {
  * headline, a byline (docs/en/DESIGN-V3.md §1 zone 6).
  *
  * The stored text is somebody else's release note or abstract, so the headline
- * and the deck both come from `newsText()` — the same cleanup the news list uses
+ * and the deck both come from `newsText()` - the same cleanup the news list uses
  * (a `runtime` row's stored title is a build tag such as `b11699`, and 40 items
  * in the served snapshot carry `organization: "[object Object]"`, which the store
  * has already turned into `null` by the time it reaches here).
@@ -57,7 +57,7 @@ export function StoryRow({
         {art === "image" ? (
           <Link href={href} tabIndex={-1} className="shrink-0">
             {/* 3:2 and 72 px wide, not 96: the rail column is ~296 px, and a 96 px
-                plate left 188 px for text — enough to break the kicker
+                plate left 188 px for text - enough to break the kicker
                 (`RELEASE · LANGUAGE / LLM`) onto two lines and the byline too. */}
             <PlateImage
               src={item.thumbnail}

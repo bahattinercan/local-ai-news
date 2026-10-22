@@ -13,7 +13,7 @@ import { Term } from "./ui/Term";
  * It used to be a 287 px card with a grid texture, a rotating radar sweep and
  * four equal-weight 24 px stats. The card is gone: it is a ruled band now, the
  * decorative layers are gone with it (nothing moves inside the reading area), one
- * metric still leads, and the hot list stays a disclosure — one click away and
+ * metric still leads, and the hot list stays a disclosure - one click away and
  * outside the first screen's budget.
  */
 export async function PulseStrip({ locale, days, category }: { locale: Locale; days: number; category?: string }) {
@@ -45,11 +45,11 @@ export async function PulseStrip({ locale, days, category }: { locale: Locale; d
         {category ? null : (
           <Stat
             label={t(dict, "pulse.top")}
-            value={pulse.topCategory ? categoryLabel(pulse.topCategory) : "—"}
+            value={pulse.topCategory ? categoryLabel(pulse.topCategory) : "-"}
             hint={`${pulse.topCategoryCount}`}
           />
         )}
-        <Stat label={t(dict, "pulse.updated")} value={pulse.generatedAt ? relativeTime(pulse.generatedAt) : "—"} />
+        <Stat label={t(dict, "pulse.updated")} value={pulse.generatedAt ? relativeTime(pulse.generatedAt) : "-"} />
 
         {pulse.hot.length > 0 ? (
           <details className="w-full lg:ml-auto lg:w-auto">

@@ -1,13 +1,13 @@
-# Design v3 — "Basın Baskısı" (The Press Plate)
+# Design v3 - "Basın Baskısı" (The Press Plate)
 
 > Turkish mirror: [docs/tr/DESIGN-V3.md](../tr/DESIGN-V3.md)
 > Status: **implemented** 2026-10-18 (§0 records what landed, the deviations and the measured results). Written as a plan 2026-10-18 against the live snapshot (`generatedAt 2026-10-18T09:09:12Z`, **1 633 models / 185 news**), the running site's screenshots supplied by the owner, and the reference shot `dribbble.com/shots/10827673-Retro-news-web-app`.
-> Supersedes the *visual* goals of [DESIGN.md](DESIGN.md) and [DESIGN-V2.md](DESIGN-V2.md). The **defect list and the measurement method of DESIGN-V2 stay in force** — every number in its §2/§3 was re-verified for this plan (§2.4) and none of it is being undone.
+> Supersedes the *visual* goals of [DESIGN.md](DESIGN.md) and [DESIGN-V2.md](DESIGN-V2.md). The **defect list and the measurement method of DESIGN-V2 stay in force** - every number in its §2/§3 was re-verified for this plan (§2.4) and none of it is being undone.
 > Evidence for this document: `.shots/ref-crop.png` (reference anatomy, 3× crop), `.shots/live-snapshot.json` (live snapshot, 2.2 MB), `.shots/contrast.mjs` (token contrast, re-runnable), `.shots/thumb1-small.png` (what a news thumbnail actually looks like).
 
 ---
 
-## 0. Implementation log — 2026-10-18
+## 0. Implementation log - 2026-10-18
 
 > Implemented in one session on the owner's approval of D2 (paper default), D3 (route move) and D4 (Playfair Display). Every number below was measured **after** the change and has a command behind it (§9).
 
@@ -17,7 +17,7 @@
 | **P0-2** growth, measured | `src/lib/heat.ts` (`growthOf`, `growthCoverage`, `hasGrowthSignal`, `formatGrowth`); the ingest stamps `downloadsAtFirstSeen` on the first sighting. The front page's band prints `+Δ` only when coverage is ≥ 60 %, so the column stays dormant until real baselines accumulate instead of printing `+0` |
 | **P0-3** generated plates | `PressPlate` renders for **100 %** of model rows, story rows and news items that have no thumbnail: a 6 px dot `<pattern>` under one radial mask, 3 SVG elements per plate, deterministic from the slug |
 | **P0-4** evidence tooling | `scripts/fetch-snapshot.ts`, `scripts/contrast.ts` (reads the tokens out of `globals.css`, so it cannot go stale), `scripts/type-census.ts`; `scripts/audit-ui.ts` gained `/models` |
-| **P1** tokens + type | `scripts/contrast.ts`: **paper** (muted/bg 6.57, accent/bg 5.94, control/bg 3.84, rule/bg 1.48) and **night** (7.63, 8.01, 3.64, 1.55) — every gated pair passes. Playfair Display is loaded with `latin-ext`; Space Grotesk gained `latin-ext` too, because Turkish `ğ ş İ ı` had been falling back to Georgia all along |
+| **P1** tokens + type | `scripts/contrast.ts`: **paper** (muted/bg 6.57, accent/bg 5.94, control/bg 3.84, rule/bg 1.48) and **night** (7.63, 8.01, 3.64, 1.55) - every gated pair passes. Playfair Display is loaded with `latin-ext`; Space Grotesk gained `latin-ext` too, because Turkish `ğ ş İ ı` had been falling back to Georgia all along |
 | **P2** shell | masthead + ribbon + desk nav = **180 px** at 1440/1280, 174 at 1024, 220 at 390 (target ≤ 210); the nameplate is exactly **1 line** from 320 to 1440; **0 overflow** across 8 routes × 7 widths (320/360/390/430/768/1024/1440) = 56 combinations; smallest tap target **24 px**; **exactly one nav item marked per route** (`npm run verify-nav`, §0.2.9) |
 | **P3** front page | `/` is the broadsheet and the index moved to `/models`; `middleware.ts` answers **308** for `/?window=…` with the query preserved (verified live). At 1440×900 the hero plate starts at **y = 298**, the lead headline spans **673 → 765**, fully above the fold |
 | **P4** routes | `PageHeader` gives every route the same strap line; the feed's cards are ruled rows (no card, no shadow, ~40 % less height per row); `/news` groups by day inside ruled disclosures; `/stats` is ruled sections with an ink trend chart; the model page prints a plate plus a ruled spec grid |
@@ -29,8 +29,8 @@
 | Planned | Landed | Reason |
 |---|---|---|
 | Container `max-w-[1180px]` (§6) | **1280 px** (`.shell`) | The masthead's three zones measure ≈ 1 260 px with the nameplate at 30 px: at 1 180 px the nameplate wrapped to two lines and the snapshot block broke into five. A broadsheet is wider than an app. |
-| "hero headline top edge ≤ 260 px" (P3) | plate at 298, headline 673–765 | The criterion was written before the design existed and ignored the plate that sits above the headline. The honest, measurable version — the lead headline fully visible inside the first 900 px — is what §9 checks now. |
-| "≥ 55 % of text in 15–17 px; one element ≥ 40 px" (§5) | front page 25 % at ≥ 15 px, largest **44 px**; `/models` 67 %; no sentence below 15 px anywhere | The first half was measuring the *old* defect (everything at 12–14 px) and conflicts with the design's own signature: kickers, bylines, counts and annotations are deliberately 11–13 px letterspaced caps. `scripts/type-census.ts` now gates what actually matters — **no sentence below 15 px, at most one element ≥ 40 px** — and reports the share. |
+| "hero headline top edge ≤ 260 px" (P3) | plate at 298, headline 673–765 | The criterion was written before the design existed and ignored the plate that sits above the headline. The honest, measurable version - the lead headline fully visible inside the first 900 px - is what §9 checks now. |
+| "≥ 55 % of text in 15–17 px; one element ≥ 40 px" (§5) | front page 25 % at ≥ 15 px, largest **44 px**; `/models` 67 %; no sentence below 15 px anywhere | The first half was measuring the *old* defect (everything at 12–14 px) and conflicts with the design's own signature: kickers, bylines, counts and annotations are deliberately 11–13 px letterspaced caps. `scripts/type-census.ts` now gates what actually matters - **no sentence below 15 px, at most one element ≥ 40 px** - and reports the share. |
 | `lib/heat.ts` exports a documented "attention score" (P0-2) | exports growth helpers only | `lib/store.ts` already derives a `trending` sort from likes and downloads. A second undocumented blend beside it would be one more number nobody can check, and the ribbon already prints the same figure that ordered it. |
 | "charts redraw in ink" (P4) | trend + bars in ink/accent; the donut keeps the categorical tokens, reordered so slice 1 is the accent and slice 2 is ink | A seven-slice monochrome ramp is unreadable; the legend prints label, count and share, and the token palette is contrast-verified rather than hand-picked. |
 | `FeedCard` → `ModelRow` (§7.2) | `FeedCard` (ruled index row) plus a separate compact `ModelRow` for the band | The two have different jobs and different shapes; renaming one into the other would have been churn with no reader benefit. |
@@ -38,29 +38,29 @@
 ### 0.2 Real defects found while implementing (fixed here)
 
 1. **Implicit `auto` grid columns on mobile.** A single-column grid with no explicit track is sized by its items' minimum contribution, and a `truncate` row contributes its whole text: the front page built a **957 px track inside a 343 px page** at 390 px (+598 px of horizontal overflow), and `/models` and `/news` carried the same latent bug. Fixed by declaring `grid-cols-1` / `minmax(0, 1fr)` (`FeedView`, `NewsList`, `Charts`, `VramCalculator`, `Masthead`, the front page's three grids, `.stats-grid`).
-2. **The theme toggle and the language switch shrank.** As flex children they compressed to **18 px** at 1024 px once the masthead got tight — a sub-24 px target that appeared in exactly one viewport. Fixed with `shrink-0`.
+2. **The theme toggle and the language switch shrank.** As flex children they compressed to **18 px** at 1024 px once the masthead got tight - a sub-24 px target that appeared in exactly one viewport. Fixed with `shrink-0`.
 3. **The halftone screen was invisible in the night edition.** `mix-blend-mode: multiply` with light ink is a no-op over a photograph, so `--screen-ink` is now a dark ink in both themes.
 4. **`.byline` uppercased its own timestamps** (`3d` → `3D`, `56m` → `56M`); the uppercase moved onto the organisation label only.
 5. **The hero plate broke out of its column.** `PlateImage` carried the pixel size in an inline style, which overrode `w-full` and pushed a 720 px image out of its 600 px track and over the rail.
-6. **Every `text-*` colour on an anchor was silently dead.** `globals.css` carried a bare `a { color: inherit }` *outside* any layer, and unlayered CSS outranks every layered rule in the cascade — so it beat each Tailwind colour utility on every `<a>` on the site, including all the `hover:text-accent`. Measured on the RSS call to action: light ink on a light block, i.e. an invisible button (and its computed colour was `var(--text)` while `--bg` was dark ink). The base rules now live in `@layer base`, where a default belongs, and the accent layer of the design (arrow links, kickers, the promo CTA) actually renders.
+6. **Every `text-*` colour on an anchor was silently dead.** `globals.css` carried a bare `a { color: inherit }` *outside* any layer, and unlayered CSS outranks every layered rule in the cascade - so it beat each Tailwind colour utility on every `<a>` on the site, including all the `hover:text-accent`. Measured on the RSS call to action: light ink on a light block, i.e. an invisible button (and its computed colour was `var(--text)` while `--bg` was dark ink). The base rules now live in `@layer base`, where a default belongs, and the accent layer of the design (arrow links, kickers, the promo CTA) actually renders.
 7. **The desk nav hard-cut a taxonomy term.** The strip needed ~1 375 px inside a 1 280 px container, so `EMBEDDING / RAG` arrived as `EMI` with the rest scrolled out of sight. The nav uses the terms' short forms now (still English taxonomy: LLM, Image, …, Embedding, Vision, Robotics), and both scrollable strips fade at the right edge so a cut term reads as "there is more".
-8. **`BAŞ HABER` printed twice** on the front page — once as the page kicker, once above the hero headline. The page kicker names the window; the lead story keeps its own label.
-9. **The scrollable strips could not actually be scrolled.** The ribbon measured `client 1248 / scroll 2966` — genuinely scrollable — but `scrollbar-width: none` hid the only affordance, a vertical wheel over a 37 px strip scrolls the *page*, and the desk strip was not even a tab stop (`tabIndex = -1`). So with a mouse the rest of the ticker was unreachable: "this part does not scroll". Both strips are now a shared `ScrollStrip`: a visible 4 px ink scrollbar, drag-to-pan with the mouse (a drag suppresses the click it would otherwise fire), and `tabIndex = 0` with an accessible name for the keyboard. The vertical wheel is deliberately not hijacked, and the bar costs 3 px of shell height rather than the 19 px that `scrollbar-width: thin` cost by making Chrome ignore the `::-webkit-scrollbar` rules.
-9. **The nav underlined the wrong thing on every page but a desk.** Only `/c/[category]` passed `active`, and the desk predicate was `desk.key === (active ?? "")` — so an undefined `active` matched the empty key and **All** carried the ink underline on News, Research, Stats, Compare, Glossary, `/models` and every detail page, while the section links had no state to carry at all: the reader could not tell which of the fifteen items they were standing on (owner: *"burada seçili olan hangisi belli olmuyor"*, 2026-10-18). The nav now takes a `section` as well as a desk, reads `active` only when the page declared one, marks the item's own page with `aria-current="page"` and an ancestor (a model inside its category, a news item inside News/Research, a glossary term) with `aria-current="true"` — the ARIA value for "current item in a set". Measured per route: `/tr` All:page, `/tr/models` All:true, `/tr/news` News:page, `/tr/research` Research:page, `/tr/stats` Stats:page, `/tr/compare` Compare:page, `/tr/glossary` Glossary:page, `/tr/c/coding` Coding:page, a model page its own category:true, a glossary term Glossary:true; exactly one item on each. The magnifier follows the same rule it always stated for desks: a search from News or Research now stays in News or Research (`/news?q=`, `/research?q=`) instead of dropping the term on the model index.
-10. **The night edition fell back to paper on a language switch.** `data-theme` lives on `<html>`, and `<html>` is rendered by the root layout — which is `app/[locale]/layout.tsx`, so every TR/EN click **remounts** it. Next.js then re-applies every attribute on `<html>` from the RSC payload, and that payload can only say `data-theme="light"`: the server does not know the reader's choice. The `<head>` bootstrap script did not save it either, because it is rendered through `dangerouslySetInnerHTML`, and React says so itself in the console — *"Scripts inside React components are never executed when rendering on the client"*. Measured 2026-10-20 (`npm run verify-theme`, before the fix): clicking TR in the night edition left `localStorage` on `dark` and the page on `rgb(242, 239, 230)`, i.e. the choice survived and the page did not; the toggle also flipped to the wrong icon, because it read the (already overwritten) DOM in a `useEffect`. The theme now lives in one store (`src/lib/theme.ts`), `ThemeSync` re-asserts it in a **layout** effect — before paint, so there is no flash of paper — and the toggle reads that store instead of the document (`src/lib/useTheme.ts`). `scripts/check-theme.ts` asserts it end-to-end in a real browser: paper on a cold load, ink after the toggle, ink after EN → TR, ink after TR → EN, the toggle still returning to paper, and a hard load honouring the saved choice. The one honest cost: React's dev-only script-tag notice still fires on each language switch, because the pre-paint bootstrap has to stay a `<script>` (without it a cold load flashes paper). It is expected; the attribute is no longer its job.
+8. **`BAŞ HABER` printed twice** on the front page - once as the page kicker, once above the hero headline. The page kicker names the window; the lead story keeps its own label.
+9. **The scrollable strips could not actually be scrolled.** The ribbon measured `client 1248 / scroll 2966` - genuinely scrollable - but `scrollbar-width: none` hid the only affordance, a vertical wheel over a 37 px strip scrolls the *page*, and the desk strip was not even a tab stop (`tabIndex = -1`). So with a mouse the rest of the ticker was unreachable: "this part does not scroll". Both strips are now a shared `ScrollStrip`: a visible 4 px ink scrollbar, drag-to-pan with the mouse (a drag suppresses the click it would otherwise fire), and `tabIndex = 0` with an accessible name for the keyboard. The vertical wheel is deliberately not hijacked, and the bar costs 3 px of shell height rather than the 19 px that `scrollbar-width: thin` cost by making Chrome ignore the `::-webkit-scrollbar` rules.
+9. **The nav underlined the wrong thing on every page but a desk.** Only `/c/[category]` passed `active`, and the desk predicate was `desk.key === (active ?? "")` - so an undefined `active` matched the empty key and **All** carried the ink underline on News, Research, Stats, Compare, Glossary, `/models` and every detail page, while the section links had no state to carry at all: the reader could not tell which of the fifteen items they were standing on (owner: *"burada seçili olan hangisi belli olmuyor"*, 2026-10-18). The nav now takes a `section` as well as a desk, reads `active` only when the page declared one, marks the item's own page with `aria-current="page"` and an ancestor (a model inside its category, a news item inside News/Research, a glossary term) with `aria-current="true"` - the ARIA value for "current item in a set". Measured per route: `/tr` All:page, `/tr/models` All:true, `/tr/news` News:page, `/tr/research` Research:page, `/tr/stats` Stats:page, `/tr/compare` Compare:page, `/tr/glossary` Glossary:page, `/tr/c/coding` Coding:page, a model page its own category:true, a glossary term Glossary:true; exactly one item on each. The magnifier follows the same rule it always stated for desks: a search from News or Research now stays in News or Research (`/news?q=`, `/research?q=`) instead of dropping the term on the model index.
+10. **The night edition fell back to paper on a language switch.** `data-theme` lives on `<html>`, and `<html>` is rendered by the root layout - which is `app/[locale]/layout.tsx`, so every TR/EN click **remounts** it. Next.js then re-applies every attribute on `<html>` from the RSC payload, and that payload can only say `data-theme="light"`: the server does not know the reader's choice. The `<head>` bootstrap script did not save it either, because it is rendered through `dangerouslySetInnerHTML`, and React says so itself in the console - *"Scripts inside React components are never executed when rendering on the client"*. Measured 2026-10-20 (`npm run verify-theme`, before the fix): clicking TR in the night edition left `localStorage` on `dark` and the page on `rgb(242, 239, 230)`, i.e. the choice survived and the page did not; the toggle also flipped to the wrong icon, because it read the (already overwritten) DOM in a `useEffect`. The theme now lives in one store (`src/lib/theme.ts`), `ThemeSync` re-asserts it in a **layout** effect - before paint, so there is no flash of paper - and the toggle reads that store instead of the document (`src/lib/useTheme.ts`). `scripts/check-theme.ts` asserts it end-to-end in a real browser: paper on a cold load, ink after the toggle, ink after EN → TR, ink after TR → EN, the toggle still returning to paper, and a hard load honouring the saved choice. The one honest cost: React's dev-only script-tag notice still fires on each language switch, because the pre-paint bootstrap has to stay a `<script>` (without it a cold load flashes paper). It is expected; the attribute is no longer its job.
 
 ---
 
 ## 1. What the reference actually is
 
-The owner's brief: *"kullanışlı, modern, göze hitap eden … bu tarz bir websitesi"* — a classic broadsheet front page, not a dashboard. `.shots/ref-crop.png` is a 3× crop of the reference, and it decomposes into eight zones. Nothing in it is decoration for its own sake: each zone is a *job*.
+The owner's brief: *"kullanışlı, modern, göze hitap eden … bu tarz bir websitesi"* - a classic broadsheet front page, not a dashboard. `.shots/ref-crop.png` is a 3× crop of the reference, and it decomposes into eight zones. Nothing in it is decoration for its own sake: each zone is a *job*.
 
 | # | Zone | Reference element | The job it does | Our equivalent |
 |---|---|---|---|---|
 | 1 | **Masthead, left** | seal + `DEVY'S PUBLIC HOUSE` + `BEERS · BOURBONS · BREAD` + `Los Angeles · Montreal · New York` | says *who publishes this* and *from where* | brand mark + `OPENWEIGHT RADAR` + `open-weight models · huggingface` + `Vercel Blob · cron 30 min` |
 | 2 | **Masthead, centre** | `HOLLYWOOD FACTORY` in letterspaced serif caps between two hairlines, dateline `March 24, 1976` beneath | the nameplate is the page's whole identity; the dateline makes "today" explicit | `HOLLYWOOD FACTORY` → `OPENWEIGHT RADAR` nameplate; dateline = `Edition of 18 October 2026 · 1 633 models tracked` |
 | 3 | **Masthead, right** | `Telephone is here / $18.90` + a small engraving | one live classified/ticker figure, not a stat grid | `Snapshot 09:09 UTC · 1 633 models · 617 gate-passed` + a halftone radar engraving |
-| 4 | **Ribbon** | pink `#f6c9d8` strip: `Apies 9.1 · The Godfather 9.4 · …` — a horizontal ticker, each title with a superscript score | the "what's hot right now" line, one row, zero vertical cost | `Hot in the window`: top models by window downloads, each with a superscript score |
+| 4 | **Ribbon** | pink `#f6c9d8` strip: `Apies 9.1 · The Godfather 9.4 · …` - a horizontal ticker, each title with a superscript score | the "what's hot right now" line, one row, zero vertical cost | `Hot in the window`: top models by window downloads, each with a superscript score |
 | 5 | **Section nav** | hamburger + `LATEST FEATURED AUTOMOBILES …` in letterspaced caps + a search icon, sitting on a hairline | taxonomy as *type*, not as pills | `ALL · AUDIO 247 · EMBEDDING 244 · IMAGE 225 …` + search icon |
 | 6 | **Body, 3 zones** | left column (portrait + deck + `WATCH VIDEO →`), centre hero (photo, kicker `TRENDING`, 2-line headline, deck, byline + avatar + date + prev/next), right rail (tinted promo box + CTA, then teaser rows, then subscribe box) | **rank**: one story leads, two flank it, the rest is a rail. Reading order is expressed as size and position | hero = top paper of the window; left column = runtime/release stories; right rail = "Run it yourself" promo (copy command) + latest teasers + RSS box |
 | 7 | **Ornament** | halftone dot burst at the hero's top-right | one printed-texture gesture, in a corner | the existing radar sweep + `grid-bg`, reduced to masthead/hero corner only |
@@ -70,17 +70,17 @@ The owner's brief: *"kullanışlı, modern, göze hitap eden … bu tarz bir web
 
 1. **Type carries the hierarchy.** Four sizes and two families do all the ranking; there is no reliance on colour, shadows or icons.
 2. **Rules instead of containers.** A 1 px line separates; a card wraps the same two lines of text in a border, a radius, a shadow and 16 px of padding on all four sides (`FeedCard`'s `card p-4`), and every wrapped card forces a gap to its neighbour.
-3. **One pastel.** Pink ribbon + one tinted box against monochrome ink. Scarcity is what makes the accent mean something. The reference tints its box blue; here the blue read as a foreign panel in a newsprint column (visual review, 2026-10-20), so `--promo` is a shade of the page itself and `--rule` carries the box — see §4.
+3. **One pastel.** Pink ribbon + one tinted box against monochrome ink. Scarcity is what makes the accent mean something. The reference tints its box blue; here the blue read as a foreign panel in a newsprint column (visual review, 2026-10-20), so `--promo` is a shade of the page itself and `--rule` carries the box - see §4.
 4. **Small caps with tracking.** Every label (`TRENDING`, `READ MORE`, `SUBSCRIBE TO ALL THE NEWS`) is letterspaced caps at 11–13 px. This is the single cheapest "retro press" signal and it costs nothing.
 5. **The score superscript.** `9.1` set as a superscript next to a title turns a list into a *ranked* list without a table.
 
-**What does NOT transfer — the images.** This is the decisive constraint of the whole plan and it is measured, not guessed (`.shots/thumb1-small.png`):
+**What does NOT transfer - the images.** This is the decisive constraint of the whole plan and it is measured, not guessed (`.shots/thumb1-small.png`):
 
 - Only **25 of 1 633 models (1.5 %)** have `sampleImages`. Model photography cannot be a design pillar.
 - **151 of 185 news items (82 %)** *do* have a `thumbnail`, 150 of them from `cdn-thumbnails.huggingface.co` (already an allowed `remotePatterns` host in `next.config.ts`).
 - But those thumbnails are **1 200 × 648 renders of the paper's own first page** (dense two-column body text, measured 317 KB for one PNG), not photographs. Dropped into a full-bleed hero they read as noise.
 
-So the art direction is: **news thumbnails are used as printed plates** — cropped from the top, desaturated to ink, halftone-dotted, at rail/column size, and only ever full-size behind a heavy treatment; **models get a generated plate** (procedural halftone monogram, deterministic from the slug) so no slot in the layout is ever empty. §7 P0-3 specifies this.
+So the art direction is: **news thumbnails are used as printed plates** - cropped from the top, desaturated to ink, halftone-dotted, at rail/column size, and only ever full-size behind a heavy treatment; **models get a generated plate** (procedural halftone monogram, deterministic from the slug) so no slot in the layout is ever empty. §7 P0-3 specifies this.
 
 ---
 
@@ -90,9 +90,9 @@ Method: `node .shots/fetch-snapshot.mjs` (reads the private Blob with `SNAPSHOT_
 
 | # | Measurement | Value | Design consequence | Gate + fallback |
 |---|---|---|---|---|
-| 1 | Models / news in the served snapshot | **1 633 / 185** | the front page is an *edit* of a large set, never a dump | — |
+| 1 | Models / news in the served snapshot | **1 633 / 185** | the front page is an *edit* of a large set, never a dump | - |
 | 2 | Distinct `firstSeenAt` days | **3** (2026-10-13 ×343, 10-14 ×572, 10-18 ×718; **15–17 Oct missing**) → the 7-day window returns all 1 633 | "daily edition" would be a lie; the dateline states the *edition* and the *window*, never "today's news" | dateline = snapshot date + window label; the ingest gap stays an open P0 ingest bug |
-| 3 | `qualityPassed` | **617 / 1 633 (37.8 %)**, `gated` **7** | "617 of 1 633 pass the gate" is a real, honest masthead figure | — |
+| 3 | `qualityPassed` | **617 / 1 633 (37.8 %)**, `gated` **7** | "617 of 1 633 pass the gate" is a real, honest masthead figure | - |
 | 4 | `downloads` | > 0 on **1 408/1 633 (86 %)**; p50 **22**, p90 **299**, max **119 265** | downloads is the only universally present metric → it is the ribbon score and the hero's weight | hero requires `downloads ≥ p90`; ribbon requires ≥ 8 items with `downloads ≥ 1` |
 | 5 | `likes` = 0 | **1 188 / 1 633 (73 %)** | likes can never lead; print it only when > 0 | existing behaviour, keep |
 | 6 | `trendingScore` | **null on 1 633/1 633** | there is no HF trending signal to print, and no download *history* → **"trending" is not measurable today** | see P0-2: derive a documented heat score at read time, or label the ribbon "Most downloaded in the window" |
@@ -113,11 +113,11 @@ Method: `node .shots/fetch-snapshot.mjs` (reads the private Blob with `SNAPSHOT_
 |---|---|
 | 0 horizontal overflow at 320/360/390/430/768/1024/1440 | holds (70 route×width combos, DESIGN-V2 §0.3) |
 | 0 tap targets < 24×24 at 1440 and 390 | holds |
-| Light theme AA (`muted/bg` 4.54, `muted/surface` 5.00) | holds — and v3 replaces the ramp, so §4 re-derives it |
+| Light theme AA (`muted/bg` 4.54, `muted/surface` 5.00) | holds - and v3 replaces the ramp, so §4 re-derives it |
 | `next/link` for every internal href | holds (D10 closed) |
 | i18n parity | holds: **125 keys** in both dictionaries |
 
-The single accepted regression to date is `firstCardY` = 565 px at 1440×900 (target was 560). **v3 does not chase that number** — it changes what the first screen is (§7 P3 sets a new, honest one).
+The single accepted regression to date is `firstCardY` = 565 px at 1440×900 (target was 560). **v3 does not chase that number** - it changes what the first screen is (§7 P3 sets a new, honest one).
 
 ---
 
@@ -127,7 +127,7 @@ The single accepted regression to date is `firstCardY` = 565 px at 1440×900 (ta
 |---|---|---|
 | **D1** | The design language becomes **print**: hairline rules, ink on paper, letterspaced small caps, one pastel accent, real nameplate. Cards, glows, glass and the animated sweep leave the content area. | The reference's whole effect comes from these five moves; keeping cards on top of them produces a dashboard wearing a serif. |
 | **D2** | **Paper (light) becomes the default theme**; dark becomes "Night Edition", a real second ramp (not an inverted afterthought). `localStorage` keeps working because the keys stay `light` / `dark`. | A newspaper is ink on paper. The dark ramp stays because half the subject matter is read at night, and DESIGN-V2 spent a pass making it AA. |
-| **D3** | The front page (`/`) becomes a **broadsheet**, and today's filterable model list **moves to `/models`** (verbatim: pulse, filters, grid, pagination). `/?window=…` etc. 308-redirect to `/models?…` in `middleware.ts`. | A front page and a query tool are different pages. Both are wanted; neither survives being merged. *This is the one decision that needs the owner's explicit yes — see §12.* |
+| **D3** | The front page (`/`) becomes a **broadsheet**, and today's filterable model list **moves to `/models`** (verbatim: pulse, filters, grid, pagination). `/?window=…` etc. 308-redirect to `/models?…` in `middleware.ts`. | A front page and a query tool are different pages. Both are wanted; neither survives being merged. *This is the one decision that needs the owner's explicit yes - see §12.* |
 | **D4** | **One new typeface**: a serif for the nameplate and section titles. Headlines stay Space Grotesk 700 (the reference's own headlines are a heavy grotesque, not a serif). Data stays JetBrains Mono. | Keeps the site's existing voice, adds the one missing register, costs ~2 font weights. |
 | **D5** | Model art is **generated** (`PressPlate`): a deterministic halftone monogram from the slug + category glyph, in ink. `sampleImages` is used when present (1.5 %), never required. | Measured constraint (§1). Also the reason the design will still look intentional in three years. |
 | **D6** | News thumbnails are treated as **plates**: `grayscale(1) contrast(1.15)`, halftone overlay, cropped from the top (`object-position: top left`), never shown bigger than one column. | They are paper renders, not photos (§1). Treated correctly, "a page of a paper reproduced in a paper" is a *feature* of the reference's language. |
@@ -137,19 +137,19 @@ The single accepted regression to date is `firstCardY` = 565 px at 1440×900 (ta
 
 ---
 
-## 4. Tokens v3 — contrast computed, not estimated
+## 4. Tokens v3 - contrast computed, not estimated
 
 Script: `.shots/contrast.mjs` → `node .shots/contrast.mjs` (WCAG 2.x relative luminance, sRGB, composited per pair). Full output reproduced below.
 
 ```css
-/* paper — the default */
+/* paper - the default */
 :root {
   --bg: #f2efe6;        /* newsprint */
   --surface: #fdfcf8;   /* panel, used sparingly (D8) */
   --raised: #e8e3d6;
   --text: #141310;      /* ink */
   --muted: #58544a;
-  --accent: #b3123f;    /* deep rose — text-safe cousin of the ribbon */
+  --accent: #b3123f;    /* deep rose - text-safe cousin of the ribbon */
   --accent-2: #1b5a8a;
   --ok: #1c6b45; --warn: #7a5200; --danger: #a3271f;
   --rule: #cdc6b4;         /* 1 px hairline */
@@ -185,10 +185,10 @@ Script: `.shots/contrast.mjs` → `node .shots/contrast.mjs` (WCAG 2.x relative 
 | `danger / bg` | **6.37** | 8.55 | ≥ 4.5 | pass |
 | `rule-strong / bg` | **12.81** | 13.10 | ≥ 3 (non-text) | pass |
 | `control / bg` | **3.84** | 3.64 | ≥ 3 (non-text) | pass |
-| `control / surface` | **4.30** | — | ≥ 3 | pass |
+| `control / surface` | **4.30** | - | ≥ 3 | pass |
 | `rule / bg` | **1.48** | 1.55 | ≥ 1.4 (decorative hairline) | pass |
 | `rule / surface` | **1.66** | 1.44 | ≥ 1.4 | pass |
-| ink on `ribbon` | **12.62** | — (night ribbon is dark: use `--text` on it) | ≥ 4.5 | pass |
+| ink on `ribbon` | **12.62** | - (night ribbon is dark: use `--text` on it) | ≥ 4.5 | pass |
 | ink on `promo` | **14.64** | 15.00 | ≥ 4.5 | pass |
 | `surface / bg` | 1.12 | 1.08 | *not a gate* | separation comes from `--rule` and `--rule-strong`, not from fills (D8). DESIGN-V2's "surface/bg ≥ 1.08" gate is **retired with the cards**. |
 
@@ -210,7 +210,7 @@ Note the two deliberate changes against DESIGN-V2 §6: **the paper ramp is lower
 | Data, IDs, scores | JetBrains Mono | 13 px | ribbon scores, counts, downloads |
 | Ribbon item | Space Grotesk 500 | 13 px + mono superscript score | masthead ribbon |
 
-Additions to `src/app/fonts.ts` — one face, two weights:
+Additions to `src/app/fonts.ts` - one face, two weights:
 
 ```ts
 export const display = Playfair_Display({
@@ -253,14 +253,14 @@ Ornaments: the radar `sweep` + `grid-bg` survive **only** inside the masthead en
 | Route | Today | v3 | Mechanism |
 |---|---|---|---|
 | `/` | filterable model feed (pulse + 8 filters + 2-col grid + pagination) | **front page**: masthead, ribbon, desk nav, hero story, 2 columns, rail, "MOST DOWNLOADED" band, `Browse all 1 633 models →` | new `FrontPage` server component; reuses `getPulse`, `getNews`, `getFeed` (limit 6) |
-| `/models` | — | today's `/` **unchanged** (pulse, `FilterBar`, grid, `Pagination`) | `FeedView` moved to `app/[locale]/models/page.tsx` |
+| `/models` | - | today's `/` **unchanged** (pulse, `FilterBar`, grid, `Pagination`) | `FeedView` moved to `app/[locale]/models/page.tsx` |
 | `/?window=…&sort=…&gate=…&q=…` | filtered list | 308 → `/models?…` | `src/middleware.ts` (already exists) |
 | `/c/[category]` | category list | category **desk**: ribbon-filtered, kicker + big category label, top-3 feature, then rows | `TabBar` → `DeskNav`, `FeedView` gains a `variant="desk"` heading block |
-| `/news` | wire list | **The Wire** — desks by `kind` (Releases, Runtime) with section rules | groupings added over the existing `getNews` result (no query change) |
-| `/research` | papers list | **Papers Desk** — 1 hero paper + 2-column rows | existing `getNews({scope:"research"})` headline query is already there |
+| `/news` | wire list | **The Wire** - desks by `kind` (Releases, Runtime) with section rules | groupings added over the existing `getNews` result (no query change) |
+| `/research` | papers list | **Papers Desk** - 1 hero paper + 2-column rows | existing `getNews({scope:"research"})` headline query is already there |
 | `/m/[slug]` | detail | printed **spec sheet**: plate + ticker (downloads/likes/params when present) + ruled spec table | `m/[slug]/page.tsx` restyle only |
 | `/n/[id]` | article | **article page**: kicker, headline, byline rule, plate image, deck, source link | `n/[id]/page.tsx` restyle |
-| `/stats` | charts | **Data Desk** — head figures, ruled category/gate/runner tables, HTML daily bars | implemented 2026-10-20 as a page rewrite, not a chart restyle: see [STATS-PLAN.md](STATS-PLAN.md) §15 (`src/lib/stats.ts`, `components/ui/DailyBars.tsx`) |
+| `/stats` | charts | **Data Desk** - head figures, ruled category/gate/runner tables, HTML daily bars | implemented 2026-10-20 as a page rewrite, not a chart restyle: see [STATS-PLAN.md](STATS-PLAN.md) §15 (`src/lib/stats.ts`, `components/ui/DailyBars.tsx`) |
 | `/compare`, `/glossary` | table / list | ruled table; **Almanac** | restyle |
 
 ### 7.2 Components
@@ -275,7 +275,7 @@ Ornaments: the radar `sweep` + `grid-bg` survive **only** inside the masthead en
 | `src/components/front/Hero.tsx` | hero story: plate, kicker, headline, deck, byline, prev/next |
 | `src/components/front/StoryRow.tsx` | one ruled row: optional 72×72 plate, kicker, 2-line headline, byline |
 | `src/components/front/Rail.tsx` | rail: `PromoBox` + teaser list + `RssBox` |
-| `src/components/front/PromoBox.tsx` | "Run it yourself" — runner command + `CopyCommand` (already exists), on `--promo` |
+| `src/components/front/PromoBox.tsx` | "Run it yourself" - runner command + `CopyCommand` (already exists), on `--promo` |
 | `src/components/front/RssBox.tsx` | "Subscribe to all the news" → `/feed.rss` + ingest cadence + `SavedFilters` link |
 | `src/components/ui/PressPlate.tsx` | deterministic halftone monogram plate (SVG, no animation) |
 | `src/components/ui/PlateImage.tsx` | client wrapper for `next/image` with `onError` → `PressPlate`; `unoptimized` for HF hosts |
@@ -289,32 +289,32 @@ Ornaments: the radar `sweep` + `grid-bg` survive **only** inside the masthead en
 
 ## 8. Phases and acceptance criteria
 
-### P0 — data and harness (no visual change, ships alone)
+### P0 - data and harness (no visual change, ships alone)
 
 | Item | Why | Acceptance |
 |---|---|---|
 | **P0-1** `normalizeNews` rejects poisoned strings (`/^\[object /i`) and `store` no longer serves `"[object Object]"`; trace which ingest path wrote it (`feeds.ts`/`hf.ts` current code looks correct, so the string is baked in the snapshot and **the merge only fills missing fields, i.e. the poison is permanent**) and fix the merge to overwrite a poisoned value | 40/185 items print `[object Object]` today | unit test with a poisoned snapshot; `grep -c "object Object"` on the served snapshot is `0` after the next ingest; byline never renders `[object Object]` |
-| **P0-2** `src/lib/heat.ts` — documented read-time score; **plus** `downloadsAtFirstSeen` written by ingest for new records so a real delta becomes measurable over time | `trendingScore` is null for 1 633/1 633 | score is deterministic for a fixed snapshot (test); the UI prints `+Δ` **only** when `delta != null` for ≥ 60 % of the items in the band, otherwise absolute downloads (D7) |
+| **P0-2** `src/lib/heat.ts` - documented read-time score; **plus** `downloadsAtFirstSeen` written by ingest for new records so a real delta becomes measurable over time | `trendingScore` is null for 1 633/1 633 | score is deterministic for a fixed snapshot (test); the UI prints `+Δ` **only** when `delta != null` for ≥ 60 % of the items in the band, otherwise absolute downloads (D7) |
 | **P0-3** `PressPlate` + `PlateImage` | 98.5 % of models have no image | a plate renders for **100 %** of the first 200 model rows and for the 34 news items without a thumbnail; plate output is stable for a fixed slug (test) |
 | **P0-4** extend `scripts/check-overflow.ts` + `scripts/audit-ui.ts` route list with `/models`, and add `scripts/contrast.ts` (from `.shots/contrast.mjs`) + `scripts/type-census.ts` | v3 needs its own re-runnable evidence | 0 overflow on the new routes; contrast script prints the §4 table; type census prints the §5 percentages |
 
-### P1 — tokens and type
+### P1 - tokens and type
 
 Acceptance: §4 table reproduced by the script from the **live** page in both themes; `document.fonts.check("600 30px 'Playfair Display'")` true on `/tr` **and** the nameplate screenshot shows Turkish diacritics; type census ≥ 55 % in 15–17 px and exactly one element ≥ 40 px per page; `npm test`, `lint`, `typecheck` green; **no visual change on `/models` yet** (P1 lands on `/m/[slug]` first, so it can be reviewed in isolation).
 
-### P2 — the shell
+### P2 - the shell
 
 Acceptance: masthead + ribbon + nav ≤ **210 px** at 1440 and ≤ **190 px** at 390 (today's header is 65/57 px plus a 60 px strip plus a 148 px pulse card = 273 px before the first model); ribbon overflows only by scrolling (`scrollWidth > clientWidth` allowed, `documentElement.scrollWidth == clientWidth` required); nav keeps DESIGN-V2's 44 px targets and `aria-current`; **one `h1` per route** whose text names the route; i18n parity holds.
 
-### P3 — the front page
+### P3 - the front page
 
 Acceptance: at 1440×900 the hero headline's top edge is **≤ 260 px** (i.e. the lede is above the fold with masthead, ribbon and nav all present); the hero **always** has a plate or image (`hasImage` asserted in the measurement payload); every story row prints a byline only from the 121 usable organisations; `MOST DOWNLOADED` shows ≥ 8 rows with a log bar; **0 placeholder rows** (a row renders only fields that exist); `/?window=30d` 308s to `/models?window=30d`; EN and TR both measured; LCP (hero headline, text) < 2.5 s on a throttled 4× CPU / Slow-4G run.
 
-### P4 — the other routes
+### P4 - the other routes
 
-Acceptance: every route renders the same shell (masthead/ribbon/nav) — no route keeps the old card language; `/news` groups by `kind` with ≥ 3 desks in the 30-day window; `/stats` charts redraw in ink with real axes and keep the donut legend; `/m/[slug]` prints no empty spec row; 0 overflow across 70 route×width combos; 0 targets < 24×24.
+Acceptance: every route renders the same shell (masthead/ribbon/nav) - no route keeps the old card language; `/news` groups by `kind` with ≥ 3 desks in the 30-day window; `/stats` charts redraw in ink with real axes and keep the donut legend; `/m/[slug]` prints no empty spec row; 0 overflow across 70 route×width combos; 0 targets < 24×24.
 
-### P5 — polish
+### P5 - polish
 
 Acceptance: `@media print` on `/` and `/n/[id]` produces a readable one-page edition with no nav/ribbon; `prefers-reduced-motion` disables the ribbon marquee and the remaining reveals; a `print` + a `light` + a `dark` screenshot of `/` and `/models` are committed under `.shots/v3-*`; `docs/README.md` and both DESIGN docs link to v3.
 
@@ -362,13 +362,13 @@ Rollback: v3 touches tokens + three shell components + two route files. `Header.
 
 ## 11. Open questions
 
-**Answered by the owner on 2026-10-18:** (1) the route move is approved — done, with the 308s in place; (2) paper is the default theme, with the night edition as the second ramp; (3) the display face is Playfair Display; (4) the wordmark stays `OpenWeight Radar` in letterspaced serif caps.
+**Answered by the owner on 2026-10-18:** (1) the route move is approved - done, with the 308s in place; (2) paper is the default theme, with the night edition as the second ramp; (3) the display face is Playfair Display; (4) the wordmark stays `OpenWeight Radar` in letterspaced serif caps.
 
 Still open:
 
-1. ~~**D3 — approve the route move?**~~ `/` becomes the broadsheet and the model list moves to `/models` (old query URLs 308). *Alternative (lower risk): keep `/` as the list and put only the masthead + ribbon + hero above it.*
-2. **D2 — is paper the right default?** (default = paper, dark = "Night Edition")
-3. **D4 — which display face?** `Playfair Display` (classic newspaper, recommended) vs `Fraunces` (wavier, more 1970s).
+1. ~~**D3 - approve the route move?**~~ `/` becomes the broadsheet and the model list moves to `/models` (old query URLs 308). *Alternative (lower risk): keep `/` as the list and put only the masthead + ribbon + hero above it.*
+2. **D2 - is paper the right default?** (default = paper, dark = "Night Edition")
+3. **D4 - which display face?** `Playfair Display` (classic newspaper, recommended) vs `Fraunces` (wavier, more 1970s).
 4. **Wordmark**: keep `OpenWeight Radar` set in letterspaced serif caps, or shorten the nameplate to a masthead-sized wordmark (e.g. `RADAR`)?
-5. **P0-2 — add `downloadsAtFirstSeen` to the ingest** so the ribbon can print a real `+Δ` (and stop calling a total "trending")?
+5. **P0-2 - add `downloadsAtFirstSeen` to the ingest** so the ribbon can print a real `+Δ` (and stop calling a total "trending")?
 6. **How far in one go?** P0–P3 (data + shell + front page) is the smallest honest increment; P4 (five more routes) roughly doubles the diff. Recommended: ship P0–P3, look at it on the real snapshot, then decide P4.

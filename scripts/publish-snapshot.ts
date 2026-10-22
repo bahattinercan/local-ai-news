@@ -18,7 +18,7 @@ if (existsSync(".env")) {
  */
 const token = process.env.BLOB_READ_WRITE_TOKEN;
 if (!token) {
-  console.error("BLOB_READ_WRITE_TOKEN is not set — cannot publish the snapshot.");
+  console.error("BLOB_READ_WRITE_TOKEN is not set - cannot publish the snapshot.");
   process.exit(1);
 }
 
@@ -34,7 +34,7 @@ try {
   blob = await put("feed.json", body, { access: "public", token, allowOverwrite: true });
 } catch (error) {
   if (error instanceof Error && error.message.includes("private access")) {
-    console.warn("store is private — uploading with private access (the app reads it with the token)");
+    console.warn("store is private - uploading with private access (the app reads it with the token)");
     blob = await put("feed.json", body, { access: "private", token, allowOverwrite: true });
   } else {
     throw error;

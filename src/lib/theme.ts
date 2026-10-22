@@ -1,7 +1,7 @@
 /**
  * The night edition's one source of truth.
  *
- * `data-theme` lives on `<html>`, which is rendered by the root layout — and the
+ * `data-theme` lives on `<html>`, which is rendered by the root layout - and the
  * root layout is `app/[locale]/layout.tsx`, so **switching the language remounts
  * it**. Next.js re-writes every attribute on `<html>` from the RSC payload on that
  * remount, and the payload can only ever say `data-theme="light"` (the server does
@@ -11,7 +11,7 @@
  *
  * Measured 2026-10-20 with `scripts/check-theme.ts`: in the night edition,
  * clicking TR/EN reset the document to paper while `localStorage` still said
- * `dark` — the reader's choice survived, the page did not.
+ * `dark` - the reader's choice survived, the page did not.
  *
  * So the choice is re-applied on **every** mount (see `ThemeSync`), and the
  * toggle and the sync read the same store instead of the DOM.

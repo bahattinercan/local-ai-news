@@ -30,13 +30,13 @@ Yani HF `daily_papers` ağırlıklı ve `modelSlug` bir "ilgili model" bloğu ku
 | Alan | Kapsama (1062 model) | Kapıyı geçen 388 içinde |
 |---|---|---|
 | `paramsTotal` | 77 (%7) | 76 (**%20**) |
-| `paramDtypes` | 77 (%7) | — |
-| `vramEstGb` | 76 (%7) | — |
-| `quantizations` | 225 (%21) | — |
-| `storageBytes` | 311 (%29) | — |
-| `runners` | 709 (%67) | — |
-| `sampleImages` | 9 (%1) | — |
-| `spaces` | 21 (%2) | — |
+| `paramDtypes` | 77 (%7) | - |
+| `vramEstGb` | 76 (%7) | - |
+| `quantizations` | 225 (%21) | - |
+| `storageBytes` | 311 (%29) | - |
+| `runners` | 709 (%67) | - |
+| `sampleImages` | 9 (%1) | - |
+| `spaces` | 21 (%2) | - |
 
 **`paramsTotal` neden yalnızca %7:** değer detay endpoint'indeki `safetensors.parameters`'tan geliyor; GGUF repolarında bu yok. Kütüphaneye göre kırılım: `libraryName=gguf` → 46 model, `paramsTotal` **%0**, ama `quantizations` %70. Yerel çıkarım için en önemli modeller, tam da parametre sayısı olmayanlar.
 
@@ -46,7 +46,7 @@ Yani HF `daily_papers` ağırlıklı ve `modelSlug` bir "ilgili model" bloğu ku
 
 ### 1.3 Çürütüldü: parametreyi dosya boyutundan türetmek
 
-GGUF boşluğu için akla gelen çözüm — `paramsTotal ≈ storageBytes / bytesPerParam(kuantizasyon)`, mevcut `BYTES_PER_PARAM` tablosuyla (`src/lib/runner/vram.ts`) — **çalışmıyor**. Her iki değeri de olan 51 modelde test edildi:
+GGUF boşluğu için akla gelen çözüm - `paramsTotal ≈ storageBytes / bytesPerParam(kuantizasyon)`, mevcut `BYTES_PER_PARAM` tablosuyla (`src/lib/runner/vram.ts`) - **çalışmıyor**. Her iki değeri de olan 51 modelde test edildi:
 
 | Sonuç | Sayı |
 |---|---|
@@ -89,7 +89,7 @@ Planı değiştirdiği için kodu okuyarak doğrulandı:
 
 | # | Eşik | Eşik tutmazsa fallback |
 |---|---|---|
-| G1 | Parametre/VRAM arayüzü yalnızca `paramsTotal != null` olan yerde (bugün kapı-geçenlerin %20'si) | Spec satırı hiç gösterilmez, `—` olarak gösterilmez; hesaplayıcının erişilebilir kalması için elle "parametre sayısı gir" alanı sunulur |
+| G1 | Parametre/VRAM arayüzü yalnızca `paramsTotal != null` olan yerde (bugün kapı-geçenlerin %20'si) | Spec satırı hiç gösterilmez, `-` olarak gösterilmez; hesaplayıcının erişilebilir kalması için elle "parametre sayısı gir" alanı sunulur |
 | G2 | Parametre **asla** `storageBytes`'tan türetilmez (çürütüldü, %45 doğruluk) | İleride istenirse yeniden ölçülür ve etkinleştirmeden önce ±%30 içinde ≥ %90 şartı aranır |
 | G3 | Haber öğesinde "ilgili model" bloğu `modelSlug` gerektirir (%5 kapsama) | Blok tamamen atlanır; boş bölüm render edilmez |
 | G4 | Yeni kaynak ancak `sources-check` onun için 200 ve items > 0 raporlarsa devreye girer | `registry.ts`'te `enabled: false` kalır, ölçülen hata `note`'a yazılır |
@@ -99,21 +99,21 @@ Planı değiştirdiği için kodu okuyarak doğrulandı:
 
 ## 4. Fazlar
 
-### Faz 0 — Sağlık kontrolü ve şema altyapısı (ön koşul)
+### Faz 0 - Sağlık kontrolü ve şema altyapısı (ön koşul)
 - `scripts/verify-sources.ts`: sabit HF listesi yerine registry tabanlı döngü, kaynak başına `check()` çağrısı → `enabled: true` "CI'da kontrol ediliyor" anlamına gelsin.
 - `src/lib/sources/registry.ts`: `SourceDefinition`'a `check` metadata'sı eklenir; her yeni kaynak G4 geçene kadar `enabled: false` kalır.
 - `src/lib/query.ts`: `newsQuerySchema.kind` genişletilir; `src/i18n/dictionaries/{en,tr}.json`: `news.runtime`, `news.community` eklenir (kısıt 2).
 - Kabul: `npm run sources-check --dry` hâlâ geçer; typecheck/lint/test yeşil.
 
-### Faz 1 — Model detayları (A1), G1/G2 ile sınırlı
+### Faz 1 - Model detayları (A1), G1/G2 ile sınırlı
 - `src/lib/model.ts`: opsiyonel `siblings?: string[]`, `cardData?: Record<string, unknown>`, `usedStorage?: number | null`.
-- `src/lib/ingest.ts`: `normalizeModel` bunları korusun; `siblings` eksik olan satırları zenginleştiren bir **geri doldurma geçişi** eklensin — `seen`'e değil alanın varlığına bakarak (bkz. §1.2). `maxDetailLookups` 300'den bütçe tavanına doğru yükseltilsin: son koşu 319/400 kullandı, yani ~370 karşılanabilir.
+- `src/lib/ingest.ts`: `normalizeModel` bunları korusun; `siblings` eksik olan satırları zenginleştiren bir **geri doldurma geçişi** eklensin - `seen`'e değil alanın varlığına bakarak (bkz. §1.2). `maxDetailLookups` 300'den bütçe tavanına doğru yükseltilsin: son koşu 319/400 kullandı, yani ~370 karşılanabilir.
 - Model sayfası: kuantizasyon dosya tablosu (ad + boyut), model kartı metadata'sı (base model, etiketler, lisans detayı), gerçek disk boyutu.
 - VRAM hesaplayıcı: yalnızca `paramsTotal` varsa render edilir, yoksa elle parametre girişi (G1).
-- Kabul: spec sheet hiç `—` satırı basmaz; dosya tablosu zenginleştirilmiş her modelde görünür.
+- Kabul: spec sheet hiç `-` satırı basmaz; dosya tablosu zenginleştirilmiş her modelde görünür.
 
-### Faz 2 — Gerçek local-AI haberleri (B1 + C1 + D1)
-- Yeni adaptör `src/lib/sources/feeds.ts` (RSS 2.0 + Atom; bu dört feed için `<item>`/`<entry>` ayrıştırmak yeterli, yeni bağımlılık gerekmez — alternatif `fast-xml-parser`; uygulama anında karar verilir).
+### Faz 2 - Gerçek local-AI haberleri (B1 + C1 + D1)
+- Yeni adaptör `src/lib/sources/feeds.ts` (RSS 2.0 + Atom; bu dört feed için `<item>`/`<entry>` ayrıştırmak yeterli, yeni bağımlılık gerekmez - alternatif `fast-xml-parser`; uygulama anında karar verilir).
 - Kaynaklar, değer sırasına göre: `r/LocalLLaMA`, `llama.cpp`, `ollama`, `vLLM`.
 - `kind`: `runtime` (runtime sürümleri) ve `community` (Reddit) eklenir. `paper` ve `release` aynen kalır.
 - Yeni `externalId` önekleri: `reddit:`, `gh:`.
@@ -121,13 +121,13 @@ Planı değiştirdiği için kodu okuyarak doğrulandı:
 - Arayüz: yeni tür renkleri; enum genişletildikten sonra haber sayfası filtresi zaten çalışır (Faz 0).
 - Kabul: `/news` en az 3 farklı tür gösterir; zorlanmış 429 akışı değiştirmez.
 
-### Faz 3 — Haber detay sayfası (A3)
+### Faz 3 - Haber detay sayfası (A3)
 - `/{locale}/n/[id]` rotası, saklanan `summary` ile (medyan 1526 karakter, yani dışarı linklemek yerine gerçek bir sayfa hak ediyor).
 - Kaynak atfı + orijinale link; tam metin yeniden yayınlanmaz (D1).
 - İlgili model bloğu yalnızca `modelSlug` varsa (G3).
 - Kabul: 154 haberin her biri çalışan kaynak linkiyle bir detay sayfası render eder.
 
-### Faz 4 — Kavram sözlüğü (A2) — **tamam**
+### Faz 4 - Kavram sözlüğü (A2) - **tamam**
 İki dilli açıklayıcı sayfalar (quantization, VRAM, MoE, LoRA, context window, GGUF vs safetensors). İçerik yazımı ve iki dilde bakım gerektirir; bilinçli olarak en sonda.
 
 ---
@@ -178,8 +178,8 @@ Faz 0, 2, 3 ve 1 uygulandı. Canlı snapshot `generatedAt 2026-10-15T22:14Z`: 10
 | dosya listesi (`files`) olan model | 0 | **113** (kapı geçen 384'ün 113'ü = %29) |
 | `cardMeta` olan model | 0 | 89 |
 | sonraki koşuda detay kazanabilen model | 0 (`seen` atlıyordu) | **tek CI koşusunda 76 geri dolduruldu** |
-| VRAM hesaplayıcı erişilebilirliği | — | her zaman (gerçek sayı, yoksa kullanıcı girişi — G1) |
-| haberlerde `modelSlug` bağlantısı | 7/154 (%5) | 8/209 (%4) — **G3 hâlâ geçerli, çözülmezse ilgili model bloğu yok** |
+| VRAM hesaplayıcı erişilebilirliği | - | her zaman (gerçek sayı, yoksa kullanıcı girişi - G1) |
+| haberlerde `modelSlug` bağlantısı | 7/154 (%5) | 8/209 (%4) - **G3 hâlâ geçerli, çözülmezse ilgili model bloğu yok** |
 
 ### Uygulama sırasında bulunan plan düzeltmeleri
 
@@ -198,7 +198,7 @@ Her girişte iki dil tek nesnenin zorunlu alanları; yani eksik çeviri yayına 
 
 ### Hâlâ açık
 
-- ~~Faz 4 (kavram sözlüğü) başlanmadı~~ — **tamam**: `/{locale}/glossary` altında 10 giriş; iki dil tip tarafından zorunlu olduğu için eksik çeviri derleme hatası verir. Altbilgiden ve model sayfalarındaki spec etiketlerinden (parametre, kuantizasyon, VRAM) bağlantılı.
+- ~~Faz 4 (kavram sözlüğü) başlanmadı~~ - **tamam**: `/{locale}/glossary` altında 10 giriş; iki dil tip tarafından zorunlu olduğu için eksik çeviri derleme hatası verir. Altbilgiden ve model sayfalarındaki spec etiketlerinden (parametre, kuantizasyon, VRAM) bağlantılı.
 - Haber listesinde `?page` sorgu ayrıştırıcısı tarafından düşürülüyordu, yani 2. sayfa 1. sayfayı render ediyordu. `scope` eklenirken düzeltildi ve testle korundu.
-~~- Feed hâlâ %72 paper (150/209)~~ — **çözüldü**: `scope` yüzeyleri ayırıyor. `/news` `release`, `announcement`, `runtime`, `community` sahibi; `/research` `paper` sahibi. Kümeler ayrık ve bir testle korunuyor; RSS çıktısı `/news`'ü yansıtıyor.
+~~- Feed hâlâ %72 paper (150/209)~~ - **çözüldü**: `scope` yüzeyleri ayırıyor. `/news` `release`, `announcement`, `runtime`, `community` sahibi; `/research` `paper` sahibi. Kümeler ayrık ve bir testle korunuyor; RSS çıktısı `/news`'ü yansıtıyor.
 - `files` kapsaması bugün kapı geçenlerin %29'u ve yalnızca geri doldurma bütçesi kadar hızlı büyüyor.

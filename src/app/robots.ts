@@ -11,11 +11,11 @@ import { ANSWER_ENGINE_CRAWLERS, SITE_URL, TRAINING_CRAWLERS } from "@/lib/seo";
  * Decision Q2 (docs/en/SEO-PLAN.md §14, v3) replaced the old "allow the AI
  * crawlers" policy with **search only**:
  *
- *  - the wildcard rule serves every unnamed crawler, search engines included —
+ *  - the wildcard rule serves every unnamed crawler, search engines included -
  *    Googlebot, Bingbot, DuckDuckBot, Applebot and YandexBot match `*` and are
  *    never denied;
  *  - the training/fetch crawlers in `TRAINING_CRAWLERS` get their own group
- *    that disallows `/` in full — no `Allow` line, because an equal-length
+ *    that disallows `/` in full - no `Allow` line, because an equal-length
  *    `Allow` wins the tie in the major engines' matchers;
  *  - the answer engines in `ANSWER_ENGINE_CRAWLERS` keep the wildcard
  *    behaviour: they cite and link the page they read, which is search, not

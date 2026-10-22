@@ -1,8 +1,8 @@
-# SEO plan — from 252 advertised URLs to a findable archive
+# SEO plan - from 252 advertised URLs to a findable archive
 
 > Turkish mirror: [docs/tr/SEO-PLAN.md](../tr/SEO-PLAN.md)
 > Status: **plan**, written 2026-10-20. Nothing in §11 has shipped yet.
-> Measured against the production deployment (`https://local-ai-news.vercel.app`, the origin the app advertises) and a local `next dev` on `:3000` serving the published snapshot `generatedAt 2026-10-20T20:42:42Z` — **1 402 models, 529 gate-passed, 210 news items** (bundled fallback: 915 / 347 / 104).
+> Measured against the production deployment (`https://local-ai-news.vercel.app`, the origin the app advertises) and a local `next dev` on `:3000` serving the published snapshot `generatedAt 2026-10-20T20:42:42Z` - **1 402 models, 529 gate-passed, 210 news items** (bundled fallback: 915 / 347 / 104).
 > Scope: crawlability, index policy, metadata, structured data, content depth, demand capture. Not in scope: paid acquisition, link buying, a CMS migration, or machine-translating 1 400 entity pages.
 >
 > **Revision 2 (2026-10-20):** added the competitor/SERP evidence (§2.1), the query portfolio with win conditions (§2.2), the realistic SERP-feature list (§2.3), the domain migration runbook (§3.5), the content quality rubric (§7.7), the internal link matrix (§8.1), event instrumentation and indexing accelerators (§10.4–10.6), the 90-day calendar (§11.5), link acquisition (§11.6), pruning (§11.7) and the file-level implementation map (§16). Three earlier assumptions were corrected: a model page will not earn a Software App rich result without ratings; FAQ/HowTo markup is not a rich-result lever; and a generic VRAM calculator is too crowded to be the P2 differentiator.
@@ -13,13 +13,13 @@
 
 The hard part of this product exists: a unique dataset, nine category desks, a glossary, a stats desk, news, RSS, JSON-LD and two locales. The plumbing that lets a crawler read any of it does not.
 
-- **Every content route we measured returns the same `<title>` and description.** Measured on `/`, `/models`, `/c/llm`, `/m/…`, `/news`, `/glossary/gguf` and `/stats` (production, 2026-10-20): all seven return `OpenWeight Radar — New open-weight models you can run locally`. Only `/compare` exports a route-level `generateMetadata` (the `[locale]` layout supplies the one sitewide value), and only the TR chrome changes the tagline.
+- **Every content route we measured returns the same `<title>` and description.** Measured on `/`, `/models`, `/c/llm`, `/m/…`, `/news`, `/glossary/gguf` and `/stats` (production, 2026-10-20): all seven return `OpenWeight Radar - New open-weight models you can run locally`. Only `/compare` exports a route-level `generateMetadata` (the `[locale]` layout supplies the one sitewide value), and only the TR chrome changes the tagline.
 - **There is no canonical, no hreflang, no Open Graph and no Twitter card on any route.** Measured: 0 `rel="canonical"`, 0 `hreflang`, 0 `property="og:*"` on `/en`.
-- **The sitemap advertises 252 URLs and zero model pages.** 1 402 model pages exist per locale — **2 804 URLs are structurally invisible**. The news list is also hard-capped at 200 while the served snapshot holds 210 items, so at least 10 pages can never be advertised.
-- **Unknown model, news and category URLs answer `200`** — three soft-404 classes that GSC will report as "submitted URL can be crawled but is not indexed".
+- **The sitemap advertises 252 URLs and zero model pages.** 1 402 model pages exist per locale - **2 804 URLs are structurally invisible**. The news list is also hard-capped at 200 while the served snapshot holds 210 items, so at least 10 pages can never be advertised.
+- **Unknown model, news and category URLs answer `200`** - three soft-404 classes that GSC will report as "submitted URL can be crawled but is not indexed".
 - **Locale redirects are `307`**, not `308`, on both `/` and `/prefixless`.
 - **Every HTML response is `Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate`.** No ISR, no CDN hit, worst-case TTFB for crawlers and readers.
-- **The served snapshot has 0 model-card summaries.** 7.5 % of models report params, 31 % a license, 18 % files. Most model pages are a spec grid with several `—` rows and no sentence about the model.
+- **The served snapshot has 0 model-card summaries.** 7.5 % of models report params, 31 % a license, 18 % files. Most model pages are a spec grid with several `-` rows and no sentence about the model.
 - **RSS items link off-site** (`huggingface.co`, `github.com`), so the feed sends readers and link equity away from the 210 canonical detail pages the site already built.
 - **The brand domain in the code's own default (`openweightradar.com`) is NXDOMAIN.** Production only works because `NEXT_PUBLIC_SITE_URL` points at the `vercel.app` host.
 
@@ -45,20 +45,20 @@ The plan is deliberately ordered by leverage, not by URL count: **P0 makes the s
 
 | Route | Document title | Canonical | hreflang | OG/Twitter | Status |
 |---|---|---|---|---|---|
-| `/` | site title | — | — | — | `307 → /en` |
-| `/en` | site title | — | — | — | 200 |
-| `/en/models` | site title | — | — | — | 200 |
-| `/en/c/llm` | site title | — | — | — | 200 |
-| `/en/m/realrebelai-MOSS-Imagine_ComfyUI` | site title | — | — | — | 200 |
-| `/en/news` | site title | — | — | — | 200 |
-| `/en/glossary/gguf` | site title | — | — | — | 200 |
-| `/en/stats` | site title | — | — | — | 200 |
-| `/en/compare?ids=…` | pair title | yes | — | — | 200, `noindex` |
-| `/en/m/does-not-exist` | site title | — | — | — | **200 (soft 404)** |
-| `/en/n/does-not-exist` | site title | — | — | — | **200 (soft 404)** |
-| `/en/c/notacategory` | site title | — | — | — | **200 (soft 404)** |
-| `/en/glossary/nope` | 404 page | — | — | — | 404 ✓ |
-| `/models` (no locale) | — | — | — | — | `307 → /en/models` |
+| `/` | site title | - | - | - | `307 → /en` |
+| `/en` | site title | - | - | - | 200 |
+| `/en/models` | site title | - | - | - | 200 |
+| `/en/c/llm` | site title | - | - | - | 200 |
+| `/en/m/realrebelai-MOSS-Imagine_ComfyUI` | site title | - | - | - | 200 |
+| `/en/news` | site title | - | - | - | 200 |
+| `/en/glossary/gguf` | site title | - | - | - | 200 |
+| `/en/stats` | site title | - | - | - | 200 |
+| `/en/compare?ids=…` | pair title | yes | - | - | 200, `noindex` |
+| `/en/m/does-not-exist` | site title | - | - | - | **200 (soft 404)** |
+| `/en/n/does-not-exist` | site title | - | - | - | **200 (soft 404)** |
+| `/en/c/notacategory` | site title | - | - | - | **200 (soft 404)** |
+| `/en/glossary/nope` | 404 page | - | - | - | 404 ✓ |
+| `/models` (no locale) | - | - | - | - | `307 → /en/models` |
 
 ### 1.3 Defects, measured
 
@@ -80,7 +80,7 @@ The plan is deliberately ordered by leverage, not by URL count: **P0 makes the s
 | **D14** | No verification, analytics or OG assets | no `google-site-verification`, no Bing token, no analytics script, no `opengraph-image` route | No data to act on; no measurement loop | P0 |
 | **D15** | Brand domain does not resolve | `openweightradar.com` → NXDOMAIN; production uses `local-ai-news.vercel.app` | Authority accrues to a shared `*.vercel.app` host, not to the product | P0 (owner) |
 
-### 1.4 What already works — do not break it
+### 1.4 What already works - do not break it
 
 - Locale-prefixed routes and `<html lang>`; dictionaries are the only string source.
 - One `<h1>` per route; real page types (front, index, category, model, news, glossary, stats, compare).
@@ -152,9 +152,9 @@ No keyword volumes are claimed; none were measured with a keyword tool. The port
 | 5 | Definitional | "what is quantization", "Q4_K_M", "gguf vs safetensors" / "quantization nedir" | `/glossary/*` | Blogs, docs | Definition + live evidence from the snapshot + calculator + model links | P1–P2 |
 | 6 | Category | "open weight video models", "local image generation models", "open embedding models" | `/c/*` | Generic lists | Per-category counts, runner coverage, gate, median VRAM | P2 |
 | 7 | Data / statistics | "open weight model statistics", "how many open models released" | `/stats` + monthly study | Nobody strong | A citable dataset with CSV and a monthly finding | P3 |
-| 8 | Brand / navigational | "OpenWeight Radar" | `/`, `/about` | — | Consistent `Organization`, `sameAs`, about/method pages | P0–P1 |
+| 8 | Brand / navigational | "OpenWeight Radar" | `/`, `/about` | - | Consistent `Organization`, `sameAs`, about/method pages | P0–P1 |
 
-### 2.3 Expected SERP features — and the ones we will not get
+### 2.3 Expected SERP features - and the ones we will not get
 
 | Feature | Realistic? | Why / action |
 |---|---|---|
@@ -172,7 +172,7 @@ No keyword volumes are claimed; none were measured with a keyword tool. The port
 
 ---
 
-## 3. Index policy — the contract
+## 3. Index policy - the contract
 
 ### 3.1 Route matrix
 
@@ -193,8 +193,8 @@ No keyword volumes are claimed; none were measured with a keyword tool. The port
 | `/{locale}/compare` (no ids) | yes | self | yes | tool landing page |
 | `/{locale}/compare?ids=…` | **no** | deduped, order preserved | no | already implemented; keep |
 | `/{locale}/guides/*`, `/tools/*` (P2) | yes | self | yes | curated only |
-| `/api/*` | no | — | no | `Disallow: /api/` in robots |
-| 404 / not-found | no | — | no | real 404 status + `noindex` |
+| `/api/*` | no | - | no | `Disallow: /api/` in robots |
+| 404 / not-found | no | - | no | real 404 status + `noindex` |
 
 ### 3.2 Model predicate (measured volume)
 
@@ -218,7 +218,7 @@ export function isIndexableModel(model: ClassifiedModel): boolean {
 | **`qualityPassed && (specCount ≥ 4 || summary ≥ 200)`** | **430** | **860** |
 | `qualityPassed && specCount ≥ 5` | 324 | 648 |
 
-Start with the 430; the same predicate expands to all 529 automatically once card backfill lands (§7.1). Non-passing models stay `noindex, follow` but remain reachable, comparable and linkable — the gate stays a quality signal, not a wall.
+Start with the 430; the same predicate expands to all 529 automatically once card backfill lands (§7.1). Non-passing models stay `noindex, follow` but remain reachable, comparable and linkable - the gate stays a quality signal, not a wall.
 
 ### 3.3 Query-string policy
 
@@ -226,7 +226,7 @@ Start with the 430; the same predicate expands to all 529 automatically once car
 - `page` is the exception: it is a distinct document and self-canonical.
 - Filtered pages return `robots: { index: false, follow: true }` and `alternates.canonical` pointing at the bare route. `follow` matters: the filtered pages link to model pages.
 - `/compare?ids=…` keeps its existing `noindex` + deduped canonical (the only correct implementation on the site today).
-- Never put a query URL in the sitemap and never `Disallow` a URL that carries `noindex` — the crawler must be able to see the directive.
+- Never put a query URL in the sitemap and never `Disallow` a URL that carries `noindex` - the crawler must be able to see the directive.
 
 ### 3.4 404s and redirects
 
@@ -247,7 +247,7 @@ Next only returns a 404 status **before streaming starts**; after that the not-f
 
 The site is currently live on `local-ai-news.vercel.app` while the code's default is the NXDOMAIN `openweightradar.com`. Moving after indexing starts costs more than moving now.
 
-1. **Choose one host** — apex (`https://openweightradar.com`) or `www` — and 308 the other to it permanently. Never serve both.
+1. **Choose one host** - apex (`https://openweightradar.com`) or `www` - and 308 the other to it permanently. Never serve both.
 2. Add the domain in Vercel, set the DNS records it prints, and wait for TLS. Do not announce the domain before it resolves.
 3. Set `NEXT_PUBLIC_SITE_URL` to the final origin in Production/Preview, redeploy, and verify that sitemap, robots, RSS, canonical and OG URLs all print the **same** host.
 4. 308 `local-ai-news.vercel.app/*` → the custom host at the platform level, before Next. Keep it for at least 12 months.
@@ -268,7 +268,7 @@ const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://openweightradar.com";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: {
-    default: "OpenWeight Radar — open-weight models you can run locally",
+    default: "OpenWeight Radar - open-weight models you can run locally",
     template: "%s · OpenWeight Radar"
   },
   description: "Track new open-weight AI models you can run locally: params, VRAM, quantization, runners and license, updated every 10 minutes.",
@@ -303,19 +303,19 @@ Titles are absolute on dynamic routes so the brand suffix never pushes the entit
 
 | Route | Title | Description |
 |---|---|---|
-| `/` | `OpenWeight Radar — open-weight models you can run locally` | `1 402 open-weight models tracked, 529 pass the quality gate. New LLM, image, video, audio and coding models you can run locally, updated every 10 minutes.` |
-| `/models` | `All open-weight models — OpenWeight Radar` | `Browse every tracked model: filter by window, runner, params and license. 430 pages with full specs, 9 categories, updated hourly.` |
-| `/c/{category}` | `New {label} models you can run locally — OpenWeight Radar` | `{N} new {label} models first seen in the last {window}. Filter by runner, params and license; sorted by downloads, likes or recency.` |
-| `/m/{slug}` | `{repoId} — {params?} local {category} model` (truncate to 60) | `{repoId}: {params} {category} model first seen {date}. {quantizations} · {runners} · ~{vram} GB VRAM · {license}. Run command and file list.` |
-| `/n/{id}` | `{clean title} — {kind} · OpenWeight Radar` | First 155 characters of `newsText(...).body`, cleaned of URLs. |
-| `/news` | `Local AI news — releases, runtimes and announcements` | `{N} model releases and runtime updates from the last {window}, with the source and the model each one mentions.` |
-| `/research` | `Open-weight AI papers — daily research feed` | `{N} papers from the Hugging Face daily feed, filtered to work that ships open weights you can run.` |
-| `/glossary` | `Local AI glossary — quantization, VRAM, GGUF, MoE` | `{15} terms behind the spec sheets, each with the numbers from the current snapshot and a VRAM calculator.` |
+| `/` | `OpenWeight Radar - open-weight models you can run locally` | `1 402 open-weight models tracked, 529 pass the quality gate. New LLM, image, video, audio and coding models you can run locally, updated every 10 minutes.` |
+| `/models` | `All open-weight models - OpenWeight Radar` | `Browse every tracked model: filter by window, runner, params and license. 430 pages with full specs, 9 categories, updated hourly.` |
+| `/c/{category}` | `New {label} models you can run locally - OpenWeight Radar` | `{N} new {label} models first seen in the last {window}. Filter by runner, params and license; sorted by downloads, likes or recency.` |
+| `/m/{slug}` | `{repoId} - {params?} local {category} model` (truncate to 60) | `{repoId}: {params} {category} model first seen {date}. {quantizations} · {runners} · ~{vram} GB VRAM · {license}. Run command and file list.` |
+| `/n/{id}` | `{clean title} - {kind} · OpenWeight Radar` | First 155 characters of `newsText(...).body`, cleaned of URLs. |
+| `/news` | `Local AI news - releases, runtimes and announcements` | `{N} model releases and runtime updates from the last {window}, with the source and the model each one mentions.` |
+| `/research` | `Open-weight AI papers - daily research feed` | `{N} papers from the Hugging Face daily feed, filtered to work that ships open weights you can run.` |
+| `/glossary` | `Local AI glossary - quantization, VRAM, GGUF, MoE` | `{15} terms behind the spec sheets, each with the numbers from the current snapshot and a VRAM calculator.` |
 | `/glossary/{slug}` | `{term}: {short definition}` (≤ 60) | `{summary} Definition, evidence from {N} tracked models, and a VRAM calculator.` |
-| `/stats` | `Open-weight model statistics — the Data Desk` | `1 402 models tracked, 529 pass the gate, {median} median downloads. Category share, runner coverage, gate pass rate and daily cadence.` |
+| `/stats` | `Open-weight model statistics - the Data Desk` | `1 402 models tracked, 529 pass the gate, {median} median downloads. Category share, runner coverage, gate pass rate and daily cadence.` |
 | `/compare` | `Compare open-weight models side by side` | `Two to four models on one sheet: params, VRAM, quantization, runners, license, downloads per day and the differences that matter.` |
 
-`{params?}` means the segment is omitted cleanly rather than printing `null` or `—`. Every title is generated by a pure function in `src/lib/seo.ts` and unit-tested with a model that has all fields, one with none, and one with only a summary.
+`{params?}` means the segment is omitted cleanly rather than printing `null` or `-`. Every title is generated by a pure function in `src/lib/seo.ts` and unit-tested with a model that has all fields, one with none, and one with only a summary.
 
 ### 4.3 hreflang rules
 
@@ -338,13 +338,13 @@ Titles are absolute on dynamic routes so the brand suffix never pushes the entit
 
 | Page | Types | Required / recommended fields | Rule |
 |---|---|---|---|
-| Sitewide (`layout`) | `WebSite`, `Organization` | `name`, `url`, `inLanguage`, `publisher.logo`, `sameAs` (GitHub, Hugging Face org, X when they exist) | No `SearchAction` — Google retired the sitelinks search box; keep the graph honest. |
-| Model | `SoftwareApplication` + `BreadcrumbList` | `name`, `applicationCategory: "DeveloperApplication"`, `applicationSubCategory` (category label), `operatingSystem`, `offers: { price: 0, priceCurrency: "USD" }`, `license`, `datePublished`, `dateModified`, `url` (internal), `sameAs` (HF), `keywords`, `isPartOf` | Never put the HF URL in `url`; it goes in `sameAs`. Omit `offers` when the license forbids commercial use? No — price 0 is still true; put the restriction in `license`. |
+| Sitewide (`layout`) | `WebSite`, `Organization` | `name`, `url`, `inLanguage`, `publisher.logo`, `sameAs` (GitHub, Hugging Face org, X when they exist) | No `SearchAction` - Google retired the sitelinks search box; keep the graph honest. |
+| Model | `SoftwareApplication` + `BreadcrumbList` | `name`, `applicationCategory: "DeveloperApplication"`, `applicationSubCategory` (category label), `operatingSystem`, `offers: { price: 0, priceCurrency: "USD" }`, `license`, `datePublished`, `dateModified`, `url` (internal), `sameAs` (HF), `keywords`, `isPartOf` | Never put the HF URL in `url`; it goes in `sameAs`. Omit `offers` when the license forbids commercial use? No - price 0 is still true; put the restriction in `license`. |
 | News | `NewsArticle` + `BreadcrumbList` | `headline`, `datePublished`, `dateModified`, `mainEntityOfPage` (internal), `url` (internal), `image` (thumbnail if present), `publisher` = Radar + logo, `author` = source organisation when known, `isBasedOn` = source URL, `articleSection` | The page does not republish the body; `isBasedOn` is the honest link to the source. Google's Article guidelines ask for headline, image, datePublished, author and publisher; when the source organisation is unknown, keep the graph valid and accept that the item may not earn a rich result rather than inventing an author. |
 | Lists (`/models`, `/c/*`, `/news`, `/research`) | `ItemList` + `BreadcrumbList` | `itemListElement` with **internal** URLs, `numberOfItems`, `itemListOrder` | Use only the items actually rendered on that page. |
 | Glossary index/term | `DefinedTermSet` / `DefinedTerm` + `BreadcrumbList` | existing fields | Keep; add `dateModified` when copy changes. |
 | Stats | `Dataset` (optional) | `name`, `description`, `temporalCoverage`, `creator`, `isAccessibleForFree`, `distribution` → `/api/stats` | Only if the owner is comfortable licensing the dataset; otherwise a plain `WebPage`. |
-| Compare with ids | none (`noindex`) | — | Structured data on a non-indexable page is wasted bytes. |
+| Compare with ids | none (`noindex`) | - | Structured data on a non-indexable page is wasted bytes. |
 
 Pitfalls measured in the current code:
 - The model page's `CreativeWork.url` is the Hugging Face URL, and the news `NewsArticle.url` is the external source. Both tell Google the page is a copy of an off-site document. Fix in the same commit as §4.
@@ -394,7 +394,7 @@ Sitemap: https://<canonical-host>/sitemap.xml
 ```
 
 - `/api/` is JSON, not content; disallow it to keep crawl budget on pages.
-- Do not `Disallow` filters, `?page=`, or `/compare?ids=` — those carry `noindex` and the crawler must be able to read it.
+- Do not `Disallow` filters, `?page=`, or `/compare?ids=` - those carry `noindex` and the crawler must be able to read it.
 - Allowing AI crawlers is a product decision (citations and referrals vs. training use). Document it in `DECISIONS.md`; the block above is the recommendation.
 - No `Host:` directive (Yandex-only, deprecated).
 
@@ -411,7 +411,7 @@ Current feed: 50 items, `<link>` points at the external source, `atom:link rel="
 
 ---
 
-## 7. Content depth — the part that actually ranks
+## 7. Content depth - the part that actually ranks
 
 ### 7.1 Model pages
 
@@ -435,7 +435,7 @@ Then: refuse to index a model page whose summary is missing and whose spec count
 | Section | Source | Present today | Rule |
 |---|---|---|---|
 | What it is | `cardSummary` (README excerpt, ≤ 600 chars) | 0 % | Required for index; attribution + link to HF |
-| Specs | params, storage, quants, runners, library, VRAM, license, popularity | 7.5–74.9 % | Print only non-empty rows; no `—` grid |
+| Specs | params, storage, quants, runners, library, VRAM, license, popularity | 7.5–74.9 % | Print only non-empty rows; no `-` grid |
 | Run it | `runCommand(model)` + per-runner commands | 100 % (derived) | Show `llama.cpp`, `Ollama`, `MLX` variants when detected |
 | VRAM table | `estimateVramGb` at 4/8/16/24 GB, context 4k/8k | 7.5 % params | If params absent, hide the table, show the calculator |
 | Files | `files` | 18.1 % | Keep; it is unique per repo |
@@ -474,7 +474,7 @@ Already the best content on the site. Extend, do not rewrite:
 - Add `dateModified` to the `DefinedTerm` when the copy changes.
 - The glossary index already answers `?q=`; keep it `noindex` but make the search results link out to terms.
 
-### 7.5 Demand surfaces (P2 — capped at 12; `/best/*` deferred to P3)
+### 7.5 Demand surfaces (P2 - capped at 12; `/best/*` deferred to P3)
 
 | URL | Query intent | Why it can rank | Data it needs |
 |---|---|---|---|
@@ -653,7 +653,7 @@ Write the five numbers into `docs/en/SEO-LOG.md` (new, one line per week) so the
 
 ## 11. Phases
 
-### P0 — crawlable and measurable (1–3 days)
+### P0 - crawlable and measurable (1–3 days)
 
 | Task | Files | Acceptance |
 |---|---|---|
@@ -667,7 +667,7 @@ Write the five numbers into `docs/en/SEO-LOG.md` (new, one line per week) so the
 | robots: disallow `/api/`, list sitemap, AI crawler policy | `robots.ts` | text matches §6.2 |
 | GSC + Bing verification, sitemap submission, analytics | env + platform | properties verified, sitemap "Success" |
 
-### P1 — index policy and structured data (3–5 days)
+### P1 - index policy and structured data (3–5 days)
 
 | Task | Files | Acceptance |
 |---|---|---|
@@ -679,25 +679,25 @@ Write the five numbers into `docs/en/SEO-LOG.md` (new, one line per week) so the
 | ISR + cached snapshot, remove `no-store` | route files, `lib/store.ts` | response has `s-maxage` |
 | `seo-audit.ts` + `npm run seo-audit` + CI | `scripts/`, workflow | fails on a deliberately broken title in a test branch |
 
-### P2 — content depth (1–2 weeks)
+### P2 - content depth (1–2 weeks)
 
 | Task | Files | Acceptance |
 |---|---|---|
 | Unstarve card backfill (reserve budget or separate workflow step) | `lib/ingest.ts`, `.github/workflows/ingest.yml` | served snapshot: ≥ 80 % of passed models have a ≥ 200-char summary within 5 runs |
-| Model page: data-derived sections, no empty headings, similar models, provenance | `m/[slug]/page.tsx` | ≥ 150 words of unique prose on indexable models; no `—`-only grids |
+| Model page: data-derived sections, no empty headings, similar models, provenance | `m/[slug]/page.tsx` | ≥ 150 words of unique prose on indexable models; no `-`-only grids |
 | Category intro + FAQ copy in both dictionaries | `i18n/*.json`, `c/[category]/page.tsx` | 9 × 2 pages with 150–250 words and snapshot numbers |
 | News → model resolution at ingest | `lib/ingest.ts`, `lib/model-mentions.ts` | `modelSlug` on > 50 % of news that name a repo |
 | 7 guides; the VRAM tool only if the §7.5 condition holds (9 `/best/*` pages are P3, only if each differs) | new routes | each has a unique data table + ≥ 150 words |
 | Glossary 15 → 25 terms with TR definitions | `lib/glossary.ts`, dictionaries | 50 indexable term pages |
 | OG image routes | `opengraph-image.tsx` per segment | `og:image` 200, 1200×630, Turkish glyphs render |
 
-### P3 — authority and iteration (ongoing)
+### P3 - authority and iteration (ongoing)
 
 - Publish one data study per month from `/stats` (e.g. "What 1 400 open-weight releases say about VRAM vs downloads"), with a citation block and a CSV download; this is the link magnet.
-- Pitch the study to newsletters/communities (r/LocalLLaMA, Hacker News, TLDR AI) — no paid links.
+- Pitch the study to newsletters/communities (r/LocalLLaMA, Hacker News, TLDR AI) - no paid links.
 - Curated comparisons for the top 20 model pairs; keep the `?ids=` permutations `noindex`.
 - Quarterly content refresh: prune noindex pages that never earned an impression, merge duplicates, update category copy.
-- Experiment log: title formulas, description formulas, OG variants — one change at a time, 28-day windows.
+- Experiment log: title formulas, description formulas, OG variants - one change at a time, 28-day windows.
 
 ### 11.5 90-day calendar
 
@@ -809,16 +809,16 @@ Expected after P0/P1: 7/7 distinct titles, 3 canonical/hreflang pairs, 3/3 404s,
 
 ---
 
-## 14. Open questions (owner's call) — all six answered 2026-10-22
+## 14. Open questions (owner's call) - all six answered 2026-10-22
 
 Each question keeps its heading; the answer and its one-line consequence sit under it. The implementation is §15.3.
 
-1. **Custom domain now?** — **No custom domain.** `FALLBACK_SITE_URL` in `src/lib/seo.ts` and `NEXT_PUBLIC_SITE_URL` in `.env.example` both read `https://local-ai-news.vercel.app`, and `src/app/feed.rss/route.ts` takes the shared `SITE_URL` instead of carrying its own copy. Consequence: the `vercel.app` host is the one canonical origin; the §3.5 migration runbook is not executed and S1's "real domain" half is decided against, not deferred.
-2. **AI crawler policy:** — **Allow search only.** `robots.ts` keeps the `*` `Allow: /` + `Disallow: /api/` rule and the sitemap, and adds one deny group (`Disallow: /`) for GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai and Diffbot. Consequence: training and fetch agents get nothing to read; `PerplexityBot` and `OAI-SearchBot` stay allowed because they answer with a citation and a link — the single judgement call, flippable by one line.
-3. **Dataset license:** — **Not publishable as a citable dataset.** Consequence: no `Dataset` schema (§5's optional row stays unbuilt), no CSV export, and no monthly data study from `/stats` (§11.5 row 9, §11.6).
-4. **TR entity pages:** — **Translate them.** `category.<desk>.intro` plus three answered FAQs per desk now exist in both dictionaries (9 desks) and render on `c/[category]`. Consequence: the TR category pages carry their own 150–250 word intro and FAQ instead of English copy under a Turkish shell.
-5. **Non-gate-passed models:** — **Index those with ≥ 6 specs.** A model reporting six or more of the eight spec fields is indexable regardless of the quality gate. Consequence: measured on `data/feed.json`, indexable models 251 → 252 and the sitemap 792 → 794 URLs.
-6. **Analytics:** — **Vercel Analytics.** `@vercel/analytics` 2.0.1 is mounted once in the locale root layout; cookieless, so no consent banner. Consequence: the collector stays empty until the owner enables Web Analytics in the Vercel project.
+1. **Custom domain now?** - **No custom domain.** `FALLBACK_SITE_URL` in `src/lib/seo.ts` and `NEXT_PUBLIC_SITE_URL` in `.env.example` both read `https://local-ai-news.vercel.app`, and `src/app/feed.rss/route.ts` takes the shared `SITE_URL` instead of carrying its own copy. Consequence: the `vercel.app` host is the one canonical origin; the §3.5 migration runbook is not executed and S1's "real domain" half is decided against, not deferred.
+2. **AI crawler policy:** - **Allow search only.** `robots.ts` keeps the `*` `Allow: /` + `Disallow: /api/` rule and the sitemap, and adds one deny group (`Disallow: /`) for GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai and Diffbot. Consequence: training and fetch agents get nothing to read; `PerplexityBot` and `OAI-SearchBot` stay allowed because they answer with a citation and a link - the single judgement call, flippable by one line.
+3. **Dataset license:** - **Not publishable as a citable dataset.** Consequence: no `Dataset` schema (§5's optional row stays unbuilt), no CSV export, and no monthly data study from `/stats` (§11.5 row 9, §11.6).
+4. **TR entity pages:** - **Translate them.** `category.<desk>.intro` plus three answered FAQs per desk now exist in both dictionaries (9 desks) and render on `c/[category]`. Consequence: the TR category pages carry their own 150–250 word intro and FAQ instead of English copy under a Turkish shell.
+5. **Non-gate-passed models:** - **Index those with ≥ 6 specs.** A model reporting six or more of the eight spec fields is indexable regardless of the quality gate. Consequence: measured on `data/feed.json`, indexable models 251 → 252 and the sitemap 792 → 794 URLs.
+6. **Analytics:** - **Vercel Analytics.** `@vercel/analytics` 2.0.1 is mounted once in the locale root layout; cookieless, so no consent banner. Consequence: the collector stays empty until the owner enables Web Analytics in the Vercel project.
 
 ---
 
@@ -842,7 +842,7 @@ Each question keeps its heading; the answer and its one-line consequence sit und
 - [ ] HTML is ISR-cached; `/api` is the only `no-store` surface.
 - [ ] Card backfill runs every ingest; ≥ 80 % of gate-passed models have a summary.
 - [x] Category pages have 150–250 words of translated intro + FAQ.
-  - *(wave 2, §15.3)* Q4: `category.<desk>.intro` and three answered FAQs per desk in both dictionaries — 9 desks × `en`/`tr`. Measured 184–223 words per EN intro and 173–198 per TR intro, answers 50–81 words; `tests/i18n.test.ts` gates 150–250 and 40–90.
+  - *(wave 2, §15.3)* Q4: `category.<desk>.intro` and three answered FAQs per desk in both dictionaries - 9 desks × `en`/`tr`. Measured 184–223 words per EN intro and 173–198 per TR intro, answers 50–81 words; `tests/i18n.test.ts` gates 150–250 and 40–90.
 - [ ] Seven guides ship; the VRAM calculator ships only if it reads real GGUF file sizes and links to model pages (§7.5).
 - [ ] Every indexable page scores ≥ 8/12 on the content rubric; pages < 6 are `noindex`.
 - [ ] IndexNow key is served and every publish pings the changed model/news URLs.
@@ -857,19 +857,19 @@ Each question keeps its heading; the answer and its one-line consequence sit und
 
 ---
 
-## 15.1 Implementation log — P0 (2026-10-21)
+## 15.1 Implementation log - P0 (2026-10-21)
 
 Landed:
 
-- `src/lib/seo.ts` — canonical/alternate builders, `specCount`/`isIndexableModel`/`isIndexableNews`, model/news title and description builders, `listMetadata` for list surfaces.
-- `[locale]/layout.tsx` — `metadataBase`, title template, default description, OG/Twitter defaults, robots directives, GSC/Bing verification from env.
+- `src/lib/seo.ts` - canonical/alternate builders, `specCount`/`isIndexableModel`/`isIndexableNews`, model/news title and description builders, `listMetadata` for list surfaces.
+- `[locale]/layout.tsx` - `metadataBase`, title template, default description, OG/Twitter defaults, robots directives, GSC/Bing verification from env.
 - `generateMetadata` on the front page, `/models`, `/c/*`, `/m/*`, `/n/*`, `/news`, `/research`, `/glossary`, `/glossary/*`, `/stats` and `/compare`.
 - Canonical + `en`/`tr`/`x-default` on every indexable route. Filtered views are `noindex, follow` with a canonical to the bare route; `?page=N` alone is self-canonical on `/models` and `/c/*`.
 - `notFound()` for unknown model/news/category; the status is a real 404 on 3/3 probes. Next 16.4.0 still renders its built-in 404 shell in the HTML body (the nested `not-found.tsx` files compile but are not used by the shell); the status and `noindex` are correct, the body is a follow-up.
 - `308` for `/` and no-locale paths, with `Vary: Accept-Language` so a CDN cannot serve the TR redirect to an EN reader.
 - Sitemap: **1 342 URLs** (32 core + 30 glossary + 860 models + 420 news), no query strings, no `noindex` URLs, real `lastModified`, `x-default` and image entries where the snapshot has one.
 - `robots.txt`: `Disallow: /api/`, sitemap, explicit AI-crawler allow list.
-- Fixed a latent 500 found by the sitemap crawl: `getNewsItem` returned raw rows, so 40 papers whose `organization` is an object (`{_id, name, fullname, avatar}`) crashed their detail pages — **80 URLs** across both locales. The detail path now uses `normalizeNews`, the same guard the list uses.
+- Fixed a latent 500 found by the sitemap crawl: `getNewsItem` returned raw rows, so 40 papers whose `organization` is an object (`{_id, name, fullname, avatar}`) crashed their detail pages - **80 URLs** across both locales. The detail path now uses `normalizeNews`, the same guard the list uses.
 
 Verification, production build with the canonical host mapped to the local server:
 
@@ -895,11 +895,11 @@ Deviations from the plan:
 
 ---
 
-## 15.2 Implementation log — wave 1 (2026-10-22)
+## 15.2 Implementation log - wave 1 (2026-10-22)
 
-Three rows landed together — the audit gate (P1), ten more terms and the four card routes (P2). Measured on the committed snapshot, with no deployed server.
+Three rows landed together - the audit gate (P1), ten more terms and the four card routes (P2). Measured on the committed snapshot, with no deployed server.
 
-- **`npm run seo-audit` + `.github/workflows/seo.yml` (P1).** Seven checks — `meta`, `titles`, `canonical`, `alternates`, `sitemap`, `robots`, `index-policy` — running against the route modules' own `generateMetadata()`, the real `sitemap.ts`/`robots.ts` and the `lib/seo.ts` predicates. Result: **7/7 passed, 792 sitemap URLs, 38 pages** — 38 indexable pages across 11 route types × `en`/`tr`, 38 self-canonicals in 38 alternate pairs, 396 advertised paths with reciprocal `en`/`tr`/`x-default`, robots with the `/api/` disallow and the sitemap URL, and 251 indexable models against 104 indexable news.
+- **`npm run seo-audit` + `.github/workflows/seo.yml` (P1).** Seven checks - `meta`, `titles`, `canonical`, `alternates`, `sitemap`, `robots`, `index-policy` - running against the route modules' own `generateMetadata()`, the real `sitemap.ts`/`robots.ts` and the `lib/seo.ts` predicates. Result: **7/7 passed, 792 sitemap URLs, 38 pages** - 38 indexable pages across 11 route types × `en`/`tr`, 38 self-canonicals in 38 alternate pairs, 396 advertised paths with reciprocal `en`/`tr`/`x-default`, robots with the `/api/` disallow and the sitemap URL, and 251 indexable models against 104 indexable news.
 - **Glossary 15 → 25 (P2).** benchmark, fine-tuning, distillation, embedding, tokenizer, inference, throughput, batch-size, chat-template and license, each with an EN and a TR body plus aliases and related links; the sitemap carries **50** glossary URLs (25 × `en`/`tr`).
 - **The four OG routes (P2).** 1200×630 `ImageResponse` for the site, a model, a news item and a glossary term, all from one card in `lib/og.tsx`.
 
@@ -908,23 +908,23 @@ Verified: `npm run typecheck` clean, `npm run lint` clean, `npm test` **213/213*
 Deviations from the plan:
 
 - **The audit is offline, not the §10.2 crawl.** A gate that needs a build, a bound port and a round trip per URL turns a real regression into a flaky retry, so it asserts the same contract at the layer that produces the HTML: "returns 200" becomes "the path resolves to a real route, and for entity pages to a snapshot row"; "is not `noindex`" becomes `isIndexableModel` / `isIndexableNews`. JSON-LD parsing and the three-click depth stay in the P2 content rubric.
-- **Its counts are the committed snapshot's, not production's.** 915 models and 104 news resolve locally, of which 251 models and 104 news pass the index predicate — 502 + 208 + 50 + 32 = **792** URLs, against the 1 342 §15.1 measured against production (1 402 models). Same composition, smaller denominator.
+- **Its counts are the committed snapshot's, not production's.** 915 models and 104 news resolve locally, of which 251 models and 104 news pass the index predicate - 502 + 208 + 50 + 32 = **792** URLs, against the 1 342 §15.1 measured against production (1 402 models). Same composition, smaller denominator.
 - **Static instances, not the variable fonts.** `@vercel/og` throws on the upstream variable TTFs (`Cannot read properties of undefined (reading '256')` in `parseFvarAxis`), so `public/fonts/` holds pinned instances; `tests/og.test.ts` parses each `cmap` and asserts all eleven Turkish letters are present rather than trusting the subset.
 
 ---
 
-## 15.3 Implementation log — wave 2 (2026-10-22)
+## 15.3 Implementation log - wave 2 (2026-10-22)
 
 The owner answered all six §14 questions in one pass and the working tree took the answers. Measured on the committed snapshot plus this working tree, with no deployed server; nothing is pushed and no domain of its own is attached.
 
 - **One host, and it is the Vercel one (Q1).** `FALLBACK_SITE_URL` in `src/lib/seo.ts` is `https://local-ai-news.vercel.app` and `.env.example` says the same, so the code default and production finally agree. `src/app/feed.rss/route.ts` now imports the shared `SITE_URL` instead of repeating the `process.env` lookup and a fallback of its own. `grep -R openweightradar.com src/ tests/ scripts/ .github/` returns nothing; the OG card prints `OG_HOST`, which derives from `SITE_URL`, so the four 1200×630 cards re-point without a second edit.
-- **Search only (Q2).** `src/app/robots.ts` keeps the `*` rule (`Allow: /`, `Disallow: /api/`) and the sitemap, and adds one deny group — `Disallow: /` with no `Allow: /` beside it, because an equal-length `Allow` wins the tie — for GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai and Diffbot. `PerplexityBot` and `OAI-SearchBot` keep the wildcard behaviour on purpose: they answer with a citation and a link, which is what a search engine does. The two lists live in `lib/seo.ts` as `TRAINING_CRAWLERS` and `ANSWER_ENGINE_CRAWLERS`, so the route, the audit and the tests assert one array instead of three copies.
-- **Index policy (Q5).** `isIndexableModel` returns true for any model reporting six or more of the eight spec fields, whatever `qualityPassed` says; the gate-passed `specCount ≥ 4 || cardSummary ≥ 200` floor is unchanged. Measured on `data/feed.json`: indexable models **251 → 252**, sitemap **792 → 794** URLs across the two locales — one gate-failed row with seven reported specs.
-- **Translated desk copy (Q4).** `category.<desk>.intro` and three answered FAQs (`vram`, `run`, `pick`) per desk now exist in both dictionaries — 9 desks × `en`/`tr` — and render on `c/[category]`, intro above the feed and the FAQ as a definition list below it. The figures the copy quotes (`{count}`, `{passed}`, `{days}`) are counted from the snapshot, so an ingest cannot leave the sentence contradicting the list. Measured intro lengths 184–223 words (EN) and 173–198 (TR), answers 50–81 words; `tests/i18n.test.ts` gates 150–250 and 40–90 and asserts nine desks.
+- **Search only (Q2).** `src/app/robots.ts` keeps the `*` rule (`Allow: /`, `Disallow: /api/`) and the sitemap, and adds one deny group - `Disallow: /` with no `Allow: /` beside it, because an equal-length `Allow` wins the tie - for GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai and Diffbot. `PerplexityBot` and `OAI-SearchBot` keep the wildcard behaviour on purpose: they answer with a citation and a link, which is what a search engine does. The two lists live in `lib/seo.ts` as `TRAINING_CRAWLERS` and `ANSWER_ENGINE_CRAWLERS`, so the route, the audit and the tests assert one array instead of three copies.
+- **Index policy (Q5).** `isIndexableModel` returns true for any model reporting six or more of the eight spec fields, whatever `qualityPassed` says; the gate-passed `specCount ≥ 4 || cardSummary ≥ 200` floor is unchanged. Measured on `data/feed.json`: indexable models **251 → 252**, sitemap **792 → 794** URLs across the two locales - one gate-failed row with seven reported specs.
+- **Translated desk copy (Q4).** `category.<desk>.intro` and three answered FAQs (`vram`, `run`, `pick`) per desk now exist in both dictionaries - 9 desks × `en`/`tr` - and render on `c/[category]`, intro above the feed and the FAQ as a definition list below it. The figures the copy quotes (`{count}`, `{passed}`, `{days}`) are counted from the snapshot, so an ingest cannot leave the sentence contradicting the list. Measured intro lengths 184–223 words (EN) and 173–198 (TR), answers 50–81 words; `tests/i18n.test.ts` gates 150–250 and 40–90 and asserts nine desks.
 - **Analytics (Q6).** `@vercel/analytics` 2.0.1 is mounted once, as `<Analytics />` in the locale root layout beside the footer. It sets no cookie, so no consent banner ships; the tag reports nothing until the owner switches Web Analytics on for the Vercel project.
 - **Q3, the answer that removes work.** The dataset cannot be licensed as a citable dataset, so there is no `Dataset` schema (§5's optional row stays unbuilt), no CSV export, and no monthly data study from `/stats` (§11.5 row 9, §11.6). §15's checklist never promised any of the three, so no box changes for it.
 
-Verified on the final tree: `npm run typecheck` clean, `npm run lint` clean, `npm test` **226/226** (was 213), `npm run seo-audit` **7/7** — 794 sitemap URLs, 38 pages, 252 indexable models, 104 indexable news, 397 advertised paths, and robots at 3 rules with 11 training crawlers denied and 2 answer engines allowed.
+Verified on the final tree: `npm run typecheck` clean, `npm run lint` clean, `npm test` **226/226** (was 213), `npm run seo-audit` **7/7** - 794 sitemap URLs, 38 pages, 252 indexable models, 104 indexable news, 397 advertised paths, and robots at 3 rules with 11 training crawlers denied and 2 answer engines allowed.
 
 Deviations from the plan:
 
@@ -934,7 +934,7 @@ Deviations from the plan:
 
 ---
 
-## 16. Appendix A — implementation map
+## 16. Appendix A - implementation map
 
 | File | Change | Phase |
 |---|---|---|
@@ -958,7 +958,7 @@ Deviations from the plan:
 | `docs/en/SEO-LOG.md`, `docs/tr/SEO-LOG.md` (new) | weekly five-number log | P1 |
 | `docs/en/REDIRECTS.md`, `docs/tr/REDIRECTS.md` (new) | redirect map for pruned/merged pages | P3 |
 
-## 17. Appendix B — revision log
+## 17. Appendix B - revision log
 
 | Version | Date | Change |
 |---|---|---|
@@ -966,6 +966,6 @@ Deviations from the plan:
 | v2 | 2026-10-20 | Added competitor/SERP evidence (§2.1), query portfolio (§2.2), realistic SERP features (§2.3), migration runbook (§3.5), rubric (§7.7), link matrix (§8.1), instrumentation/indexing/log review (§10.4–10.6), 90-day calendar (§11.5), link acquisition (§11.6), pruning (§11.7), implementation map (§16). Corrected: Software App rich result is not achievable without ratings; FAQ/HowTo markup is not a lever; the generic VRAM calculator is conditional. |
 | v2.1 | 2026-10-21 | P0 implemented; §15.1 records the verification, the latent 500 and the three deviations (single sitemap, built-in 404 shell, owner accounts). |
 | v2.2 | 2026-10-22 | Wave 1 landed; §15.2 records the offline audit and its CI gate, the glossary at 25 terms and the four OG card routes, with the measured numbers and the three deviations (offline vs crawl, committed-snapshot counts, static font instances). |
-| v3 | 2026-10-22 | §14 closed — no custom domain (`local-ai-news.vercel.app` is canonical), search-only crawler policy, no citable dataset, translated TR desk copy, the ≥ 6-spec index clause, Vercel Analytics. Wave 2 landed; §15.3 records 251 → 252 indexable models, 792 → 794 sitemap URLs, 226/226 tests and 7/7 audit, with the three deviations (answer-engine judgement call, the RSS fallback found en route, audit still offline). |
+| v3 | 2026-10-22 | §14 closed - no custom domain (`local-ai-news.vercel.app` is canonical), search-only crawler policy, no citable dataset, translated TR desk copy, the ≥ 6-spec index clause, Vercel Analytics. Wave 2 landed; §15.3 records 251 → 252 indexable models, 792 → 794 sitemap URLs, 226/226 tests and 7/7 audit, with the three deviations (answer-engine judgement call, the RSS fallback found en route, audit still offline). |
 
 The next revision should replace §2.1's search snapshot with a recorded SERP audit (date, query, top 10 URLs, feature type) and replace the relative KPIs with the first four weeks of GSC data.

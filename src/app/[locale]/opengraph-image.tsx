@@ -8,11 +8,11 @@ import { OG_CONTENT_TYPE, OG_SIZE, OgCardView, loadOgFonts, ogSiteCard } from "@
  * the numbers come from and the two counts the masthead prints.
  *
  * This is the segment-level default, so every page under `/[locale]` that does
- * not carry a closer `opengraph-image` inherits it — the layout sets the OG and
+ * not carry a closer `opengraph-image` inherits it - the layout sets the OG and
  * Twitter *tags* (`src/app/[locale]/layout.tsx`), this file supplies the
  * picture they point at.
  */
-export const alt = "OpenWeight Radar — open-weight models you can run locally, with the edition and model counts";
+export const alt = "OpenWeight Radar - open-weight models you can run locally, with the edition and model counts";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

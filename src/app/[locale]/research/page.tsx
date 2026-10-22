@@ -23,8 +23,8 @@ export async function generateMetadata({
   const total = await countNews({ ...query, scope: "research" });
   const title =
     locale === "tr"
-      ? "Açık ağırlıklı AI makaleleri — günlük araştırma akışı"
-      : "Open-weight AI papers — daily research feed";
+      ? "Açık ağırlıklı AI makaleleri - günlük araştırma akışı"
+      : "Open-weight AI papers - daily research feed";
   const description =
     locale === "tr"
       ? `Hugging Face günlük akışından ${descriptionCount(total, locale)} makale; yerelde çalıştırılabilir açık ağırlıklar yayınlayan işlere odaklanır.`

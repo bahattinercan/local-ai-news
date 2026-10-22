@@ -21,7 +21,7 @@ export function promoCaption(model: ClassifiedModel): string {
  * The reference spends its one coloured box on an advertisement; the most useful
  * thing this site can advertise is the fact that every model page ends in a
  * command you can paste. So the box is the site's own CTA, on `--promo` with ink
- * text (14.64:1 — checked by `scripts/contrast.ts`). `--promo` is a shade of the
+ * text (14.64:1 - checked by `scripts/contrast.ts`). `--promo` is a shade of the
  * page, not a coloured panel: the original blue block read as a foreign element in
  * a newsprint column, so the box is separated by its `--rule` border and its
  * `--surface` command slip alone.
@@ -32,7 +32,7 @@ export function promoCaption(model: ClassifiedModel): string {
  *
  * Layout: the command owns the full width of the rail and the actions sit on
  * their own row. Sharing one row with the copy button left the command 129 px
- * wide — 8 wrapped lines clamped to 2, i.e. `from transformers i / mport
+ * wide - 8 wrapped lines clamped to 2, i.e. `from transformers i / mport
  * AutoModelFor…` with a third line cut in half (measured 1440 px, 2026-10-18).
  */
 export function PromoBox({ model, locale }: { model: ClassifiedModel; locale: Locale }) {
@@ -47,8 +47,8 @@ export function PromoBox({ model, locale }: { model: ClassifiedModel; locale: Lo
       </h2>
       <p className="mt-1 text-sm">{t(dict, "front.runItNote")}</p>
 
-      {/* The caption is set in the same 11 px mono as the specimen — it is the
-          specimen's label, not a headline — and its figure is `shrink-0`: the row
+      {/* The caption is set in the same 11 px mono as the specimen - it is the
+          specimen's label, not a headline - and its figure is `shrink-0`: the row
           used to be a single `truncate`, so a 25-character name left the reader
           with "35.4" of "35.4k". */}
       <Link

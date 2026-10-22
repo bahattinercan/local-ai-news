@@ -8,7 +8,7 @@ import { getGeneratedAt } from "@/lib/store";
  *
  * Measured: `/compare` with no ids rendered a blank viewport (844 px, one screen
  * of nothing) and the feed's zero-result card said only "no models match these
- * filters" — both told the reader that something is missing without saying what
+ * filters" - both told the reader that something is missing without saying what
  * to do next. The optional hint and action turn the dead end into the next step.
  */
 export function EmptyState({

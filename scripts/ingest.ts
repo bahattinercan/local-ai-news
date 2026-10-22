@@ -31,7 +31,7 @@ console.log(`backfilled:        ${result.backfilled} models gained detail data`)
 console.log(`model cards:       ${result.cardsBackfilled} models gained a card excerpt`);
 if (result.feedFailures.length > 0) {
   console.warn(`feed failures:     ${result.feedFailures.join("; ")}`);
-  console.warn("                   (their previous items were kept — gate G5)");
+  console.warn("                   (their previous items were kept - gate G5)");
 }
 if (result.budgetExhausted) {
   console.warn("warning: the HF budget ran out mid-run; the snapshot holds what was fetched");

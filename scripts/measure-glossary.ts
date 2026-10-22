@@ -40,7 +40,7 @@ interface Measurement {
 async function main(): Promise<void> {
   const targets = (await (await fetch(`http://127.0.0.1:${CDP_PORT}/json`)).json()) as Target[];
   const page = targets.find((target) => target.type === "page");
-  if (!page) throw new Error("no page target — start headless Chrome with --remote-debugging-port");
+  if (!page) throw new Error("no page target - start headless Chrome with --remote-debugging-port");
 
   const ws = new WebSocket(page.webSocketDebuggerUrl);
   await new Promise((resolve) => ws.addEventListener("open", resolve));
@@ -142,7 +142,7 @@ async function main(): Promise<void> {
   for (const entry of measurements) {
     if (entry.overflow !== 0) problems.push(`${entry.path} @${entry.width}: ${entry.overflow} px of horizontal overflow`);
     for (const target of entry.smallTargets) {
-      problems.push(`${entry.path} @${entry.width}: target below 24 px — ${target}`);
+      problems.push(`${entry.path} @${entry.width}: target below 24 px - ${target}`);
     }
   }
   for (const entry of index) {
@@ -164,7 +164,7 @@ async function main(): Promise<void> {
     for (const problem of problems) console.error(`  - ${problem}`);
     process.exit(1);
   }
-  console.log(`\nok — ${measurements.length} measurements, 0 problems`);
+  console.log(`\nok - ${measurements.length} measurements, 0 problems`);
 }
 
 main().catch((error) => {

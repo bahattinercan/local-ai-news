@@ -33,7 +33,7 @@ import type { ClassifiedModel } from "@/lib/model";
  * The address is the state, and it accepts what a reader actually has: the Hub
  * repo id (`owner/model`), the feed's slug (`owner-model`), or a Hub URL. The same
  * parser backs the add form, so the taught form and the working form cannot drift
- * apart — the empty state used to document `?ids=owner/model`, which never
+ * apart - the empty state used to document `?ids=owner/model`, which never
  * resolved because `slugify()` turns `/` into `-`.
  *
  * Every state is explained: nothing selected (picker + computed pairs), one model

@@ -1,18 +1,18 @@
-# Neon'un kaldırılması — veri depolama planı (TR)
+# Neon'un kaldırılması - veri depolama planı (TR)
 
-Durum: **karar verildi — seçenek C (Vercel Blob)**. Uygulama sürüyor.
+Durum: **karar verildi - seçenek C (Vercel Blob)**. Uygulama sürüyor.
 
 ## 1. Amaç
 
 Sitede hiçbir yerde Postgres/Neon olmayacak. Her şey tek bir JSON snapshot'ından
 okunacak. Çalışmaya devam etmesi gerekenler: feed, kategori sekmeleri, model
-detayı, haberler, istatistik, karşılaştırma, RSS, sitemap — ve haber akışı
+detayı, haberler, istatistik, karşılaştırma, RSS, sitemap - ve haber akışı
 zamanlanmış olarak güncellenmeye devam edecek.
 
 Mevcut durum: `src/lib/db/store.ts` iki yol içeriyor (Drizzle ile Neon ve
 `data/feed.json` fallback'ı). 456 KB snapshot, 343 model, 51 haber satırı.
 
-## 2. Snapshot nerede duracak — asıl karar
+## 2. Snapshot nerede duracak - asıl karar
 
 | Seçenek | Güncelleme sıklığı | Ek servis | Her günclemede rebuild | Maliyet | Risk |
 |---|---|---|---|---|---|
@@ -45,9 +45,9 @@ ve in-memory TTL ile cache'ler, yani saatte en fazla ~4 kez çeker.
   Actions workflow'a yönlendiren `501` döner.
 
 **Eklenecek**
-- `data/overrides.json` — manuel kategori override'ları (`category_overrides`
+- `data/overrides.json` - manuel kategori override'ları (`category_overrides`
   tablosunun yerini alır). `classify/rules.ts` okur.
-- `scripts/publish-snapshot.ts` — `data/feed.json`'ı yazar ve yükler.
+- `scripts/publish-snapshot.ts` - `data/feed.json`'ı yazar ve yükler.
 
 ## 4. Değişiklik sonrası ingest akışı
 

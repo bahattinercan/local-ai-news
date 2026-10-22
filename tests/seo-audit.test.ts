@@ -12,8 +12,8 @@ import { SITE_URL, isIndexableModel, languageAlternates, modelPath } from "../sr
 
 /**
  * The audit is a gate, so the test that matters is the one proving it *fails*.
- * Every case below mutates an in-memory copy of the real audit input — the
- * snapshot, the sitemap and the pages the route modules actually build — and
+ * Every case below mutates an in-memory copy of the real audit input - the
+ * snapshot, the sitemap and the pages the route modules actually build - and
  * asserts that the named check, and only the intended finding, catches it. No
  * test writes to disk; `data/feed.json` and the route modules are read-only
  * fixtures here.

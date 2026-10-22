@@ -7,7 +7,7 @@ import { DEFAULT_THEME, THEME_BOOTSTRAP, THEME_KEY, storedTheme } from "../src/l
  * runs before the first paint, so a hard load never flashes paper at a reader who
  * chose the night edition) and React (`ThemeSync` + the toggle, which re-assert
  * the choice after a language switch remounts the root layout, see
- * `scripts/check-theme.ts`). They can only agree if they read the same key —
+ * `scripts/check-theme.ts`). They can only agree if they read the same key -
  * hence this test, which pins the contract instead of the implementation.
  */
 

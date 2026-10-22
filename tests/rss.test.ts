@@ -4,7 +4,7 @@ import { buildRss } from "../src/lib/rss.ts";
 
 test("RSS output is valid XML with escaped titles", () => {
   const xml = buildRss({
-    title: "OpenWeight Radar — Video",
+    title: "OpenWeight Radar - Video",
     link: "https://local-ai-news.vercel.app/en/feed.rss?category=video",
     description: "New video models",
     language: "en",

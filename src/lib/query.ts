@@ -11,7 +11,7 @@ export const FEED_DEFAULTS = { window: "7d", sort: "new", gate: "passed" } as co
 
 /**
  * A GET form submits *every* named control, so an untouched select or an empty
- * search box arrives as `""` — and `?runner=` typed by hand does the same.
+ * search box arrives as `""` - and `?runner=` typed by hand does the same.
  * Zod's `.min(1)` / `.enum()` reject those, and before this sanitizer existed
  * every "Apply" click that left one field blank threw out of the page render
  * (HTTP 500 instead of a filtered feed). Blank means "not set", so drop it.
@@ -109,7 +109,7 @@ export function parseFeedQuery(search: Record<string, string | string[] | undefi
   return normalizeFeedQuery(parsed.success ? parsed.data : EMPTY_FEED_QUERY);
 }
 
-/** The filter state as a query *input* — what the tab bar counts and links from. */
+/** The filter state as a query *input* - what the tab bar counts and links from. */
 export type FeedFilterInput = Pick<FeedQueryInput, "window" | "sort" | "gate" | "runner" | "maxParams" | "license" | "q">;
 
 /**
@@ -169,7 +169,7 @@ export function parseNewsQuery(search: Record<string, string | string[] | undefi
 /**
  * The Data Desk (docs/en/STATS-PLAN.md S3).
  *
- * It speaks the feed's window vocabulary — `24h / 7d / 30d / 90d` — because a
+ * It speaks the feed's window vocabulary - `24h / 7d / 30d / 90d` - because a
  * control that offers a number no other page offers is a second dialect. The old
  * `/stats?days=180` links are mapped onto it instead of 404ing: 180 days of
  * tracking do not exist (the snapshot's `firstSeenAt` spans three), and `90d`

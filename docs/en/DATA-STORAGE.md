@@ -1,17 +1,17 @@
-# Removing Neon — data storage plan (EN)
+# Removing Neon - data storage plan (EN)
 
-Status: **decided — option C (Vercel Blob)**. Implementation in progress.
+Status: **decided - option C (Vercel Blob)**. Implementation in progress.
 
 ## 1. Goal
 
 The site has no Postgres/Neon anywhere. Everything reads one JSON snapshot.
 What must still work: feed, category tabs, model detail, news, stats, compare,
-RSS, sitemap — and the news feed must keep updating on a schedule.
+RSS, sitemap - and the news feed must keep updating on a schedule.
 
 Current state: `src/lib/db/store.ts` has two paths (Neon via Drizzle, and a
 `data/feed.json` fallback). 456 KB snapshot, 343 models, 51 news rows.
 
-## 2. Where the snapshot lives — the real decision
+## 2. Where the snapshot lives - the real decision
 
 | Option | Update cadence | Extra service | Rebuild per update | Cost | Risk |
 |---|---|---|---|---|---|
@@ -45,9 +45,9 @@ Cadence: ingest every 10 minutes, publish every run; the app caches with
   `501` with a pointer to the Actions workflow.
 
 **Add**
-- `data/overrides.json` — manual category overrides (replaces the
+- `data/overrides.json` - manual category overrides (replaces the
   `category_overrides` table). Read by `classify/rules.ts`.
-- `scripts/publish-snapshot.ts` — writes `data/feed.json` and uploads it.
+- `scripts/publish-snapshot.ts` - writes `data/feed.json` and uploads it.
 
 ## 4. Ingest flow after the change
 

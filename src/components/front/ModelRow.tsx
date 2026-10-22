@@ -11,7 +11,7 @@ import type { ClassifiedModel } from "@/lib/model";
  * A ranked model row for the front page's band: rank, plate, name, one secondary
  * line, one figure (docs/en/DESIGN-V3.md §1 zone 6, centre-bottom).
  *
- * Unlike `FeedCard` this row is *only* a rank — it exists because a broadsheet
+ * Unlike `FeedCard` this row is *only* a rank - it exists because a broadsheet
  * needs a "most downloaded" column, and it therefore prints one number: the
  * downloads figure that ordered it. `showsGrowth` is decided upstream by
  * `hasGrowthSignal()`: `downloadsAtFirstSeen` only exists for models first seen

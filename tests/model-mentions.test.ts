@@ -111,7 +111,7 @@ test("a news item linked to the model is a mention, whatever its text says", () 
 
 test("an item linked to another model is never claimed by a shared token", () => {
   const index = buildModelNameIndex([LONG, SIBLING]);
-  const item = news("release:2", `${SIBLING.name} — new coding model`, { modelSlug: SIBLING.slug });
+  const item = news("release:2", `${SIBLING.name} - new coding model`, { modelSlug: SIBLING.slug });
   assert.equal(newsMentionsModel(item, LONG, index), false);
 });
 
@@ -142,7 +142,7 @@ test("mentions are newest first and capped", () => {
 test("ingest matcher still links an exact full name", () => {
   const models = [LONG, SIBLING];
   const index = buildModelNameIndex(models);
-  assert.equal(matchModelInText(`${SIBLING.name} — new coding model`, models, index)?.slug, SIBLING.slug);
+  assert.equal(matchModelInText(`${SIBLING.name} - new coding model`, models, index)?.slug, SIBLING.slug);
 });
 
 test("ingest matcher links a long id through the one token that names it", () => {

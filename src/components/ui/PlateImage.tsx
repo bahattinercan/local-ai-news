@@ -9,7 +9,7 @@ import { PressPlate } from "./PressPlate";
  * A news image, treated as a printed plate.
  *
  * The only images the site has are `cdn-thumbnails.huggingface.co/social-thumbnails`
- * — 1 200 × 648 renders of a paper's own first page, 151 of 185 items, ~300 kB
+ * - 1 200 × 648 renders of a paper's own first page, 151 of 185 items, ~300 kB
  * each (measured 2026-10-18). They are documents, not photographs, so they are
  * cropped from the top, desaturated to ink and screened with halftone dots; at
  * rail size that reads as "a page reproduced in a page", which is the reference's
@@ -22,7 +22,7 @@ import { PressPlate } from "./PressPlate";
  *
  * Two failure paths matter and both land on the generated plate: a missing
  * `thumbnail` (34 of 185 items) and a remote image that 404s or times out. The
- * fallback is why the layout can promise no empty slot — `onError` needs a client
+ * fallback is why the layout can promise no empty slot - `onError` needs a client
  * component, which is the only reason this file has `"use client"`.
  */
 export function PlateImage({

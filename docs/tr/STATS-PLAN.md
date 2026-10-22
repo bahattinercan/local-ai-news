@@ -1,8 +1,8 @@
-# İstatistik sayfası v2 — "Veri Masası"
+# İstatistik sayfası v2 - "Veri Masası"
 
 > İngilizce kaynak: [docs/en/STATS-PLAN.md](../en/STATS-PLAN.md)
 > Durum: **uygulandı** 2026-10-20 (§15 neyin indiğini, sapmaları ve ölçülen sonuçları kaydeder). Sitenin gerçekten sunduğu anlık görüntüye göre yazıldı (`generatedAt 2026-10-20T12:17:46Z`, **1 544 model / 210 haber**), çalışan dev sunucusuna ve eski sayfanın headless-Chrome ölçümüne dayanır.
-> [DESIGN-V3.md](DESIGN-V3.md) §7.1'deki `/stats` satırını ("`ui/Charts.tsx` renk/eksen restyle") geçersiz kılar. V3'ün tasarım dili aynen kalır — bu plan **sayfanın neyi ölçtüğünü** değiştirir, sitenin nasıl göründüğünü değil.
+> [DESIGN-V3.md](DESIGN-V3.md) §7.1'deki `/stats` satırını ("`ui/Charts.tsx` renk/eksen restyle") geçersiz kılar. V3'ün tasarım dili aynen kalır - bu plan **sayfanın neyi ölçtüğünü** değiştirir, sitenin nasıl göründüğünü değil.
 > Kanıt: `.shots/live-snapshot.json` (`npx tsx scripts/fetch-snapshot.ts`), `.shots/measure-stats-page.mjs` (CDP ölçümü), `.shots/before-stats-390.png` ve metin içinde alıntılanan curl çıktıları.
 
 ---
@@ -13,10 +13,10 @@ Bugün `/stats` üç panelden oluşuyor (çubuklar, halka, çizgi) ve **tek** bo
 
 Plan bunu bir veri sayfasının olması gereken masaya çeviriyor:
 
-1. **İki zaman ekseni, adlarıyla** — `tracked` (Radar'ın ilk gördüğü an) ve `created` (Hugging Face depo tarihi). İkincisi bugün günlük çözünürlüğe sahip tek eksen (49 farklı gün'e karşı 3), dolayısıyla zaman serisi ona taşınıyor.
-2. **Her sayı bir fiil ve bir bağlantı alıyor** — her panel neyi saydığını (`in view`, `tracked`, `created`, `passes`) söylüyor ve o sayıyı üreten filtreli listeyi açıyor.
-3. **Kalite kapısı görünmez olmaktan çıkıyor** — sayfa filtrenin neyi tuttuğunu ve neyi sakladığını gösteriyor (`606 / 1 544`; indirmeyle geçen 570, beğeniyle 36; robotik 0/111).
-4. **390 px'te okunabilen grafikler** — çubuklar HTML oluyor (gerçek metin, gerçek 11 px etiket), halka ilk 6 + *Diğer*'e katlanıyor, eksik günler eksik gün olarak basılıyor.
+1. **İki zaman ekseni, adlarıyla** - `tracked` (Radar'ın ilk gördüğü an) ve `created` (Hugging Face depo tarihi). İkincisi bugün günlük çözünürlüğe sahip tek eksen (49 farklı gün'e karşı 3), dolayısıyla zaman serisi ona taşınıyor.
+2. **Her sayı bir fiil ve bir bağlantı alıyor** - her panel neyi saydığını (`in view`, `tracked`, `created`, `passes`) söylüyor ve o sayıyı üreten filtreli listeyi açıyor.
+3. **Kalite kapısı görünmez olmaktan çıkıyor** - sayfa filtrenin neyi tuttuğunu ve neyi sakladığını gösteriyor (`606 / 1 544`; indirmeyle geçen 570, beğeniyle 36; robotik 0/111).
+4. **390 px'te okunabilen grafikler** - çubuklar HTML oluyor (gerçek metin, gerçek 11 px etiket), halka ilk 6 + *Diğer*'e katlanıyor, eksik günler eksik gün olarak basılıyor.
 
 ---
 
@@ -25,19 +25,19 @@ Plan bunu bir veri sayfasının olması gereken masaya çeviriyor:
 | # | Ölçüm | Değer | Komut |
 |---|---|---|---|
 | 1 | Sunulan anlık görüntü | **1 544** model · 210 haber · `2026-10-20T12:17:46Z` | `npx tsx scripts/fetch-snapshot.ts` |
-| 2 | **Pencere ölü** | `days=7/30/90/180` → **606** kalite kapısı geçen satır, `gate=all` ile **1 538** — hep aynı | `curl "localhost:3000/api/stats?days=$d"` |
+| 2 | **Pencere ölü** | `days=7/30/90/180` → **606** kalite kapısı geçen satır, `gate=all` ile **1 538** - hep aynı | `curl "localhost:3000/api/stats?days=$d"` |
 | 3 | Farklı `firstSeenAt` günü | **3** (13 Eki ×343, 14 Eki ×572, 20 Eki ×629). 15–19 Eki yok | canlı anlık görüntü |
 | 4 | Farklı `createdAt` günü | **49** (21 Ağu → 20 Eki): 24 saatte 272, 7 günde 773, 30 günde 1 491, 90 günde 1 544 | canlı anlık görüntü |
 | 5 | Trend grafiği | 1 200 birimlik viewBox'ta **3 nokta**, **0 `<text>`**, 30 günlük pencerede "3 gün" yazısı | `.shots/measure-stats-page.mjs` |
 | 6 | Bugünkü ölçüler | paneller **384 / 384 / 290 px** = 1440'ta 1 007 px ana alan; 390'da 1 228 px; seri SVG'si 1440'ta **1 248×208**, 390'da **343×57** | aynı ölçüm |
 | 7 | Sayfanın ürettiği bağlantı | **0**: `<main>` içindeki 16 bağlantı masa menüsü (15) ve kalite kapısındaki sözlük `?`'si | `grep -c Link page.tsx` |
-| 8 | Halka | **8 dilim, 7 palet girdisi** → 8. dilim (Dil / LLM) 1. dilimin (Embedding) rengini tekrar ediyor — sahibin ekran görüntüsünde görünüyor | `Charts.tsx` + ölçüm |
+| 8 | Halka | **8 dilim, 7 palet girdisi** → 8. dilim (Dil / LLM) 1. dilimin (Embedding) rengini tekrar ediyor - sahibin ekran görüntüsünde görünüyor | `Charts.tsx` + ölçüm |
 | 9 | Kapı | geçen **606 / 1 544 (%39,2)**, gated 6, başarısız 938 (6 gated depo `failed` içinde sayılıyor); geçişler `downloads ≥ 50` **570** + `likes ≥ 5` **36**; `org` / `samples` gerekçeleri **0** kez | `src/lib/classify/gate.ts` + canlı |
 | 10 | Menü sayfayla çelişiyor | `?gate=all` ile sayfa başlığı **1 538** yazarken masa şeridi hâlâ **606** yazıyor (Ses 234'e karşı 30) | `curl` + HTML kazıma |
 | 11 | İndirmeler | **1 303 / 1 544 (%84,4)** satırda > 0; p50 **38**, p90 **351**, max **119 265**; **ilk depo tüm indirmelerin %24,0'ı**, ilk 10 = %53,6 | canlı anlık görüntü |
 | 12 | Seyrek alanlar | `paramsTotal` %7,0, `storageBytes` %30,3, `vramEstGb` %6,8, `license` %28,9, `cardMeta` %11,3, `sampleImages` %0,8, **`downloadsAtFirstSeen` %0,0** | canlı anlık görüntü |
 | 13 | Yoğun alanlar | `runners` dolu **%69,7** (9 değer, transformers 668 → ExLlama 6), `gateReason` %100, `primaryCategory` %100 | canlı anlık görüntü |
-| 14 | Haber akışı | 210 öğe — paper 150, runtime 30, community 25, release 5; **23** farklı `publishedAt` günü, 7–20 Eki arası her gün dolu | canlı anlık görüntü |
+| 14 | Haber akışı | 210 öğe - paper 150, runtime 30, community 25, release 5; **23** farklı `publishedAt` günü, 7–20 Eki arası her gün dolu | canlı anlık görüntü |
 | 15 | Kategoriye göre geçiş oranı | embedding 183/228 (%80), vision 107/174 (%61), coding 122/230 (%53), video 70/165 (%42), llm 14/51 (%27), image 46/202 (%23), multimodal 34/149 (%23), audio 30/234 (%13), **robotik 0/111 (%0)** | canlı anlık görüntü |
 | 16 | İndirme medyanı (`> 0`) | embedding 213, vision 72, coding 68, video 61, llm 32, audio 21, multimodal 20, image 19, robotik 12; geçen kümenin tamamı 197 | canlı anlık görüntü |
 | 17 | Pencere sözlüğü | akış: `24h / 7d / 30d / 90d` (`lib/query.ts`); istatistik: `7 / 30 / 90 / 180` gün | kod |
@@ -56,7 +56,7 @@ Her madde bugün okuyucunun görebildiği bir şey.
 | **D4** | **Grafiğin ekseni, değeri, birimi yok.** SVG içinde ölçülen `texts: 0`: y ekseni yok, x etiketi yok, nokta değeri yok. Tek sayılar altyazıda. | #5 |
 | **D5** | **Başlıkla veri çelişiyor.** `h1` *Kategori bazlı hacim* diyor; panel *Kategoriye göre modeller* diyip **sayı** basıyor. Sitenin tek sıralama metriği olan indirmeler sayfada hiç görünmüyor. | page.tsx |
 | **D6** | **Halka bir rengi tekrar ediyor.** 8 dilim, 7 token: Dil / LLM, Embedding / RAG ile aynı pembeye boyanıyor. | #8 |
-| **D7** | **Kapı görünmez.** Sayfa varsayılan olarak *Sadece geçenler*'i gösteriyor ve 1 544'ün 606'sının (%39,2) göründüğünü, neyin çıkarıldığını hiç söylemiyor. Robotik (111 takip, 0 geçen) çubuklardan sessizce kayboluyor — menünün listelediği bir kategori. | #9, #15 |
+| **D7** | **Kapı görünmez.** Sayfa varsayılan olarak *Sadece geçenler*'i gösteriyor ve 1 544'ün 606'sının (%39,2) göründüğünü, neyin çıkarıldığını hiç söylemiyor. Robotik (111 takip, 0 geçen) çubuklardan sessizce kayboluyor - menünün listelediği bir kategori. | #9, #15 |
 | **D8** | **Masa şeridi sayfayla çelişiyor.** `DeskNav` `filters` almadan çağrılıyor, yani hep 7 gün/kapı açık görünümü sayıyor; `?gate=all` ile aynı ekranda sayfa 1 538, şerit 606 diyor. | #10 |
 | **D9** | **Hiçbir şey bağlantı değil.** Sayfanın ürettiği 0 bağlantı: "Ses 30" öğrenen okuyucu o 30 modele ulaşamıyor. | #7 |
 | **D10** | **Tarih satırı ve yöntem yok.** Tek tazelik sinyali göreli "Veriler 20 dk önce yenilendi"; bütün işi sayı olan bir sayfa ne mutlak anlık görüntü saatini ne de her sayının neyi saydığını basıyor. | `EmptyState.tsx::DataNotice` |
@@ -112,7 +112,7 @@ GÜNLÜK OLUŞTURULAN                              1 491 depo · bugün 606'sı 
        │              ▇  ▇  ▇  ▇
      0 ┴───────────────────────────────────
         21 Eyl     28 Eyl      5 Eki    12 Eki    20 Eki
-not: Hugging Face `createdAt` — depo oluşturma, ilk görülme değil.
+not: Hugging Face `createdAt` - depo oluşturma, ilk görülme değil.
      Çubuklar deponun bugün kapıdan geçip geçmediğine göre bölünmüş.
 ────────────────────────────────────────────────────────────────────────────────────────
 KAPI NEYİ TUTUYOR                     │  NEREDE ÇALIŞIYOR
@@ -139,15 +139,15 @@ YÖNTEM  Anlık görüntü 20 Eki 2026 12:17 UTC · önbellek 15 dk · pencere v
 
 | § | Bölüm | Veri | Notlar / bağlantılar | Boş durum |
 |---|---|---|---|---|
-| 0 | Üst satır | `PageHeader` + `aside` içinde mutlak tarih | `Anlık görüntü 20 Eki 2026 · 12:17 UTC` (göreli "3s önce" değil) | — |
-| 1 | Bu sayı (4 rakam) | `totals.inView`, `passRate`, `top`, `withRunner` | etiketler kapsamı taşır (`1 544 içinden`, `30g · sadece geçenler`); kalite-kapısı ve çalıştırıcı için `Term` | — |
+| 0 | Üst satır | `PageHeader` + `aside` içinde mutlak tarih | `Anlık görüntü 20 Eki 2026 · 12:17 UTC` (göreli "3s önce" değil) | - |
+| 1 | Bu sayı (4 rakam) | `totals.inView`, `passRate`, `top`, `withRunner` | etiketler kapsamı taşır (`1 544 içinden`, `30g · sadece geçenler`); kalite-kapısı ve çalıştırıcı için `Term` | - |
 | 2 | Kategoriye göre modeller | `categories[].count` (görünümde) + `medianDownloads` | satır = `/c/x?window&gate` bağlantısı; çubuk `count/max`; medyan yalnızca > 0 ise | "Bu pencerede kapıdan geçen model yok" + kapı kapalı görünüm bağlantısı |
 | 3 | Kategori payı | ilk 6 + *Diğer*, `categories[].share` | §2 ile aynı renk karesi; *Diğer* üyelerini adlandırır | 2'den az kategori varsa gizli |
 | 4 | Günlük oluşturulan | sıfır doldurulmuş `cadence[]`, `created` + `passed` | y işaretleri 0 / orta / max, 5 x etiketi, çubuk başına `<title>`, `<details>` sayı tablosu | "Bu pencerede depo oluşturulmadı" (bugün imkânsız: 24 saatte 272) |
-| 5 | Kapı neyi tutuyor | `gate.byReason`, `categories[].tracked/passed/passRate` (kapıdan bağımsız), `GATE_THRESHOLDS` | %100 yığılmış çubuk + 9 satırlık oran tablosu; satırlar `gate=all` ile açılır | — |
+| 5 | Kapı neyi tutuyor | `gate.byReason`, `categories[].tracked/passed/passRate` (kapıdan bağımsız), `GATE_THRESHOLDS` | %100 yığılmış çubuk + 9 satırlık oran tablosu; satırlar `gate=all` ile açılır | - |
 | 6 | Nerede çalışıyor | `runners[]` (toplam + görünümdeki) | satırlar `/models?runner=…`; %69,7 kapsam ve çoklu etiket notu | "Bu pencerede çalıştırıcı etiketi yok" |
 | 7 | Haber akışı (P4) | `wire[]`, `kind`'a göre sıfır doldurulmuş | `/news`, `/research` bağlantıları; 10 dakikalık sıklık yazılır | 0 öğe varsa gizli |
-| 8 | Yöntem | yukarıdaki sayılar | küçük punto, `.section-note` boyutu; baskıda çıkar | — |
+| 8 | Yöntem | yukarıdaki sayılar | küçük punto, `.section-note` boyutu; baskıda çıkar | - |
 
 Dikey bütçe: 1440'ta ≤ 1 700 px (bugün 3 panel 1 007 px), 390'da ≤ 2 400 px. §2 + §3 tek `.stats-grid` satırında; §5 + §6 ikinci satırda.
 
@@ -164,7 +164,7 @@ export interface StatsRow {
   count: number;
   share: number;                 // count / görünümdeki toplam
   medianDownloads: number | null;// indirmesi > 0 olanlar üzerinden, yoksa null
-  /** Kapıdan bağımsız, pencereyle sınırlı — yalnızca §5. */
+  /** Kapıdan bağımsız, pencereyle sınırlı - yalnızca §5. */
   tracked: number;
   passed: number;
   passRate: number;
@@ -198,7 +198,7 @@ export function foldSlices(rows: StatsRow[], keep: number): Array<StatsRow & { m
 - `store.ts` içindeki `getStatsBoard(days, options)` = `loadSnapshot()` + `buildStatsBoard` (tek 15 dakikalık önbellek okuması korunur).
 - `getStats` / `getDailySeries` ince sarmalayıcı olarak kalır, böylece mevcut importlar kırılmaz; `getDailySeries` sıfır doldurma kazanır (tek başına D3'ü her yerde kapatır).
 - `created` ekseninin pencere filtresi `buildStatsBoard` içinde yalnızca `cadence` için `createdAt`'e uygulanır. Diğer her şey `withinWindow(firstSeenAt)` kullanmaya devam eder, böylece `/stats` ile akış kayamaz.
-- `endIso` = `snapshot.generatedAt`, `Date.now()` değil — önbellekteki sayfa anlık görüntüde olmayan bir kovayı basmamalı (ve testler deterministik olmalı).
+- `endIso` = `snapshot.generatedAt`, `Date.now()` değil - önbellekteki sayfa anlık görüntüde olmayan bir kovayı basmamalı (ve testler deterministik olmalı).
 
 `src/lib/query.ts` yeni `statsQuerySchema` kazanır:
 
@@ -218,8 +218,8 @@ sonra `normalizeStatsQuery()` `normalizeFeedQuery()`'i çağırır, böylece kar
 |---|---|
 | `src/app/[locale]/stats/page.tsx` | `getStatsBoard`'dan yeniden yazılır; tek `<form method="get">`; `DeskNav` artık `filters` alır (D8'i kapatır) |
 | `src/components/ui/Charts.tsx` | `BarChart` → silinir (tek çağıran bu sayfa); `TrendChart` → silinir; `Donut` `foldSlices`, `swatches` eşlemesi, dilim başına `<title>` ve *Diğer* için `--muted` kazanır |
-| `src/components/ui/DailyBars.tsx` | **yeni** — HTML/CSS yığılmış çubuklar, metin olarak y/x etiketleri, `<details>` sayı tablosu, `role="img"` + özet; SVG yok |
-| `src/components/ui/RateBar.tsx` ya da `Meter`'ın kullanımı | §5 için %0–100 çubuk (`Meter` indirmeler için log ölçekli — **kullanılmaz**) |
+| `src/components/ui/DailyBars.tsx` | **yeni** - HTML/CSS yığılmış çubuklar, metin olarak y/x etiketleri, `<details>` sayı tablosu, `role="img"` + özet; SVG yok |
+| `src/components/ui/RateBar.tsx` ya da `Meter`'ın kullanımı | §5 için %0–100 çubuk (`Meter` indirmeler için log ölçekli - **kullanılmaz**) |
 | `src/components/ui/Stat.tsx` | değişmez; §1 dört tanesini çizgili bir bantta kullanır |
 | `src/app/globals.css` | `.stats-grid` değişmez; `.bars-*` kuralları (N kolonlu grid, `align-items: end`) ve `@media print { details > * { display: block } }` eklenir, böylece §4 basılır |
 | `src/i18n/dictionaries/{en,tr}.json` | +~30 anahtar (aşağıda), `stats.trend`→`stats.cadence`, `stats.bars`→`stats.categories`; eşitlik 175 → ~205 |
@@ -271,9 +271,9 @@ GET /api/stats?window=30d&gate=passed
 ## 9. Testler (`tests/stats.test.ts`, node:test, fixture anlık görüntü)
 
 1. `fillDaily` tam `days` kova döndürür: artan, tekil, sıfır doldurulmuş ve girdi toplamını korur.
-2. `fillDaily` `endIso` (anlık görüntü `generatedAt`) kullanır, duvar saatini değil — 2026-01-10 tarihli fixture 2026-01-10'da biten kovalar üretir.
+2. `fillDaily` `endIso` (anlık görüntü `generatedAt`) kullanır, duvar saatini değil - 2026-01-10 tarihli fixture 2026-01-10'da biten kovalar üretir.
 3. `buildStatsBoard` toplamları: `Σ categories.tracked === totals.tracked`; `Σ categories.passed === totals.passed`; `Σ share ≈ 1`; `Σ gateReasons === tracked + gated`.
-4. `cadence` `createdAt` okur, `firstSeenAt` değil (ikisinin bilerek farklı olduğu fixture — D2 regresyonu).
+4. `cadence` `createdAt` okur, `firstSeenAt` değil (ikisinin bilerek farklı olduğu fixture - D2 regresyonu).
 5. Fixture'da yalnızca 3 günlük veri varken 30 günlük pencerede 30 kova olur ve her kovada `created ≥ passed`.
 6. 0 geçenli kategori `categories` içinde görünür (§5 için) ama katlanmış halka dilimlerinde görünmez.
 7. `medianOf`: tek/çift sayı, sıfırları yok sayar, boşta `null`; `categories[].medianDownloads`, indirmesi > 0 satır yoksa `null`.
@@ -350,13 +350,13 @@ Geri alma: `page.tsx` tek dosya; `Charts.tsx` içinde `Donut` kalır; `TrendChar
 
 ---
 
-## 15. Uygulama kaydı — 2026-10-20
+## 15. Uygulama kaydı - 2026-10-20
 
 > Değişiklikten **sonra** ölçüldü: sunulan anlık görüntü (`generatedAt 2026-10-20T12:17:46Z`, **1 544 model / 210 haber**), `.shots/measure-stats-page.mjs` (CDP) ve `curl /api/stats`. `npm test` **133/133**, `lint` ve `typecheck` temiz.
 
 | Plan maddesi | Sonuç (ölçüldü) |
 |---|---|
-| **S1/S2** iki adlı eksen | `src/lib/stats.ts` — `buildStatsBoard`, `fillDaily`, `foldSlices`, `medianOf`; `store.ts` içindeki `getStatsBoard()` anlık görüntüyü bir kez okur. `window=30d` → görünümde **606**, takipte **1 538**, gated 6, geçiş **%39,4**, medyan **197**, çalıştırıcı etiketli **571**; `cadence` 30 kova, toplam **1 491** oluşturuldu; `wire` 210. 10 yeni test (toplam 133) |
+| **S1/S2** iki adlı eksen | `src/lib/stats.ts` - `buildStatsBoard`, `fillDaily`, `foldSlices`, `medianOf`; `store.ts` içindeki `getStatsBoard()` anlık görüntüyü bir kez okur. `window=30d` → görünümde **606**, takipte **1 538**, gated 6, geçiş **%39,4**, medyan **197**, çalıştırıcı etiketli **571**; `cadence` 30 kova, toplam **1 491** oluşturuldu; `wire` 210. 10 yeni test (toplam 133) |
 | **S3** tek pencere sözlüğü | `lib/query.ts` içinde `parseStatsQuery`: `?window=24h/7d/30d/90d`, `?days=` takma ad (30 → 30d, 180 → 90d). `gate=all` bu toplu yüzeyde 30 gün içinde `normalizeFeedQuery(input, { aggregate: true })` ile serbest; akışın karar 9'u değişmedi |
 | **S4/S5** HTML çubuklar | `DailyBars.tsx`: 30 günde 30 çubuk, 24 saatte 1, 90 günde 90; panelde **0** `<svg>`, sayfada **0** `<svg text>`; y işaretleri 235 / 118 / 0, beş x etiketi; boş gün `--rule` renginde 2 px; sayılar kapalı bir `<details>` içinde |
 | **S6** katlama + palet | 8 veya 9 kategori **6 + Diğer** olur; halkada en fazla 7 dilim var ve *Diğer* paletin son girdisini alır, böylece iki görünür dilim aynı rengi paylaşmaz (eski 8 dilim/7 renk hatası) |
@@ -366,7 +366,7 @@ Geri alma: `page.tsx` tek dosya; `Charts.tsx` içinde `Donut` kalır; `TrendChar
 | **S10** yöntem | §8 anlık görüntü saatini, 15 dakikalık önbelleği, iki ekseni, `GATE_THRESHOLDS`'tan okunan eşikleri ve büyüme kolonunun neden yok olduğunu basar |
 | Yerleşim | 1440: ana alan **2 214 px**, belge 2 451; 390: belge 3 734. Dört durumda (30g geçen, 30g hepsi, `tr` 24s hepsi, `tr` 90g hepsi) 360 / 390 / 1440'ta **0 yatay taşma** |
 | Menü | `/tr/stats` sayfası `İstatistik:page` işaretler; `check-nav-current.ts` 14 rotada geçer |
-| Baskı | menü, formlar ve `<details>` düğmesi düşer; eksen, efsaneler, altyazılar ve yöntem notu kalır — 1 000 px genişlikte 2 835 px'lik sayfa |
+| Baskı | menü, formlar ve `<details>` düğmesi düşer; eksen, efsaneler, altyazılar ve yöntem notu kalır - 1 000 px genişlikte 2 835 px'lik sayfa |
 
 ### 15.1 Plandan sapmalar (ve nedenleri)
 
@@ -382,7 +382,7 @@ Geri alma: `page.tsx` tek dosya; `Charts.tsx` içinde `Donut` kalır; `TrendChar
 
 ### 15.2 Uygularken bulunan gerçek kusurlar (burada düzeltildi)
 
-1. **Halka efsanesi belgeyi 360 px'lik görünümün 92 px dışına taşırdı.** Efsanedeki `min-w-[9rem]`, otomatik min-content tabanını kaldırdığı için satırlar 183 px'lik yuvada 276 px genişliğinde çizildi (`gate=all` ile `docScroll` 452, `client` 360 ölçüldü). Liste ve satıra `min-w-0` eklendi — DESIGN-V3 §0.2 #1 ile aynı `min-width: auto` ailesi.
+1. **Halka efsanesi belgeyi 360 px'lik görünümün 92 px dışına taşırdı.** Efsanedeki `min-w-[9rem]`, otomatik min-content tabanını kaldırdığı için satırlar 183 px'lik yuvada 276 px genişliğinde çizildi (`gate=all` ile `docScroll` 452, `client` 360 ölçüldü). Liste ve satıra `min-w-0` eklendi - DESIGN-V3 §0.2 #1 ile aynı `min-width: auto` ailesi.
 2. **`failedColor` ilk kullanımından sonra tanımlıydı**, her render `ReferenceError: Cannot access 'failedColor' before initialization` ile düştü ve rota 500 verdi. TypeScript bir callback içindeki TDZ okumasını yakalamaz; sayfayı yüklemek yakaladı.
 3. **Kapı tablosu ortak `.stats-grid` (`1fr auto`) tarafından sıkıştırıldı**: Geçiş oranı başlığı iki satıra kırıldı ve sayılar çubuğa sokuldu. O satır artık kendi `1.25fr / 1fr` ızgarasında.
 4. **§2'deki satır içi çubuk 390 px'te satır ayırıcı gibi okunuyordu** (her etiketin altında 256 px'lik çizgi). Kendi kolonuna taşındı, `sm` altında gizli.
@@ -390,6 +390,6 @@ Geri alma: `page.tsx` tek dosya; `Charts.tsx` içinde `Donut` kalır; `TrendChar
 
 ### 15.3 Açık maddeler
 
-- **`?gate=all` altında masa şeridinin *Hepsi* rozeti** (15.1) — istatistik sayfasının değil, menünün kararı.
+- **`?gate=all` altında masa şeridinin *Hepsi* rozeti** (15.1) - istatistik sayfasının değil, menünün kararı.
 - **Ingest boşluğu** (15–19 Eki koşu yok) hâlâ duruyor; kadans paneli `createdAt` okuduğu için onu gizler, yöntem notundaki "13 Eki'den beri" ise üç `firstSeenAt` kovasından gelir.
 - **Mobil uzunluk** (3 734 px): sahip 2 400'ün altını isterse atılacak panel haber akışı (§7).

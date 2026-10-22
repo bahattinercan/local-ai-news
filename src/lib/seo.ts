@@ -87,13 +87,13 @@ const SPEC_FLOOR = 4;
 const SPEC_ALWAYS_INDEXABLE = 6;
 
 /**
- * Decision S4 plus Q5: a gate-passed model with enough specs — or, after the
- * card backfill, enough prose — is worth indexing, and so is any model that
+ * Decision S4 plus Q5: a gate-passed model with enough specs - or, after the
+ * card backfill, enough prose - is worth indexing, and so is any model that
  * reports six or more specs regardless of the gate. Everything else stays
  * reachable but `noindex, follow`, so the site never ships near-empty pages.
  *
  * Measured on the committed `data/feed.json` snapshot (2026-10-14, 915 models):
- * the pre-Q5 predicate admits 251 models, Q5 lifts that to 252 — one gate-failed
+ * the pre-Q5 predicate admits 251 models, Q5 lifts that to 252 - one gate-failed
  * row with seven reported specs. Sitemap URLs therefore move 792 → 794 across
  * the two locales. (§15.1 measured 1 402 models in production; this snapshot is
  * the smaller offline denominator the audit and the tests run against.)
@@ -146,7 +146,7 @@ export function isIndexableNews(item: SnapshotNews): boolean {
 /**
  * A one-word category for titles, because "language / llm" is not a noun. These
  * are taxonomy terms, not UI copy, but the Turkish column is still a translation
- * of the *word* — "görüntü modeli" is what a Turkish reader searches for, while
+ * of the *word* - "görüntü modeli" is what a Turkish reader searches for, while
  * the category label on the desk stays English by decision.
  */
 const CATEGORY_WORD: Record<string, { en: string; tr: string }> = {
@@ -190,14 +190,14 @@ export function modelTitle(model: ClassifiedModel, locale: Locale = "en"): strin
      near-identical repos differ, and it must survive next to the descriptor. */
   const id = shortModelId(model);
   if (locale === "tr") {
-    return params ? `${id} — ${params} yerel ${category} modeli` : `${id} — yerel ${category} modeli`;
+    return params ? `${id} - ${params} yerel ${category} modeli` : `${id} - yerel ${category} modeli`;
   }
-  return params ? `${id} — ${params} local ${category} model` : `${id} — local ${category} model`;
+  return params ? `${id} - ${params} local ${category} model` : `${id} - local ${category} model`;
 }
 
 /**
  * The description is built from facts that are present, and it says which ones
- * are absent by omission — never "unknown", "null" or a bare dash. License and
+ * are absent by omission - never "unknown", "null" or a bare dash. License and
  * quantization come before the long-tail facts because they are what a reader
  * deciding whether to run the model actually needs.
  */
@@ -291,7 +291,7 @@ function hasAny(raw: Record<string, string | string[] | undefined>, keys: readon
  *
  * - No query: the bare route is the canonical document.
  * - `?page=N` alone: self-canonical and indexable (pagination is a path, not a
- *   duplicate) — except on surfaces that declare `pageIsIndexable: false`.
+ *   duplicate) - except on surfaces that declare `pageIsIndexable: false`.
  * - Any filter: `noindex, follow` and a canonical back to the bare route. The
  *   crawler can see the directive because the URL is never blocked in robots.
  */
@@ -326,7 +326,7 @@ export function isDesk(key: string): boolean {
   return DESK_KEYS.includes(key);
 }
 
-/** "1 402" / "1.402" — descriptions carry an exact number, not a compacted one. */
+/** "1 402" / "1.402" - descriptions carry an exact number, not a compacted one. */
 export function descriptionCount(value: number | null | undefined, locale: Locale): string {
   return formatCount(value ?? 0, locale);
 }

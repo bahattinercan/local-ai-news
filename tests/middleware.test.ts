@@ -31,7 +31,7 @@ test("a root-level static file is served, never given a locale prefix", () => {
  * Regression (measured 2026-10-22): `/_vercel/insights/script.js` answered 307
  * to `/en/_vercel/insights/script.js` → 404 in production. The path has three
  * segments, so neither the root-file rule nor the excluded list caught it, and
- * `_vercel` is not a locale — the `@vercel/analytics` collector mounted in the
+ * `_vercel` is not a locale - the `@vercel/analytics` collector mounted in the
  * layout could never load, so the dashboard stayed empty even with Web Analytics
  * enabled. Platform paths are not pages and must never take a locale prefix.
  */
@@ -78,7 +78,7 @@ test("an already-localised path passes through untouched", () => {
 /**
  * The index moved from `/` to `/models` (docs/en/DESIGN-V3.md D3). A URL that
  * carries feed filters is a query against the index, not a request for the front
- * page, so it is redirected — permanently, because it is a move, not a rewrite.
+ * page, so it is redirected - permanently, because it is a move, not a rewrite.
  * The front page itself reads no search params and must keep answering 200.
  */
 test("a feed query on the root moves to the index", () => {

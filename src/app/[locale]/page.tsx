@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const passed = descriptionCount(pulse?.passed, locale);
   const title =
     locale === "tr"
-      ? `${SITE_NAME} — yerelde çalıştırabileceğin açık ağırlıklı modeller`
-      : `${SITE_NAME} — open-weight models you can run locally`;
+      ? `${SITE_NAME} - yerelde çalıştırabileceğin açık ağırlıklı modeller`
+      : `${SITE_NAME} - open-weight models you can run locally`;
   const description =
     locale === "tr"
       ? `Son 7 günde ${tracked} açık ağırlıklı model izleniyor, ${passed} tanesi kalite kapısını geçiyor. Yerelde çalıştırabileceğin yeni LLM, görüntü, video, ses ve kod modelleri, 10 dakikada bir güncellenir.`
@@ -42,8 +42,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
  *
  * A broadsheet edit of the snapshot, not a query surface: the filterable index
  * lives at `/models` and the old query URLs 308 into it (`middleware.ts`). The
- * composition is the reference's three zones — left column of stories, centre
- * lead, right rail — followed by the ranked band and the wire.
+ * composition is the reference's three zones - left column of stories, centre
+ * lead, right rail - followed by the ranked band and the wire.
  *
  * It reads no search params on purpose, so "the edition" is one page for
  * everybody; every element that could be filter-dependent either states its own
@@ -75,7 +75,7 @@ export default async function FrontPage({ params }: { params: Promise<{ locale: 
      content was 529 px tall inside a 997 px grid row, while the right rail (the
      tallest column, i.e. the one that sets the row height) ran the full 997.
      A row measures 159 px there, so six rows give 1 006 px against the rail's
-     997 — the nearest reachable height (one row short leaves ~150 px of dead
+     997 - the nearest reachable height (one row short leaves ~150 px of dead
      rule, one row long adds 159). The 9 px tail that lands under the rail is the
      cheap side of the error: the grid row is set by the tallest column, so an
      overshoot there is invisible, while an undershoot is the gap this fixes. At

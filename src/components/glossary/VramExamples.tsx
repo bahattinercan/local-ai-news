@@ -4,8 +4,8 @@ import { estimateVramGb, formatParams } from "@/lib/runner/vram";
  * Worked VRAM examples, computed with the same estimator the model pages use.
  *
  * The entry used to quote "about 8.6 GB / 21.2 GB / 49.9 GB" in prose. Those
- * numbers were correct — measured: `estimateVramGb` returns 8.6, 21.2 and 49.9 for
- * them — but a copy cannot stay correct (docs/en/GLOSSARY-PLAN.md G-D7).
+ * numbers were correct - measured: `estimateVramGb` returns 8.6, 21.2 and 49.9 for
+ * them - but a copy cannot stay correct (docs/en/GLOSSARY-PLAN.md G-D7).
  */
 export function VramExamples({
   title,

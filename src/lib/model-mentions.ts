@@ -12,7 +12,7 @@ import type { SnapshotNews } from "./store.ts";
  * served snapshot 2026-10-18: 6 / 104 news rows carry `modelSlug`, 0 of them for
  * that model) and its page had no "mentioned in" list to show.
  *
- * Loosening the search to *any* shared word does not work either — measured on
+ * Loosening the search to *any* shared word does not work either - measured on
  * the same snapshot, plain word matching attributed 20 news rows to
  * `long_rolling_switch_prompt_from_ode_init` (via "prompt"), 11 to
  * `cedar-horizon-91` (via "horizon") and 5 to `Adversarial-Gradient-Forcing`.
@@ -48,7 +48,7 @@ export interface ModelNameIndex {
 /**
  * `Qwen3.8-27B-Coder390-EfficientThink` splits on everything that is not a letter,
  * digit or dot, so `qwen3.8` and `flux.2` stay whole. Tokens shorter than
- * `TOKEN_MIN_LENGTH` or without a digit are dropped — those are the words that
+ * `TOKEN_MIN_LENGTH` or without a digit are dropped - those are the words that
  * produced the false positives above.
  */
 export function nameTokens(name: string): string[] {
@@ -80,12 +80,12 @@ export function textHasToken(text: string, token: string): boolean {
   return new RegExp(`(^|[^a-z0-9.])${escapeRegExp(token)}([^a-z0-9.]|$)`, "i").test(text);
 }
 
-/** Tokens that point at a small family of models — good enough for a mention list. */
+/** Tokens that point at a small family of models - good enough for a mention list. */
 export function familyTokens(model: ClassifiedModel, index: ModelNameIndex): string[] {
   return nameTokens(model.name).filter((token) => (index.tokenDf.get(token) ?? 0) <= FAMILY_TOKEN_MAX_MODELS);
 }
 
-/** Tokens that point at exactly one tracked model — the only ones worth storing as a link. */
+/** Tokens that point at exactly one tracked model - the only ones worth storing as a link. */
 export function uniqueTokens(model: ClassifiedModel, index: ModelNameIndex): string[] {
   return nameTokens(model.name).filter((token) => index.tokenDf.get(token) === 1);
 }
@@ -121,7 +121,7 @@ export function newsForModel(
  * Ingest-side matcher: the full name first (unchanged behaviour and the highest
  * confidence), then the longest token that names exactly one tracked model.
  * Returns `undefined` when nothing is unambiguous, because a wrong `modelSlug` is
- * worse than a missing one — the news page prints the link as a fact.
+ * worse than a missing one - the news page prints the link as a fact.
  */
 export function matchModelInText(
   text: string,

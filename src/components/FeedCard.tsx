@@ -117,7 +117,7 @@ export function FeedCard({
               <Link
                 href={hrefFor(locale, "/glossary/vram")}
                 title={vramSummary}
-                aria-label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB — ${vramSummary}`}
+                aria-label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB - ${vramSummary}`}
               >
                 <Chip label={`${t(dict, "card.vram")} ~${model.vramEstGb} GB`} tone="accent" />
               </Link>

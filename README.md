@@ -2,7 +2,7 @@
 
 **English** | [Türkçe](README.tr.md)
 
-Track newly released **open-weight AI models you can run locally** — LLMs, image, video, audio, coding, multimodal, embedding, vision and robotics models — with a news feed that refreshes on a schedule.
+Track newly released **open-weight AI models you can run locally** - LLMs, image, video, audio, coding, multimodal, embedding, vision and robotics models - with a news feed that refreshes on a schedule.
 
 The product name is **OpenWeight Radar**. The repository and deployment project are still called `local-ai-news`, and the public origin is `https://local-ai-news.vercel.app` (no custom domain by decision).
 
@@ -63,7 +63,7 @@ npm run ingest -- --dry
 
 ## Environment variables
 
-Copy `.env.example` to `.env`. Next.js loads it automatically. `npm run publish` loads it itself, but the other scripts read variables from the process environment — run them with an env file (`npx tsx --env-file=.env scripts/ingest.ts`) or pass the values in the shell (`HF_TOKEN=... npm run ingest`).
+Copy `.env.example` to `.env`. Next.js loads it automatically. `npm run publish` loads it itself, but the other scripts read variables from the process environment - run them with an env file (`npx tsx --env-file=.env scripts/ingest.ts`) or pass the values in the shell (`HF_TOKEN=... npm run ingest`).
 
 | Variable | Required | Purpose |
 |---|---|---|
@@ -206,7 +206,7 @@ interface Snapshot {
 | `primaryCategory`, `categories` | Tab category and all matching categories |
 | `pipelineTag`, `libraryName`, `license`, `licenseName` | Hub metadata |
 | `createdAt`, `updatedAt` | Hugging Face repo dates |
-| `firstSeenAt` | When the Radar first saw the row — this is what “new” means |
+| `firstSeenAt` | When the Radar first saw the row - this is what “new” means |
 | `downloads`, `likes`, `trendingScore` | Hub metrics; `trendingScore` is null in practice |
 | `downloadsAtFirstSeen` | Baseline for in-window growth; `null` means unknown |
 | `gated` | Gated repos are excluded from the feed |
@@ -243,10 +243,10 @@ The writer caps the snapshot at **2,000 models** and **1,000 news rows**, droppi
 
 **Hugging Face** is the model source of truth:
 
-- `GET /api/models` — list by `pipeline_tag`, search term and creation date; cursor pagination is treated as opaque.
-- `GET /api/models/{id}?full=true` — `cardData`, `safetensors`, `siblings`, `spaces`, `usedStorage`, `gated`.
-- `GET /api/trending?type=model` — the only response with `authorData.avatarUrl`.
-- `GET /api/daily_papers` — roughly 50 papers per day.
+- `GET /api/models` - list by `pipeline_tag`, search term and creation date; cursor pagination is treated as opaque.
+- `GET /api/models/{id}?full=true` - `cardData`, `safetensors`, `siblings`, `spaces`, `usedStorage`, `gated`.
+- `GET /api/trending?type=model` - the only response with `authorData.avatarUrl`.
+- `GET /api/daily_papers` - roughly 50 papers per day.
 
 **News feeds** (decision 3 was revised on 2026-10-15):
 
@@ -426,8 +426,8 @@ No build-time data fetch is required: the committed `data/feed.json` is the fall
 
 Add repository secrets:
 
-- `BLOB_READ_WRITE_TOKEN` — required for `npm run publish`.
-- `HF_TOKEN` — optional, raises the Hugging Face rate limit.
+- `BLOB_READ_WRITE_TOKEN` - required for `npm run publish`.
+- `HF_TOKEN` - optional, raises the Hugging Face rate limit.
 
 The `ingest` workflow runs `sources-check` → `ingest` → `classify-check` → `publish`. The `seo` workflow runs typecheck, lint, unit tests and the offline SEO audit on `main` and on PRs that touch routes, SEO code, the snapshot or `package.json`.
 
@@ -542,7 +542,7 @@ The full plans, measurements and decision log live under `docs/`. English is the
 
 | Document | English | Turkish |
 |---|---|---|
-| Documentation index | [docs/README.md](docs/README.md) | — |
+| Documentation index | [docs/README.md](docs/README.md) | - |
 | Product plan | [PLAN.md](docs/en/PLAN.md) | [PLAN.md](docs/tr/PLAN.md) |
 | Decisions log | [DECISIONS.md](docs/en/DECISIONS.md) | [DECISIONS.md](docs/tr/DECISIONS.md) |
 | Data storage (no Postgres) | [DATA-STORAGE.md](docs/en/DATA-STORAGE.md) | [DATA-STORAGE.md](docs/tr/DATA-STORAGE.md) |
@@ -564,7 +564,7 @@ The full plans, measurements and decision log live under `docs/`. English is the
 - Admin override panel (the `data/overrides.json` escape hatch exists, but there is no UI).
 - Email digest.
 - Local Ollama integration (`localhost:11434/api/tags`).
-- Further external news sources beyond the current runtime/community feeds — that requires an explicit decision, not an incidental addition.
+- Further external news sources beyond the current runtime/community feeds - that requires an explicit decision, not an incidental addition.
 
 ---
 

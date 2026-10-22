@@ -8,7 +8,7 @@ const EXCLUDED = ["/sitemap.xml", "/robots.txt", "/feed.rss", "/favicon.ico"];
 /**
  * Paths owned by the platform, not by the site. Measured 2026-10-22:
  * `/_vercel/insights/script.js` answered 307 to `/en/_vercel/insights/script.js`,
- * which is a 404 — three segments, so `EXCLUDED` and `STATIC_FILE` both miss it,
+ * which is a 404 - three segments, so `EXCLUDED` and `STATIC_FILE` both miss it,
  * and `_vercel` is not a locale. The `@vercel/analytics` collector mounted in the
  * layout therefore never loaded and the dashboard stayed empty even with Web
  * Analytics enabled in the Vercel project. `/_next` is build output with the same
@@ -25,7 +25,7 @@ function isPlatformPath(path: string): boolean {
 /**
  * A root-level file is not a page, so it must never take a locale prefix.
  * Measured 2026-10-16: `/icon.svg` and `/apple-icon.png` answered 307 to
- * `/en/icon.svg`, which is a 404 — the layout advertises both links, so two of
+ * `/en/icon.svg`, which is a 404 - the layout advertises both links, so two of
  * the three declared icons in the document head were dead. `/favicon.ico` only
  * worked because it happened to be listed above.
  */
@@ -85,7 +85,7 @@ export function middleware(request: NextRequest) {
 
   /* The index moved from `/` to `/models` (docs/en/DESIGN-V3.md D3). A URL that
      carries feed filters is a query against the index, not a request for the
-     front page, so it is redirected permanently (`/` itself is left alone — the
+     front page, so it is redirected permanently (`/` itself is left alone - the
      front page reads no search params). */
   if (segments.length === 1) {
     const url = new URL(request.url);

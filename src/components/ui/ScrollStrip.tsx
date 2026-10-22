@@ -6,7 +6,7 @@ import { cn } from "@/lib/format";
 /**
  * A horizontally scrollable strip a mouse user can actually use.
  *
- * Measured 2026-10-18 on the ribbon: `client 1248 / scroll 2966` — genuinely
+ * Measured 2026-10-18 on the ribbon: `client 1248 / scroll 2966` - genuinely
  * scrollable, but `scrollbar-width: none` hid the only affordance and a vertical
  * wheel over a 37 px tall strip scrolls the *page*, so with a mouse the rest of
  * the ticker was simply unreachable ("bu kısım kaydırılmıyor"). The desk strip had

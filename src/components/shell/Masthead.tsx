@@ -14,7 +14,7 @@ import { ThemeToggle } from "../ThemeToggle";
  * figure from the edition (right).
  *
  * The widths are not decorative. Measured at 1 440 px with a 1 260 px container:
- * the three zones need ~1 160 px, so every block has a fixed job —
+ * the three zones need ~1 160 px, so every block has a fixed job -
  *  - the seal is the *engraving* (the reference puts its seal on the left, and
  *    that is also the only place the old radar ornament survives);
  *  - the right block prints two short mono lines instead of one long one, because

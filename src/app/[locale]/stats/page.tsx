@@ -212,7 +212,7 @@ export default async function StatsPage({
         {query.gateForced ? <p className="max-w-sm pb-1 text-xs text-warn">{t(dict, "stats.gateForced")}</p> : null}
       </form>
 
-      {/* §1 — the four figures, each with the scope that produced it. */}
+      {/* §1 - the four figures, each with the scope that produced it. */}
       <section className="rule-bottom mb-4 pb-3" aria-label={t(dict, "nav.stats")}>
         <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
           <Stat
@@ -234,7 +234,7 @@ export default async function StatsPage({
           />
           <Stat
             label={t(dict, "stats.top")}
-            value={totals.top ? categoryLabel(totals.top.category) : "—"}
+            value={totals.top ? categoryLabel(totals.top.category) : "-"}
             hint={totals.top ? `${count(totals.top.count)} · ${percent(totals.top.count / Math.max(1, totals.inView))}` : undefined}
           />
           <Stat
@@ -303,7 +303,7 @@ export default async function StatsPage({
                     </td>
                     <td className="py-1.5 text-right font-mono">{count(row.count)}</td>
                     <td className="hidden py-1.5 text-right font-mono text-muted sm:table-cell">
-                      {row.medianDownloads === null ? "—" : count(row.medianDownloads)}
+                      {row.medianDownloads === null ? "-" : count(row.medianDownloads)}
                     </td>
                   </tr>
                 ))}
@@ -330,7 +330,7 @@ export default async function StatsPage({
         </section>
       </div>
 
-      {/* §4 — the only series with daily resolution today. */}
+      {/* §4 - the only series with daily resolution today. */}
       <section className="rule-bottom mt-3 pb-4">
         <h2 className="section-title mb-1">
           {t(dict, "stats.trend")}
@@ -357,7 +357,7 @@ export default async function StatsPage({
       </section>
 
       <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
-        {/* §5 — gate-independent by design: what the filter keeps, in both states. */}
+        {/* §5 - gate-independent by design: what the filter keeps, in both states. */}
         <section className="rule-bottom pb-4">
           <h2 className="section-title mb-3">{t(dict, "stats.gateTitle")}</h2>
 
@@ -435,7 +435,7 @@ export default async function StatsPage({
           </p>
         </section>
 
-        {/* §6 — the one dimension that is 100 % present and answers "can I run it?". */}
+        {/* §6 - the one dimension that is 100 % present and answers "can I run it?". */}
         <section className="rule-bottom pb-4">
           <h2 className="section-title mb-3">{t(dict, "stats.runnersTitle")}</h2>
 
@@ -493,7 +493,7 @@ export default async function StatsPage({
         </section>
       </div>
 
-      {/* §7 — the wire: the second series with a real daily axis. */}
+      {/* §7 - the wire: the second series with a real daily axis. */}
       {wireTotal > 0 ? (
         <section className="rule-bottom mt-3 pb-4">
           <h2 className="section-title mb-1">
@@ -513,13 +513,13 @@ export default async function StatsPage({
         </section>
       ) : null}
 
-      {/* §8 — the method note is what lets the page skip "live" and "trending". */}
+      {/* §8 - the method note is what lets the page skip "live" and "trending". */}
       <section className="rule-strong rule-bottom mt-3 pb-4">
         <h2 className="section-title mb-2">{t(dict, "stats.methodTitle")}</h2>
         <p className="max-w-4xl text-xs leading-relaxed text-muted">
           {t(dict, "stats.methodBody", {
             when,
-            since: board.tracking[0] ? shortDay(board.tracking[0].date, locale) : "—"
+            since: board.tracking[0] ? shortDay(board.tracking[0].date, locale) : "-"
           })}
         </p>
       </section>

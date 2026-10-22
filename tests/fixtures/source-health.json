@@ -7,7 +7,7 @@
   { "key": "gh_llama_cpp", "status": 200, "items": 10, "note": "runtime releases" },
   { "key": "gh_ollama", "status": 200, "items": 10, "note": "runtime releases" },
   { "key": "gh_vllm", "status": 200, "items": 10, "note": "runtime releases" },
-  { "key": "hf_blog_rss", "status": "disabled", "items": 0, "note": "404 — no RSS feed exists" },
+  { "key": "hf_blog_rss", "status": "disabled", "items": 0, "note": "404 - no RSS feed exists" },
   { "key": "hf_users", "status": "disabled", "items": 0, "note": "error without a token" },
   { "key": "hf_organizations", "status": "disabled", "items": 0, "note": "error without a token" },
   { "key": "lmstudio_changelog", "status": "disabled", "items": 0, "note": "HTML only, no feed (measured 2026-10-15)" }

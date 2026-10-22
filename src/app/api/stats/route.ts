@@ -10,7 +10,7 @@ const CACHE = "public, s-maxage=900";
  * One board per request, the same one the page renders, so a figure the page
  * prints can always be reproduced here. `window` speaks the feed's vocabulary;
  * the old `?days=` links are parsed as an alias. The previous `stats`/`series`
- * keys are gone — they described a first-seen series that spans three days and a
+ * keys are gone - they described a first-seen series that spans three days and a
  * page that no longer exists, and nothing outside the docs consumed them.
  */
 export async function GET(request: NextRequest) {

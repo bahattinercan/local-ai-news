@@ -15,7 +15,7 @@ import {
  *
  * `useSyncExternalStore` rather than `useState` + `useEffect`: the value is not
  * owned by any component, and both consumers must agree on it in the *first*
- * render after a remount — a `useEffect` that reads the DOM would race the
+ * render after a remount - a `useEffect` that reads the DOM would race the
  * remount that just overwrote it.
  */
 export function useTheme(): Theme {

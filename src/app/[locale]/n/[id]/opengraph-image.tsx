@@ -13,7 +13,7 @@ import { OG_CONTENT_TYPE, OG_SIZE, OgCardView, loadOgFonts, ogNewsCard } from "@
  * the lookup is `getNewsItemByParam` rather than `getNewsItem`. An unknown id
  * prints the generic card; it does not throw.
  */
-export const alt = "OpenWeight Radar — a news headline with its source, kind and publication date";
+export const alt = "OpenWeight Radar - a news headline with its source, kind and publication date";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

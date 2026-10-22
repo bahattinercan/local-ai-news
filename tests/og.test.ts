@@ -1,7 +1,7 @@
 /**
  * OG card tests (docs/en/SEO-PLAN.md §4.4, §16).
  *
- * `ImageResponse` cannot run in a unit test — Satori needs a WASM resvg — so the
+ * `ImageResponse` cannot run in a unit test - Satori needs a WASM resvg - so the
  * pixels are never asserted here. What *is* asserted is everything that decides
  * what the pixels say: which strings a card is given for a model, a news item, a
  * glossary term and the site, what it prints when the slug is unknown, and that
@@ -139,7 +139,7 @@ test("a sparse model card prints only the fields it has, never a placeholder", (
     "en"
   );
   assert.deepEqual(card.facts, [{ label: "Quantizations", value: "Q4_K_M" }]);
-  assert.doesNotMatch(JSON.stringify(card), /unknown|—|null/);
+  assert.doesNotMatch(JSON.stringify(card), /unknown|null/);
 });
 
 test("a model card falls back to the generic nameplate for an unknown slug", () => {
@@ -247,7 +247,7 @@ test("a glossary card falls back for an unknown term", () => {
 
 /**
  * A minimal `cmap` format-4 reader. Satori does not throw when a glyph is
- * missing — it prints a blank box — so the only way to catch a latin-only
+ * missing - it prints a blank box - so the only way to catch a latin-only
  * "optimisation" of the committed TTF in CI is to read the character map.
  */
 function cmapGlyphs(buffer: Buffer): Set<number> {

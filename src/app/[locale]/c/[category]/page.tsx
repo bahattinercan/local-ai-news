@@ -110,7 +110,7 @@ export default async function CategoryPage({
 
       {/* The FAQ sits below the list on purpose: it is the deepest content on the
           route, so it must not push the first model row below the fold on a
-          laptop. Rendered as a definition list — a real question per heading —
+          laptop. Rendered as a definition list - a real question per heading -
           and it reuses `.section-title` rather than inventing a section style. */}
       <section className="mt-8" aria-labelledby="desk-faq">
         <h2 id="desk-faq" className="section-title">

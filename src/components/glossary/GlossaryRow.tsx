@@ -11,7 +11,7 @@ import { hrefFor, type Locale } from "@/i18n";
  * of dead space under the short entries. A hairline and 10 px of padding separate
  * them just as clearly.
  *
- * The `N §` badge is gone too. It was `body.length` — the paragraph count — printed
+ * The `N §` badge is gone too. It was `body.length` - the paragraph count - printed
  * as if a reader could decode it; the row now states the cost of reading the term
  * (G-D3), which is the only number a reader can act on before clicking.
  */

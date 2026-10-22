@@ -12,7 +12,7 @@ import { dictionary, hrefFor, t, type Locale } from "@/i18n";
  *
  * They were missing entirely: the only compare link on the site lived on a feed
  * card and *replaced* the whole id list, so a second model could only be added by
- * editing the address. Everything here is a plain GET form or a link — no client
+ * editing the address. Everything here is a plain GET form or a link - no client
  * state, no JavaScript, and the address stays the single source of truth.
  */
 
@@ -141,7 +141,7 @@ export function ComparePairs({
   );
 }
 
-/** Count, swap, clear — and a copyable absolute link to this exact sheet. */
+/** Count, swap, clear - and a copyable absolute link to this exact sheet. */
 export function CompareActions({
   locale,
   models,
