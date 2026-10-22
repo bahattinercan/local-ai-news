@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next";
 import { dictionary, pickLocale, t } from "@/i18n";
 import { Masthead } from "@/components/shell/Masthead";
 import { Ribbon } from "@/components/shell/Ribbon";
@@ -97,6 +98,11 @@ export default async function Layout({
         </div>
 
         <Footer locale={locale} />
+
+        {/* Vercel Web Analytics: cookieless, so it needs no consent banner and
+            writes no cookie. It only reports once the owner enables Web
+            Analytics for the Vercel project; that switch is owner-side, not code. */}
+        <Analytics />
       </body>
     </html>
   );
