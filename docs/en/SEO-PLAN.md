@@ -809,14 +809,16 @@ Expected after P0/P1: 7/7 distinct titles, 3 canonical/hreflang pairs, 3/3 404s,
 
 ---
 
-## 14. Open questions (owner's call)
+## 14. Open questions (owner's call) — all six answered 2026-10-22
 
-1. **Custom domain now?** `openweightradar.com` is NXDOMAIN; the deployed host is `local-ai-news.vercel.app`. Authority should start on the final domain, not migrate later.
-2. **AI crawler policy:** allow GPTBot/ClaudeBot/PerplexityBot/Google-Extended (recommended) or block training while allowing search?
-3. **Dataset license:** can `/stats` + `/api/stats` be published as a citable dataset (e.g. CC BY 4.0)? Needed for the `Dataset` schema and the monthly study.
-4. **TR entity pages:** translate, keep English with TR chrome, or `noindex`? Pick one.
-5. **Non-gate-passed models:** keep them `noindex` forever, or index those with ≥ 6 specs (25 today)?
-6. **Analytics:** Vercel Analytics vs Plausible; who owns the property?
+Each question keeps its heading; the answer and its one-line consequence sit under it. The implementation is §15.3.
+
+1. **Custom domain now?** — **No custom domain.** `FALLBACK_SITE_URL` in `src/lib/seo.ts` and `NEXT_PUBLIC_SITE_URL` in `.env.example` both read `https://local-ai-news.vercel.app`, and `src/app/feed.rss/route.ts` takes the shared `SITE_URL` instead of carrying its own copy. Consequence: the `vercel.app` host is the one canonical origin; the §3.5 migration runbook is not executed and S1's "real domain" half is decided against, not deferred.
+2. **AI crawler policy:** — **Allow search only.** `robots.ts` keeps the `*` `Allow: /` + `Disallow: /api/` rule and the sitemap, and adds one deny group (`Disallow: /`) for GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai and Diffbot. Consequence: training and fetch agents get nothing to read; `PerplexityBot` and `OAI-SearchBot` stay allowed because they answer with a citation and a link — the single judgement call, flippable by one line.
+3. **Dataset license:** — **Not publishable as a citable dataset.** Consequence: no `Dataset` schema (§5's optional row stays unbuilt), no CSV export, and no monthly data study from `/stats` (§11.5 row 9, §11.6).
+4. **TR entity pages:** — **Translate them.** `category.<desk>.intro` plus three answered FAQs per desk now exist in both dictionaries (9 desks) and render on `c/[category]`. Consequence: the TR category pages carry their own 150–250 word intro and FAQ instead of English copy under a Turkish shell.
+5. **Non-gate-passed models:** — **Index those with ≥ 6 specs.** A model reporting six or more of the eight spec fields is indexable regardless of the quality gate. Consequence: measured on `data/feed.json`, indexable models 251 → 252 and the sitemap 792 → 794 URLs.
+6. **Analytics:** — **Vercel Analytics.** `@vercel/analytics` 2.0.1 is mounted once in the locale root layout; cookieless, so no consent banner. Consequence: the collector stays empty until the owner enables Web Analytics in the Vercel project.
 
 ---
 
@@ -826,17 +828,21 @@ Expected after P0/P1: 7/7 distinct titles, 3 canonical/hreflang pairs, 3/3 404s,
 - [ ] Every route type has a unique, data-derived title and description in EN and TR.
 - [ ] Every indexable page has a self-canonical and reciprocal `en`/`tr`/`x-default` alternates.
 - [ ] Every indexable page has an OG image and a Twitter card.
-- [ ] `robots.txt` disallows `/api/`, lists the sitemap, and states the AI crawler policy.
+  - *(wave 2, §15.3)* Not ticked: the four 1200×630 routes landed in wave 1 (§15.2); this wave only re-pointed the host the card prints, under Q1. The emitted `og:image` tag is still unverified without a server.
+- [x] `robots.txt` disallows `/api/`, lists the sitemap, and states the AI crawler policy.
+  - *(wave 2, §15.3)* Q2 made the policy explicit: `*` allow + `/api/` disallow, one deny group for the eleven training/fetch crawlers, the two answer engines allowed, sitemap advertised. The audit's `robots` check passes with 3 rules (11 denied, 2 allowed).
 - [ ] Sitemap contains all indexable URLs, no query strings, `lastModified`, and no `noindex` URLs.
 - [ ] Unknown model/news/category URLs return 404 with `noindex`.
 - [ ] `/` and no-locale paths return 308.
 - [ ] Query-filtered pages are `noindex,follow` with a canonical to the bare route; `page` is self-canonical.
-- [ ] Model index gate: `qualityPassed && (specCount ≥ 4 || summary ≥ 200)`; unit-tested.
+- [x] Model index gate: `qualityPassed && (specCount ≥ 4 || summary ≥ 200)`; unit-tested.
+  - *(wave 2, §15.3)* Q5 added "or `specCount ≥ 6`, whatever the gate says"; the gate-passed floor is unchanged. On `data/feed.json` indexable models 251 → 252; `tests/seo.test.ts` asserts the six-spec clause, the four-spec floor and the five-spec refusal.
 - [ ] JSON-LD validates for `SoftwareApplication`, `NewsArticle`, `ItemList`, `BreadcrumbList`, `WebSite`, `Organization`.
 - [ ] RSS items link to `/n/{id}`, carry `<source>` and `rel="self"`.
 - [ ] HTML is ISR-cached; `/api` is the only `no-store` surface.
 - [ ] Card backfill runs every ingest; ≥ 80 % of gate-passed models have a summary.
-- [ ] Category pages have 150–250 words of translated intro + FAQ.
+- [x] Category pages have 150–250 words of translated intro + FAQ.
+  - *(wave 2, §15.3)* Q4: `category.<desk>.intro` and three answered FAQs per desk in both dictionaries — 9 desks × `en`/`tr`. Measured 184–223 words per EN intro and 173–198 per TR intro, answers 50–81 words; `tests/i18n.test.ts` gates 150–250 and 40–90.
 - [ ] Seven guides ship; the VRAM calculator ships only if it reads real GGUF file sizes and links to model pages (§7.5).
 - [ ] Every indexable page scores ≥ 8/12 on the content rubric; pages < 6 are `noindex`.
 - [ ] IndexNow key is served and every publish pings the changed model/news URLs.
@@ -844,7 +850,8 @@ Expected after P0/P1: 7/7 distinct titles, 3 canonical/hreflang pairs, 3/3 404s,
 - [ ] Domain migration runbook executed; old host 308s for ≥ 12 months; no mixed-host canonical anywhere.
 - [ ] `docs/en/SEO-LOG.md` has one line per week with the five GSC/log numbers.
 - [ ] GSC and Bing properties verified; sitemap submitted; analytics recording events.
-- [ ] `npm run seo-audit` passes in CI and fails on a broken title/canonical/404/sitemap.
+- [x] `npm run seo-audit` passes in CI and fails on a broken title/canonical/404/sitemap.
+  - *(wave 2, §15.3)* 7/7 on this working tree: 794 sitemap URLs, 38 pages, 252 indexable models, 104 indexable news. CI runs that same command, but nothing is pushed, so CI itself has not run this wave.
 - [ ] Lighthouse SEO 100 on `/`, `/models`, `/c/*`, `/m/*`, `/news`, `/glossary/*`, `/stats`.
 - [ ] p75 LCP < 2.5 s, INP < 200 ms, CLS < 0.1 in CrUX.
 
@@ -906,6 +913,27 @@ Deviations from the plan:
 
 ---
 
+## 15.3 Implementation log — wave 2 (2026-10-22)
+
+The owner answered all six §14 questions in one pass and the working tree took the answers. Measured on the committed snapshot plus this working tree, with no deployed server; nothing is pushed and no domain of its own is attached.
+
+- **One host, and it is the Vercel one (Q1).** `FALLBACK_SITE_URL` in `src/lib/seo.ts` is `https://local-ai-news.vercel.app` and `.env.example` says the same, so the code default and production finally agree. `src/app/feed.rss/route.ts` now imports the shared `SITE_URL` instead of repeating the `process.env` lookup and a fallback of its own. `grep -R openweightradar.com src/ tests/ scripts/ .github/` returns nothing; the OG card prints `OG_HOST`, which derives from `SITE_URL`, so the four 1200×630 cards re-point without a second edit.
+- **Search only (Q2).** `src/app/robots.ts` keeps the `*` rule (`Allow: /`, `Disallow: /api/`) and the sitemap, and adds one deny group — `Disallow: /` with no `Allow: /` beside it, because an equal-length `Allow` wins the tie — for GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai and Diffbot. `PerplexityBot` and `OAI-SearchBot` keep the wildcard behaviour on purpose: they answer with a citation and a link, which is what a search engine does. The two lists live in `lib/seo.ts` as `TRAINING_CRAWLERS` and `ANSWER_ENGINE_CRAWLERS`, so the route, the audit and the tests assert one array instead of three copies.
+- **Index policy (Q5).** `isIndexableModel` returns true for any model reporting six or more of the eight spec fields, whatever `qualityPassed` says; the gate-passed `specCount ≥ 4 || cardSummary ≥ 200` floor is unchanged. Measured on `data/feed.json`: indexable models **251 → 252**, sitemap **792 → 794** URLs across the two locales — one gate-failed row with seven reported specs.
+- **Translated desk copy (Q4).** `category.<desk>.intro` and three answered FAQs (`vram`, `run`, `pick`) per desk now exist in both dictionaries — 9 desks × `en`/`tr` — and render on `c/[category]`, intro above the feed and the FAQ as a definition list below it. The figures the copy quotes (`{count}`, `{passed}`, `{days}`) are counted from the snapshot, so an ingest cannot leave the sentence contradicting the list. Measured intro lengths 184–223 words (EN) and 173–198 (TR), answers 50–81 words; `tests/i18n.test.ts` gates 150–250 and 40–90 and asserts nine desks.
+- **Analytics (Q6).** `@vercel/analytics` 2.0.1 is mounted once, as `<Analytics />` in the locale root layout beside the footer. It sets no cookie, so no consent banner ships; the tag reports nothing until the owner switches Web Analytics on for the Vercel project.
+- **Q3, the answer that removes work.** The dataset cannot be licensed as a citable dataset, so there is no `Dataset` schema (§5's optional row stays unbuilt), no CSV export, and no monthly data study from `/stats` (§11.5 row 9, §11.6). §15's checklist never promised any of the three, so no box changes for it.
+
+Verified on the final tree: `npm run typecheck` clean, `npm run lint` clean, `npm test` **226/226** (was 213), `npm run seo-audit` **7/7** — 794 sitemap URLs, 38 pages, 252 indexable models, 104 indexable news, 397 advertised paths, and robots at 3 rules with 11 training crawlers denied and 2 answer engines allowed.
+
+Deviations from the plan:
+
+- **`PerplexityBot` and `OAI-SearchBot` are still allowed, by judgement, not by measurement.** Nothing in the snapshot says whether a citation from an answer engine converts; the plan's Q2 wording offered only "training" or "search", and these two sit on the seal. Moving either name into `TRAINING_CRAWLERS` flips it, and the audit follows the array.
+- **The RSS route's second fallback was found by a worker, not by the plan.** While grepping for the old hostname a worker found `feed.rss/route.ts` repeating the origin and its own `openweightradar.com` fallback; the channel link could have disagreed with the canonical host. It was fixed under Q1 rather than logged as a separate row, which is why §16 still describes that file under P1.
+- **The audit is still offline, not the §10.2 crawl.** Unchanged from §15.2 and now load-bearing for Q2: the `robots` check asserts the policy arrays the route renders rather than fetching `robots.txt` over HTTP, so a deny group that never reaches the response would still be caught, but a platform-level override would not.
+
+---
+
 ## 16. Appendix A — implementation map
 
 | File | Change | Phase |
@@ -938,5 +966,6 @@ Deviations from the plan:
 | v2 | 2026-10-20 | Added competitor/SERP evidence (§2.1), query portfolio (§2.2), realistic SERP features (§2.3), migration runbook (§3.5), rubric (§7.7), link matrix (§8.1), instrumentation/indexing/log review (§10.4–10.6), 90-day calendar (§11.5), link acquisition (§11.6), pruning (§11.7), implementation map (§16). Corrected: Software App rich result is not achievable without ratings; FAQ/HowTo markup is not a lever; the generic VRAM calculator is conditional. |
 | v2.1 | 2026-10-21 | P0 implemented; §15.1 records the verification, the latent 500 and the three deviations (single sitemap, built-in 404 shell, owner accounts). |
 | v2.2 | 2026-10-22 | Wave 1 landed; §15.2 records the offline audit and its CI gate, the glossary at 25 terms and the four OG card routes, with the measured numbers and the three deviations (offline vs crawl, committed-snapshot counts, static font instances). |
+| v3 | 2026-10-22 | §14 closed — no custom domain (`local-ai-news.vercel.app` is canonical), search-only crawler policy, no citable dataset, translated TR desk copy, the ≥ 6-spec index clause, Vercel Analytics. Wave 2 landed; §15.3 records 251 → 252 indexable models, 792 → 794 sitemap URLs, 226/226 tests and 7/7 audit, with the three deviations (answer-engine judgement call, the RSS fallback found en route, audit still offline). |
 
 The next revision should replace §2.1's search snapshot with a recorded SERP audit (date, query, top 10 URLs, feature type) and replace the relative KPIs with the first four weeks of GSC data.

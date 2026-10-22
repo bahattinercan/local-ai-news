@@ -809,14 +809,16 @@ P0/P1 sonrası beklenen: 7/7 farklı başlık, 3 canonical/hreflang çifti, 3/3 
 
 ---
 
-## 14. Açık sorular (sahibin kararı)
+## 14. Açık sorular (sahibin kararı) — altısı da 2026-10-22'de yanıtlandı
 
-1. **Özel alan adı şimdi mi?** `openweightradar.com` NXDOMAIN; dağıtılan host `local-ai-news.vercel.app`. Otorite son alan adında başlamalı, sonra taşınmamalı.
-2. **AI tarayıcı politikası:** GPTBot/ClaudeBot/PerplexityBot/Google-Extended'a izin (öneri) mi, aramaya izin verip eğitime kapatmak mı?
-3. **Veri kümesi lisansı:** `/stats` + `/api/stats` atıflanabilir bir veri kümesi olarak yayınlanabilir mi (ör. CC BY 4.0)? `Dataset` şeması ve aylık çalışma için gerekli.
-4. **TR varlık sayfaları:** çevir, İngilizce + TR kabuk olarak tut veya `noindex` yap? Birini seç.
-5. **Kapıyı geçmeyen modeller:** sonsuza kadar `noindex` mi, ≥ 6 spec olanlar (bugün 25) dizine mi?
-6. **Analitik:** Vercel Analytics mi Plausible mı; property kime ait?
+Her soru başlığını koruyor; yanıt ve tek satırlık sonucu altında duruyor. Uygulama §15.3'te.
+
+1. **Özel alan adı şimdi mi?** — **Özel alan adı yok.** `src/lib/seo.ts` içindeki `FALLBACK_SITE_URL` ile `.env.example` içindeki `NEXT_PUBLIC_SITE_URL` artık `https://local-ai-news.vercel.app` diyor; `src/app/feed.rss/route.ts` kendi kopyasını taşımak yerine ortak `SITE_URL`'i kullanıyor. Sonuç: tek kanonik origin `vercel.app` hostu; §3.5'teki taşıma runbook'u uygulanmıyor, S1'in "gerçek alan adı" yarısı ertelenmiş değil, aleyhine karar verilmiş durumda.
+2. **AI tarayıcı politikası:** — **Yalnızca aramaya izin.** `robots.ts` `*` için `Allow: /` + `Disallow: /api/` kuralını ve sitemap'i koruyor, üstüne GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai ve Diffbot için tek bir ret grubu (`Disallow: /`) ekliyor. Sonuç: eğitim ve fetch ajanları okuyacak bir şey bulamıyor; `PerplexityBot` ile `OAI-SearchBot` atıf ve bağlantıyla yanıt verdikleri için izinli kalıyor — tek yargı kararı, tek satırla çevrilebilir.
+3. **Veri kümesi lisansı:** — **Atıflanabilir veri kümesi olarak yayınlanamaz.** Sonuç: `Dataset` şeması yok (§5'teki opsiyonel satır inşa edilmiyor), CSV dışa aktarımı yok ve `/stats`'tan aylık veri çalışması yok (§11.5 satır 9, §11.6).
+4. **TR varlık sayfaları:** — **Çevriliyor.** `category.<desk>.intro` ve masa başına üç yanıtlı SSS artık iki sözlükte de var (9 masa) ve `c/[category]` üzerinde çiziliyor. Sonuç: TR kategori sayfaları, Türkçe kabuk altındaki İngilizce metin yerine kendi 150–250 kelimelik girişini ve SSS'ini taşıyor.
+5. **Kapıyı geçmeyen modeller:** — **≥ 6 spec'i olanlar dizine giriyor.** Sekiz spec alanından altısını veya fazlasını bildiren model, kalite kapısı ne derse desin dizine uygun. Sonuç: `data/feed.json` üzerinde ölçüldü, dizine uygun model 251 → 252, sitemap 792 → 794 URL.
+6. **Analitik:** — **Vercel Analytics.** `@vercel/analytics` 2.0.1 locale kök layout'una bir kez monte edildi; çereksiz, dolayısıyla onay banner'ı yok. Sonuç: sahip Vercel projesinde Web Analytics'i açana kadar toplayıcı boş kalıyor.
 
 ---
 
@@ -826,17 +828,21 @@ P0/P1 sonrası beklenen: 7/7 farklı başlık, 3 canonical/hreflang çifti, 3/3 
 - [ ] Her rota tipinin EN ve TR'de benzersiz, veriden türeyen başlığı ve açıklaması var.
 - [ ] Her dizine uygun sayfada kendine canonical ve karşılıklı `en`/`tr`/`x-default` var.
 - [ ] Her dizine uygun sayfada OG görseli ve Twitter card var.
-- [ ] `robots.txt` `/api/`'yi yasaklıyor, sitemap'i listeliyor ve AI tarayıcı politikasını yazıyor.
+  - *(2. dalga, §15.3)* İşaretlenmedi: dört 1200×630 rota 1. dalgada indi (§15.2); bu dalga yalnızca kartın bastığı hostu Q1 uyarınca yeniden hedefledi. Yayınlanan `og:image` etiketi sunucusuz hâlâ doğrulanmadı.
+- [x] `robots.txt` `/api/`'yi yasaklıyor, sitemap'i listeliyor ve AI tarayıcı politikasını yazıyor.
+  - *(2. dalga, §15.3)* Q2 politikayı açık hâle getirdi: `*` izinli + `/api/` yasak, on bir eğitim/fetch tarayıcısı için tek ret grubu, iki yanıt motoru izinli, sitemap ilan edilmiş. Denetimin `robots` kontrolü 3 kuralla geçiyor (11 ret, 2 izin).
 - [ ] Sitemap tüm dizine uygun URL'leri, sorgu dizesi olmadan, `lastModified` ile ve `noindex` URL'siz içeriyor.
 - [ ] Bilinmeyen model/haber/kategori URL'leri `noindex` ile 404 dönüyor.
 - [ ] `/` ve locale'siz yollar 308 dönüyor.
 - [ ] Sorguyla filtrelenmiş sayfalar `noindex,follow` ve çıplak rotaya canonical; `page` kendine canonical.
-- [ ] Model dizin yüklemi: `qualityPassed && (specCount ≥ 4 || summary ≥ 200)`; birim testli.
+- [x] Model dizin yüklemi: `qualityPassed && (specCount ≥ 4 || summary ≥ 200)`; birim testli.
+  - *(2. dalga, §15.3)* Q5 "ya da `specCount ≥ 6`, kapı ne derse desin" maddesini ekledi; kapıyı geçenlerin dört-spec tabanı değişmedi. `data/feed.json` üzerinde dizine uygun model 251 → 252; `tests/seo.test.ts` altı-spec maddesini, dört-spec tabanını ve beş-spec reddini doğruluyor.
 - [ ] `SoftwareApplication`, `NewsArticle`, `ItemList`, `BreadcrumbList`, `WebSite`, `Organization` JSON-LD'leri doğrulanıyor.
 - [ ] RSS öğeleri `/n/{id}`'ye bağlanıyor, `<source>` ve `rel="self"` taşıyor.
 - [ ] HTML ISR önbellekli; tek `no-store` yüzeyi `/api`.
 - [ ] Kart doldurma her ingest'te çalışıyor; kapıyı geçen modellerin ≥ %80'inde özet var.
-- [ ] Kategori sayfalarında 150–250 kelime çevrilmiş giriş + SSS var.
+- [x] Kategori sayfalarında 150–250 kelime çevrilmiş giriş + SSS var.
+  - *(2. dalga, §15.3)* Q4: `category.<desk>.intro` ve masa başına üç yanıtlı SSS iki sözlükte de var — 9 masa × `en`/`tr`. Ölçülen: EN girişler 184–223 kelime, TR girişler 173–198, yanıtlar 50–81 kelime; `tests/i18n.test.ts` 150–250 ve 40–90 sınırlarını denetliyor.
 - [ ] Yedi rehber yayınlandı; VRAM hesaplayıcı yalnızca gerçek GGUF dosya boyutlarını okuyup model sayfalarına bağlanıyorsa yayınlandı (§7.5).
 - [ ] Her dizine uygun sayfa içerik rubriğinde ≥ 8/12 alıyor; < 6 sayfalar `noindex`.
 - [ ] IndexNow anahtarı sunuluyor ve her yayında değişen model/haber URL'leri pingleniyor.
@@ -844,7 +850,8 @@ P0/P1 sonrası beklenen: 7/7 farklı başlık, 3 canonical/hreflang çifti, 3/3 
 - [ ] Alan adı taşıma runbook'u uygulandı; eski host ≥ 12 ay 308; hiçbir yerde karışık hostlu canonical yok.
 - [ ] `docs/en/SEO-LOG.md` haftada bir satırla beş GSC/log sayısını taşıyor.
 - [ ] GSC ve Bing property'leri doğrulandı; sitemap gönderildi; analitik olayları kaydediyor.
-- [ ] `npm run seo-audit` CI'da geçiyor ve bozuk başlık/canonical/404/sitemap'te düşüyor.
+- [x] `npm run seo-audit` CI'da geçiyor ve bozuk başlık/canonical/404/sitemap'te düşüyor.
+  - *(2. dalga, §15.3)* Bu çalışma ağacında 7/7: 794 sitemap URL'si, 38 sayfa, 252 dizine uygun model, 104 dizine uygun haber. CI aynı komutu çalıştırıyor ama hiçbir şey push edilmediği için CI'ın kendisi bu dalgada çalışmadı.
 - [ ] `/`, `/models`, `/c/*`, `/m/*`, `/news`, `/glossary/*`, `/stats` üzerinde Lighthouse SEO 100.
 - [ ] CrUX'ta p75 LCP < 2,5 sn, INP < 200 ms, CLS < 0,1.
 
@@ -906,6 +913,27 @@ Plandan sapmalar:
 
 ---
 
+## 15.3 Uygulama günlüğü — 2. dalga (2026-10-22)
+
+Sahip altı §14 sorusunu tek geçişte yanıtladı ve çalışma ağacı yanıtları aldı. Commit edilmiş snapshot ile bu çalışma ağacı üzerinde, dağıtılmış sunucu olmadan ölçüldü; hiçbir şey push edilmedi ve kendine ait bir alan adı bağlanmadı.
+
+- **Tek host, o da Vercel'in hostu (Q1).** `src/lib/seo.ts` içindeki `FALLBACK_SITE_URL` artık `https://local-ai-news.vercel.app`, `.env.example` da aynısını söylüyor; böylece kodun varsayılanı ile üretim nihayet anlaşıyor. `src/app/feed.rss/route.ts` artık `process.env` aramasını ve kendi fallback'ini tekrarlamak yerine ortak `SITE_URL`'i import ediyor. `grep -R openweightradar.com src/ tests/ scripts/ .github/` hiçbir şey döndürmüyor; OG kartı `SITE_URL`'den türeyen `OG_HOST`'u bastığı için dört 1200×630 kart ikinci bir düzenlemeye gerek kalmadan yeni hostu gösteriyor.
+- **Yalnızca arama (Q2).** `src/app/robots.ts` `*` kuralını (`Allow: /`, `Disallow: /api/`) ve sitemap'i koruyor, üstüne tek bir ret grubu ekliyor — `Disallow: /`, yanında `Allow: /` yok, çünkü eşit uzunlukta `Allow` beraberliği kazanır — GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Google-Extended, CCBot, Bytespider, Applebot-Extended, meta-externalagent, cohere-ai ve Diffbot için. `PerplexityBot` ile `OAI-SearchBot` bilerek joker davranışta kalıyor: atıf ve bağlantıyla yanıt veriyorlar, ki bir arama motorunun yaptığı budur. İki liste `lib/seo.ts` içinde `TRAINING_CRAWLERS` ve `ANSWER_ENGINE_CRAWLERS` olarak duruyor; böylece rota, denetim ve testler üç kopya yerine tek diziyi doğruluyor.
+- **Dizin politikası (Q5).** `isIndexableModel`, sekiz spec alanından altısını veya fazlasını bildiren her model için `qualityPassed` ne derse desin true dönüyor; kapıyı geçenlerin `specCount ≥ 4 || cardSummary ≥ 200` tabanı değişmedi. `data/feed.json` üzerinde ölçüldü: dizine uygun model **251 → 252**, iki locale boyunca sitemap **792 → 794** URL — yedi spec bildiren, kapıyı geçememiş tek satır.
+- **Çevrilmiş masa metni (Q4).** `category.<desk>.intro` ve masa başına üç yanıtlı SSS (`vram`, `run`, `pick`) artık iki sözlükte de var — 9 masa × `en`/`tr` — ve `c/[category]` üzerinde çiziliyor: giriş yemin üstünde, SSS altında tanım listesi olarak. Metnin andığı sayılar (`{count}`, `{passed}`, `{days}`) snapshot'tan sayılıyor, böylece bir ingest cümlenin listeyle çelişmesine yol açamıyor. Ölçülen giriş uzunlukları 184–223 kelime (EN) ve 173–198 (TR), yanıtlar 50–81 kelime; `tests/i18n.test.ts` 150–250 ile 40–90 sınırlarını ve dokuz masayı doğruluyor.
+- **Analitik (Q6).** `@vercel/analytics` 2.0.1, locale kök layout'unda footer'ın yanında `<Analytics />` olarak bir kez monte edildi. Çerez yazmıyor, dolayısıyla onay banner'ı gemide yok; etiket, sahip Vercel projesinde Web Analytics'i açana kadar hiçbir şey raporlamıyor.
+- **İşi ortadan kaldıran yanıt: Q3.** Veri kümesi atıflanabilir bir veri kümesi olarak lisanslanamıyor; bu yüzden `Dataset` şeması yok (§5'teki opsiyonel satır inşa edilmiyor), CSV dışa aktarımı yok ve `/stats`'tan aylık veri çalışması yok (§11.5 satır 9, §11.6). §15'in listesi bu üçünü hiç vaat etmemişti, bu yüzden onun için hiçbir kutu değişmiyor.
+
+Son ağaçta doğrulandı: `npm run typecheck` temiz, `npm run lint` temiz, `npm test` **226/226** (213'tü), `npm run seo-audit` **7/7** — 794 sitemap URL'si, 38 sayfa, 252 dizine uygun model, 104 dizine uygun haber, 397 ilan edilmiş yol ve 11 eğitim tarayıcısı ret, 2 yanıt motoru izinli olmak üzere 3 kurallı robots.
+
+Plandan sapmalar:
+
+- **`PerplexityBot` ve `OAI-SearchBot` hâlâ izinli — ölçümle değil, yargıyla.** Snapshot'ta bir yanıt motorundan gelen atfın dönüşüp dönüşmediğine dair hiçbir veri yok; planın Q2 ifadesi yalnızca "eğitim" ya da "arama" sunuyordu ve bu ikisi mührün üstünde duruyor. İki addan birini `TRAINING_CRAWLERS` içine taşımak kararı çevirir, denetim de diziyi izler.
+- **RSS rotasındaki ikinci fallback'i plan değil, bir worker buldu.** Eski hostu grep'lerken bir worker `feed.rss/route.ts` dosyasının origin'i ve kendi `openweightradar.com` fallback'ini tekrarladığını gördü; kanal bağlantısı kanonik hostla çelişebilirdi. Ayrı bir satır olarak kaydedilmek yerine Q1 altında düzeltildi; §16'nın o dosyayı hâlâ P1 altında anlatmasının nedeni bu.
+- **Denetim hâlâ çevrimdışı, §10.2'deki tarama değil.** §15.2'den değişmedi ve artık Q2 için yük taşıyor: `robots` kontrolü HTTP üzerinden `robots.txt` çekmek yerine rotanın çizdiği politika dizilerini doğruluyor; yani yanıta hiç ulaşmayan bir ret grubu yine yakalanır, ama platform düzeyinde bir geçersiz kılma yakalanmaz.
+
+---
+
 ## 16. Ek A — uygulama haritası
 
 | Dosya | Değişiklik | Faz |
@@ -938,5 +966,6 @@ Plandan sapmalar:
 | v2 | 2026-10-20 | Rakip/SERP kanıtı (§2.1), sorgu portföyü (§2.2), gerçekçi SERP özellikleri (§2.3), taşıma runbook'u (§3.5), rubrik (§7.7), bağlantı matrisi (§8.1), enstrümantasyon/dizinleme/log incelemesi (§10.4–10.6), 90 günlük takvim (§11.5), bağlantı kazanımı (§11.6), budama (§11.7), uygulama haritası (§16) eklendi. Düzeltmeler: Software App zengin sonucu puanlama olmadan ulaşılamaz; FAQ/HowTo işaretlemesi kaldıraç değil; genel VRAM hesaplayıcı koşullu. |
 | v2.1 | 2026-10-21 | P0 uygulandı; §15.1 doğrulamayı, gizli 500 hatasını ve üç sapmayı (tek sitemap, yerleşik 404 kabuğu, sahip hesapları) kaydediyor. |
 | v2.2 | 2026-10-22 | 1. dalga indi; §15.2 çevrimdışı denetimi ve CI kapısını, sözlüğün 25 terime çıkmasını ve dört OG kart rotasını ölçülen sayılarla ve üç sapmayla (tarama yerine çevrimdışı, commit edilmiş snapshot sayıları, statik font kopyaları) kaydediyor. |
+| v3 | 2026-10-22 | §14 kapandı — özel alan adı yok (`local-ai-news.vercel.app` kanonik), yalnızca aramaya izin veren tarayıcı politikası, atıflanabilir veri kümesi yok, çevrilmiş TR masa metni, ≥ 6 spec dizin maddesi, Vercel Analytics. 2. dalga indi; §15.3 251 → 252 dizine uygun modeli, 792 → 794 sitemap URL'sini, 226/226 testi ve 7/7 denetimi, üç sapmayla (yanıt motoru yargı kararı, yolda bulunan RSS fallback'i, denetim hâlâ çevrimdışı) kaydediyor. |
 
 Sonraki revizyon §2.1'deki arama anlık görüntüsünü kayıtlı bir SERP denetimiyle (tarih, sorgu, ilk 10 URL, özellik tipi) değiştirmeli ve göreceli KPI'ları ilk dört haftalık GSC verisiyle yenilemeli.
