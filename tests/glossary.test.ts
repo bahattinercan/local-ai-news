@@ -14,6 +14,7 @@ import {
   searchGlossary
 } from "../src/lib/glossary.ts";
 import { estimateVramGb } from "../src/lib/runner/vram.ts";
+import { getGlossaryEvidence } from "../src/lib/store.ts";
 
 test("every entry is complete in both languages", () => {
   for (const entry of GLOSSARY) {
@@ -160,6 +161,101 @@ test("vram worked examples are computable, not quoted", () => {
   for (const example of vram.examples ?? []) {
     const estimate = estimateVramGb(example.params, example.quantization, example.context);
     assert.ok(estimate && estimate > 0, "estimate must be a positive number");
+  }
+});
+
+/* --- P2 coverage (docs/en/SEO-PLAN.md §11): 15 → 25 terms --- */
+
+const P2_SLUGS = [
+  "benchmark",
+  "fine-tuning",
+  "distillation",
+  "embedding",
+  "tokenizer",
+  "inference",
+  "throughput",
+  "batch-size",
+  "chat-template",
+  "license"
+];
+
+test("the glossary reaches the P2 target of 25 terms", () => {
+  assert.equal(GLOSSARY.length, 25, "docs/en/SEO-PLAN.md §11 P2: glossary 15 → 25 terms");
+  const slugs = new Set(GLOSSARY.map((entry) => entry.slug));
+  for (const slug of P2_SLUGS) {
+    assert.ok(slugs.has(slug), `P2 term is missing from the glossary: ${slug}`);
+  }
+});
+
+test("no alias repeats inside a locale", () => {
+  for (const locale of ["en", "tr"] as const) {
+    const seen = new Map<string, string>();
+    for (const entry of GLOSSARY) {
+      for (const alias of entry.aliases?.[locale] ?? []) {
+        const key = fold(alias, locale);
+        const owner = seen.get(key);
+        assert.equal(owner, undefined, `${locale}: alias "${alias}" is claimed by both ${owner} and ${entry.slug}`);
+        seen.set(key, entry.slug);
+      }
+    }
+  }
+});
+
+test("every term has an inbound related link, so nothing is a one-way orphan", () => {
+  const inbound = new Set(GLOSSARY.flatMap((entry) => entry.related));
+
+  for (const slug of P2_SLUGS) {
+    assert.ok(inbound.has(slug), `${slug} is not listed in any other entry's related`);
+  }
+
+  /* `library` and `moe` predate P2: MoE is cross-referenced from the params body
+     only, and `library` is reachable from the index but from no related list.
+     Recording the exception keeps the guard strict for everything else instead of
+     loosening it; repairing those two would mean rewriting entries this change
+     is not allowed to touch. */
+  const knownOrphans = new Set(["library", "moe"]);
+  for (const entry of GLOSSARY) {
+    if (knownOrphans.has(entry.slug)) continue;
+    assert.ok(inbound.has(entry.slug), `${entry.slug} is not listed in any other entry's related`);
+  }
+});
+
+test("TR is a real translation: same shape, different text", () => {
+  for (const entry of GLOSSARY) {
+    assert.notEqual(entry.tr.summary, entry.en.summary, `${entry.slug}: the TR summary is the EN text`);
+    assert.equal(entry.tr.body.length, entry.en.body.length, `${entry.slug}: EN and TR bodies differ in length`);
+    entry.en.body.forEach((paragraph, index) => {
+      assert.notEqual(entry.tr.body[index], paragraph, `${entry.slug}: TR paragraph ${index + 1} is the EN text`);
+    });
+  }
+});
+
+test("every brace token in either language resolves to an entry", () => {
+  for (const entry of GLOSSARY) {
+    for (const locale of ["en", "tr"] as const) {
+      for (const paragraph of glossaryText(entry, locale).body) {
+        for (const match of paragraph.matchAll(/\{([^}]*)\}/g)) {
+          const slug = match[1] ?? "";
+          assert.ok(getGlossaryEntry(slug), `${entry.slug}/${locale}: {${slug}} is not a glossary entry`);
+        }
+      }
+    }
+  }
+});
+
+test("every stat key is a figure the snapshot really measures", async () => {
+  const evidence = await getGlossaryEvidence();
+  assert.ok(evidence, "the bundled snapshot (data/feed.json) must load for this assertion");
+  const measured = new Set(Object.keys(evidence.coverage));
+  for (const entry of GLOSSARY) {
+    if (!entry.stat) continue;
+    assert.ok(measured.has(entry.stat), `${entry.slug}: stat "${entry.stat}" is not a getGlossaryEvidence() coverage key`);
+    assert.ok(evidence.coverage[entry.stat] > 0, `${entry.slug}: the snapshot has no models for stat "${entry.stat}"`);
+  }
+  /* The P2 entries that claim a figure must be checking a real one. */
+  const withStat = P2_SLUGS.map((slug) => getGlossaryEntry(slug)).filter((entry) => entry?.stat);
+  for (const entry of withStat) {
+    assert.ok(entry?.stat && measured.has(entry.stat), `P2 entry ${entry?.slug}: stat "${entry?.stat}" does not exist`);
   }
 });
 

@@ -477,6 +477,274 @@ export const GLOSSARY: GlossaryEntry[] = [
         "Sayı küçüktür — aşağıdaki snapshot sayısı tanımla değil, basılarak verilir çünkü değişir. Gated depolar izlenen kümenin parçası olmaya devam eder; yani \"penceredeki model\" diyen bir sayım onları dışarıda bırakırken {quality-gate} sayıları tüm snapshot üzerinden hesaplanır: iki farklı payda, ikisi de etiketli."
       ]
     }
+  },
+
+  /* --- SEO P2 (docs/en/SEO-PLAN.md §11): the ten terms that take the glossary
+     from 15 to 25. Chosen for what a local-AI reader actually searches for; the
+     entry contract is unchanged, so each one renders through the existing route. */
+  {
+    slug: "benchmark",
+    category: "concepts",
+    related: ["params", "distillation", "throughput"],
+    aliases: { en: ["eval", "evals", "leaderboard"], tr: ["kıyaslama", "değerlendirme", "eval"] },
+    en: {
+      term: "Benchmark",
+      summary: "A fixed test that scores models on the same tasks — and why a leaderboard place rarely survives the trip to your machine.",
+      body: [
+        "A benchmark is a dataset plus a scoring rule, applied identically to every model so the results can be compared: multiple-choice knowledge tests, competition maths, coding tasks with unit tests, or crowdsourced pairwise votes on chat replies. The figure a model card quotes is one of these, usually with the harness that produced it left unstated.",
+        "Two weaknesses matter when you read a score. Contamination: public test items end up in training data, so a high number can measure recall of the test instead of skill. Saturation: once the leaders cluster near the ceiling the benchmark stops separating them, and the field moves to a harder one.",
+        "A score also does not transfer to a local setup. The same weights in a {quantization} below 4 bits can lose points on reasoning, the {chat-template} and the sampling settings decide how the prompt is actually formatted, and a distilled smaller model can beat a bigger one on a narrow test and lose badly on everything else.",
+        "That is why this site has no benchmark column. The snapshot carries no evaluation scores, so the sheets show size, runners, engagement and freshness — what the data really holds — and never a capability rank. A number on a model card is the author's own claim, worth reading and worth checking."
+      ]
+    },
+    tr: {
+      term: "Benchmark",
+      summary: "Modelleri aynı görevlerle puanlayan sabit bir test — ve liderlik tablosundaki yerin kendi makinenize neden nadiren taşındığı.",
+      body: [
+        "Benchmark, her modele aynı biçimde uygulanan bir veri kümesi artı puanlama kuralıdır: çoktan seçmeli bilgi testleri, yarışma matematiği, birim testleri olan kodlama görevleri ya da sohbet yanıtlarına verilen ikili oylar. Model kartında yazan sayı bunlardan biridir ve genelde onu üreten koşum düzeneği belirtilmez.",
+        "Bir puanı okurken iki zayıflık önemlidir. Kirlenme: herkese açık test maddeleri eğitim verisine karışır, yani yüksek sayı beceriyi değil testi hatırlamayı ölçebilir. Doyma: liderler tavana yaklaşıp kümelenince benchmark onları ayırmayı bırakır ve alan daha zoruna geçer.",
+        "Puan yerel kuruluma da taşınmaz. Aynı ağırlıklar 4 bitin altında bir {quantization} ile akıl yürütmede puan kaybedebilir; {chat-template} ve örnekleme ayarları istemin gerçekte nasıl biçimlendiğini belirler; damıtılmış küçük bir model dar bir testte büyüğünü geçip geri kalan her şeyde ağır kaybedebilir.",
+        "Bu sitede benchmark sütunu olmamasının sebebi budur. Snapshot değerlendirme puanı taşımaz; bu yüzden tablolar boyutu, runner'ları, etkileşimi ve tazeliği gösterir — verinin gerçekten tuttuğu şeyleri — ve yetenek sıralaması hiç basmaz. Model kartındaki sayı yazarın kendi iddiasıdır; okumaya değer, doğrulamaya da."
+      ]
+    }
+  },
+  {
+    slug: "fine-tuning",
+    category: "concepts",
+    related: ["lora", "distillation", "license"],
+    aliases: {
+      en: ["finetune", "sft", "instruction tuning", "training"],
+      tr: ["ince ayar", "finetune", "eğitim"]
+    },
+    stat: "library",
+    en: {
+      term: "Fine-tuning",
+      summary: "Continuing training on a small, specific dataset so a base model keeps a format, a tone or a task — without pretraining it again.",
+      body: [
+        "Pretraining teaches a model language and world structure from a very large corpus; fine-tuning starts from those weights and continues training on a much smaller, targeted set: instructions, a domain's documents, a house style, a tool's output format. The result is a new checkpoint, not a new model family.",
+        "Two flavours are worth separating. A full fine-tune updates every weight and produces a checkpoint the size of the base model. Parameter-efficient tuning — {lora} and other adapters — freezes the base weights and trains a small add-on, so one base model can carry many specialisations that cost a few hundred megabytes each.",
+        "Data beats hyperparameters, and both beat size: a few thousand clean, consistent examples usually move behaviour further than a million noisy ones, and overfitting shows up as a model that repeats your training format even when it no longer applies. Fine-tuning also narrows: it teaches a shape of answer, not new facts, which is what retrieval over {embedding} vectors is for.",
+        "Hugging Face has no \"is a fine-tune\" field. The nearest evidence is the declared library — `peft` for adapters — and the base model line in the model card. The figure below counts repositories that declare a library at all, the pool in which a fine-tune can be recognised, and the distribution under it shows which libraries dominate that pool."
+      ]
+    },
+    tr: {
+      term: "İnce ayar (fine-tuning)",
+      summary: "Temel bir modelin belirli bir biçimi, tonu ya da görevi koruması için küçük ve hedefli bir veri kümesiyle eğitime devam etmek.",
+      body: [
+        "Ön eğitim modele dili ve dünya yapısını çok büyük bir külliyattan öğretir; ince ayar o ağırlıklardan başlar ve çok daha küçük, hedefli bir küme üzerinde eğitimi sürdürür: talimatlar, bir alanın belgeleri, kurumsal bir üslup, bir aracın çıktı biçimi. Sonuç yeni bir model ailesi değil, yeni bir checkpoint'tir.",
+        "İki türü ayrı tutmak gerekir. Tam ince ayar her ağırlığı günceller ve temel model boyutunda bir checkpoint üretir. Parametre-verimli yöntemler — {lora} ve diğer adaptörler — temel ağırlıkları dondurup küçük bir ek parça eğitir; böylece tek bir temel model, her biri birkaç yüz megabayt tutan çok sayıda uzmanlaşmayı taşıyabilir.",
+        "Veri hiperparametreleri, ikisi de boyutu yener: birkaç bin temiz ve tutarlı örnek davranışı genelde milyonlarca gürültülü örnekten fazla değiştirir; aşırı uyum ise modelin artık geçerli olmasa da eğitim biçimini tekrarlamasıyla görünür. İnce ayar ayrıca daraltır: yeni olgular değil, yanıtın biçimini öğretir; yeni olgular için {embedding} vektörleri üzerinden erişim (retrieval) gerekir.",
+        "Hugging Face'te \"bu bir ince ayar\" alanı yok. En yakın kanıt bildirilen kütüphane — adaptörler için `peft` — ve model kartındaki temel model satırıdır. Aşağıdaki sayı, en az bir kütüphane bildiren depoları sayar; ince ayarların tanınabildiği havuz budur ve altındaki dağılım o havuzda hangi kütüphanelerin baskın olduğunu gösterir."
+      ]
+    }
+  },
+  {
+    slug: "distillation",
+    category: "concepts",
+    related: ["fine-tuning", "benchmark", "params"],
+    aliases: { en: ["distil", "teacher-student", "model distillation"], tr: ["damıtma", "distil", "öğretmen-öğrenci"] },
+    en: {
+      term: "Distillation",
+      summary: "Training a smaller model to imitate a larger one, so most of the behaviour survives at a fraction of the size.",
+      body: [
+        "Distillation trains a student model on a teacher's outputs — its answers, or its whole probability distribution over the next token — instead of only on human-written labels. The student picks up the teacher's quirks along with its skill, which is how a small model sometimes reproduces behaviour it could not have learned from the same data alone.",
+        "The economics are the point: fewer {params}, less memory to serve, faster generation, and a file small enough for a laptop. Publishing a large reasoning model distilled into 7B or 32B students is the common case, and the student usually carries its teacher's name in the repository id.",
+        "What it costs is trust at the edges. The student inherits the teacher's mistakes and blind spots, degrades faster outside the training distribution, and \"distill\" in a name is the author's claim, not a measurement — nothing in the snapshot verifies lineage or quality. Treat it as a hint about size and provenance, and read a {benchmark} before believing the rest."
+      ]
+    },
+    tr: {
+      term: "Damıtma (distillation)",
+      summary: "Daha küçük bir modeli büyük bir modeli taklit etmek üzere eğitmek; davranışın çoğu, boyutun küçük bir kısmıyla korunur.",
+      body: [
+        "Damıtma, öğrenci modeli yalnızca insan etiketleriyle değil, öğretmenin çıktılarıyla — yanıtlarıyla ya da sonraki token üzerindeki tam olasılık dağılımıyla — eğitir. Öğrenci, öğretmenin becerisiyle birlikte tuhaflıklarını da öğrenir; küçük bir modelin aynı veriden tek başına öğrenemeyeceği davranışı bazen yakalamasının sebebi budur.",
+        "Asıl mesele ekonomi: daha az {params}, sunmak için daha az bellek, daha hızlı üretim ve dizüstüne sığan bir dosya. Büyük bir akıl yürütme modelinin 7B ya da 32B öğrencilere damıtılmış yayınları olağan durumdur ve öğrenci genelde depo kimliğinde öğretmeninin adını taşır.",
+        "Bedeli, sınırlarda güvenilirliktir. Öğrenci öğretmenin hatalarını ve kör noktalarını devralır, eğitim dağılımının dışında daha hızlı bozulur; ayrıca addaki \"distill\" yazarın iddiasıdır, ölçüm değil — snapshot ne soyu ne kaliteyi doğrular. Bunu boyut ve kaynak hakkında bir ipucu say, gerisini kabul etmeden önce bir {benchmark} oku."
+      ]
+    }
+  },
+  {
+    slug: "embedding",
+    category: "concepts",
+    related: ["tokenizer", "context-window", "inference"],
+    aliases: { en: ["embeddings", "vector", "vector embedding", "rag"], tr: ["gömme vektörü", "vektör", "embedding modeli"] },
+    explore: [{ label: { en: "Embedding models in the index", tr: "Dizindeki embedding modelleri" }, query: "/models?category=embedding" }],
+    en: {
+      term: "Embedding",
+      summary: "A fixed-length vector that places a text, an image or a file in a space where near means similar — the machinery behind search and RAG.",
+      body: [
+        "An embedding model is an encoder, not a generator: it reads an input and returns a list of numbers — a few hundred to a few thousand dimensions — positioned so that similar inputs land close together. Nothing is generated; the output is one row of a vector index.",
+        "That single fact is what makes local retrieval work. Split your documents into chunks, embed each chunk, store the vectors, then embed the question and feed the nearest chunks into the {context-window}. The model that embeds the question must be the same one that embedded the documents: mixing two models puts the vectors in unrelated spaces and the retrieval silently returns nonsense.",
+        "These models are small — millions to a few hundred million parameters — and they run well on a CPU, so a retrieval layer is cheap next to the generator it feeds. The vocabulary is the limit: the {tokenizer} decides how many tokens your chunks cost, and a chunk that splits a fact in half embeds half a fact.",
+        "In the model index these repositories are labelled Embedding / RAG, derived from the `feature-extraction` and `sentence-similarity` pipeline tags plus the reranker tag. The snapshot carries those labels, not benchmark quality, so choose by the task the model was trained for and test it on your own documents."
+      ]
+    },
+    tr: {
+      term: "Embedding (gömme vektörü)",
+      summary: "Bir metni, görseli ya da dosyayı, yakın olanın benzer olduğu bir uzayda konumlandıran sabit uzunluklu vektör — arama ve RAG'ın arkasındaki mekanizma.",
+      body: [
+        "Embedding modeli üretici değil kodlayıcıdır: girdiyi okur ve bir sayı listesi döndürür — birkaç yüzden birkaç bin boyuta — benzer girdiler yan yana düşecek biçimde yerleştirilmiş. Hiçbir şey üretilmez; çıktı vektör dizinindeki tek bir satırdır.",
+        "Yerel erişimi (retrieval) mümkün kılan tam olarak budur. Belgeleri parçalara böl, her parçayı embed et, vektörleri sakla; sonra soruyu embed edip en yakın parçaları {context-window} içine ver. Soruyu embed eden model, belgeleri embed edenle aynı olmalıdır: iki farklı modeli karıştırmak vektörleri ilgisiz uzaylara koyar ve erişim sessizce anlamsız sonuç döndürür.",
+        "Bu modeller küçüktür — milyonlardan birkaç yüz milyon parametreye — ve CPU'da iyi çalışır; yani erişim katmanı, beslediği üretici modelin yanında ucuzdur. Sınır sözlüktür: {tokenizer} parçalarınızın kaç token tuttuğunu belirler ve bir olguyu ortadan bölen parça, olgunun yarısını embed eder.",
+        "Model dizininde bu depolar Embedding / RAG olarak etiketlenir; etiket `feature-extraction` ve `sentence-similarity` pipeline etiketlerinden ve reranker etiketinden türetilir. Snapshot bu etiketleri taşır, benchmark kalitesini değil; yani modeli eğitildiği göreve göre seç ve kendi belgelerinle dene."
+      ]
+    }
+  },
+  {
+    slug: "tokenizer",
+    category: "formats",
+    related: ["chat-template", "embedding", "context-window"],
+    aliases: { en: ["tokeniser", "bpe", "vocabulary", "tokenization"], tr: ["jetonlaştırıcı", "tokenization", "sözlük dosyası"] },
+    en: {
+      term: "Tokenizer",
+      summary: "The vocabulary and merge rules that turn text into the token ids a model reads — and why the same prompt costs different tokens in different models.",
+      body: [
+        "A model never sees characters. A tokenizer splits the text into tokens using a vocabulary learned during training — byte-level BPE in GPT-style and recent Llama models, SentencePiece in many multilingual and older releases, WordPiece in older encoders — and each token maps to an id the model embeds.",
+        "Tokens are not words. English prose averages a handful of characters per token; Turkish, code and heavily punctuated text spend more tokens on the same visible text, which is why a {context-window} limit buys less in one language than in another. The token count is also the unit the KV cache is measured in, so the tokenizer decides memory as well as cost.",
+        "The tokenizer ships as files beside the weights: `tokenizer.json`, `tokenizer_config.json`, `special_tokens_map.json` or a `sentencepiece` model. Loading weights with the wrong tokenizer produces fluent garbage, and a repository without its tokenizer cannot reproduce the prompt formatting at all.",
+        "This is also where the {chat-template} lives — in `tokenizer_config.json` for most repositories. {gguf} packs the vocabulary and the template into one file, which is one reason a GGUF repository is self-contained while a bare safetensors folder is not."
+      ]
+    },
+    tr: {
+      term: "Tokenizer (jetonlaştırıcı)",
+      summary: "Metni modelin okuduğu token kimliklerine çeviren sözlük ve birleştirme kuralları — ve aynı istemin neden modelden modele farklı token tuttuğu.",
+      body: [
+        "Model hiçbir zaman karakter görmez. Tokenizer metni, eğitim sırasında öğrenilmiş bir sözlükle tokenlara böler — GPT tarzı ve yeni Llama modellerinde bayt düzeyinde BPE, birçok çok dilli ve daha eski sürümde SentencePiece, eski kodlayıcılarda WordPiece — ve her token modelin embed ettiği bir kimliğe karşılık gelir.",
+        "Token kelime değildir. İngilizce düz metinde token başına birkaç karakter düşer; Türkçe, kod ve yoğun noktalama aynı görünen metin için daha fazla token harcar, bu yüzden bir {context-window} sınırı bir dilde diğerinden daha az şey satın alır. Token sayısı aynı zamanda KV önbelleğinin ölçü birimidir; yani tokenizer maliyet kadar belleği de belirler.",
+        "Tokenizer ağırlıkların yanında dosya olarak gelir: `tokenizer.json`, `tokenizer_config.json`, `special_tokens_map.json` ya da bir `sentencepiece` modeli. Ağırlıkları yanlış tokenizer ile yüklemek akıcı ama anlamsız çıktı üretir; tokenizer'ı olmayan bir depo istem biçimlendirmesini hiç yeniden üretemez.",
+        "Bir de {chat-template} burada yaşar — çoğu depoda `tokenizer_config.json` içinde. {gguf} sözlüğü ve şablonu tek dosyaya paketler; bir GGUF deposunun kendi kendine yetmesinin, çıplak bir safetensors klasörünün yetmemesinin sebeplerinden biri budur."
+      ]
+    }
+  },
+  {
+    slug: "inference",
+    category: "concepts",
+    related: ["runner", "throughput", "quantization", "batch-size"],
+    aliases: { en: ["infer", "generation", "serving"], tr: ["inference", "model çalıştırma"] },
+    stat: "runners",
+    en: {
+      term: "Inference",
+      summary: "Running a trained model to produce output — the step where memory, speed and cost are decided, and the only one a local setup does.",
+      body: [
+        "Inference is the forward pass: input tokens go in, probabilities come out, one token at a time. No weights change. Training produced the file; a {runner} reads it and does the arithmetic on your hardware, which is why the same weights can behave the same in two runtimes and still run at very different speeds.",
+        "It has two phases with different bottlenecks. Prefill processes the whole prompt in parallel and is limited by compute; decode produces one token per step and is limited by memory bandwidth, because the weights have to be streamed again for every token. That is why a more aggressive {quantization} speeds generation up and not only shrinks the file, and why a long context slows generation down even though no weight changed.",
+        "Local inference trades a per-token bill for hardware you already own, and the currency is {vram}: the weights plus the KV cache must fit, or layers spill into system RAM and the rate collapses. What you get in exchange is privacy, an offline path and no rate limit.",
+        "The engines are few and the snapshot can count them: the figure below is how many repositories name a runtime at all, with the distribution under it. That is a map of what local inference actually runs on, not a quality ranking."
+      ]
+    },
+    tr: {
+      term: "Çıkarım (inference)",
+      summary: "Eğitilmiş bir modeli çalıştırıp çıktı üretmek — belleğin, hızın ve maliyetin belirlendiği ve yerel kurulumun yaptığı tek adım.",
+      body: [
+        "Çıkarım ileri geçiştir: giren tokenlar, çıkan olasılıklar — her seferinde bir token. Hiçbir ağırlık değişmez. Dosyayı eğitim üretmiştir; {runner} onu okur ve aritmetiği sizin donanımınızda yapar; aynı ağırlıkların iki çalışma zamanında aynı davranıp çok farklı hızda çalışmasının sebebi budur.",
+        "İki aşamanın darboğazı farklıdır. Prefill istemin tamamını paralel işler ve hesapla sınırlıdır; decode her adımda bir token üretir ve bellek bant genişliğiyle sınırlıdır, çünkü her token için ağırlıklar yeniden akıtılır. Daha agresif bir {quantization} kullanmanın yalnızca dosyayı küçültmekle kalmayıp üretimi hızlandırmasının ve uzun bağlamın, ağırlıklar hiç değişmediği hâlde üretimi yavaşlatmasının sebebi budur.",
+        "Yerel çıkarım, token başına faturayı zaten sahip olduğunuz donanımla değiş tokuş eder ve para birimi {vram}'dir: ağırlıklar artı KV önbelleği sığmalı, yoksa katmanlar sistem RAM'ine taşar ve hız çöker. Karşılığında gizlilik, çevrimdışı çalışma ve hız sınırı olmaması gelir.",
+        "Motor sayısı azdır ve snapshot bunları sayabilir: aşağıdaki sayı, en az bir çalışma zamanı bildiren depoların sayısıdır ve altındaki dağılım hangisinin baskın olduğunu gösterir. Bu, yerel çıkarımın gerçekte ne üzerinde döndüğünün haritasıdır, kalite sıralaması değil."
+      ]
+    }
+  },
+  {
+    slug: "throughput",
+    category: "hardware",
+    related: ["inference", "batch-size", "vram"],
+    aliases: { en: ["tokens per second", "tok/s", "generation speed"], tr: ["işlem hızı", "token/s", "saniyede token"] },
+    en: {
+      term: "Throughput",
+      summary: "How much output a runtime produces per second — the number that decides whether a local model feels usable or not.",
+      body: [
+        "Throughput is measured in output tokens per second for text, and in seconds per image or second of video for generative media. For chat, one number is not enough: time to first token covers the prefill of your prompt, and the steady decode rate covers everything after it. A model can feel slow with a good average and fast with a bad one.",
+        "Decode is limited by memory bandwidth rather than raw compute: every token requires reading the model's weights, so the ceiling is roughly bandwidth divided by bytes per parameter. That is why a smaller {quantization} is faster, why bandwidth predicts generation speed better than raw compute does, and why offloading layers to system RAM drops the rate by an order of magnitude.",
+        "Prefill behaves the other way: it is compute-bound and parallel, which is what lets a larger {batch-size} pay off on a long prompt. Batching also spends memory, so the useful question is the highest batch that still fits, not the highest default.",
+        "Quoted rates are not comparable across setups. The same model and card in two different {runner}s, or the same runner with different flags, can differ by a factor of two or more, and a vendor number usually assumes a batch and a context you will not use. This site publishes none of them: the snapshot does not measure speed."
+      ]
+    },
+    tr: {
+      term: "Throughput (token/s)",
+      summary: "Bir çalışma zamanının saniyede ne kadar çıktı ürettiği — yerel bir modelin kullanılabilir hissettirip hissettirmediğini belirleyen sayı.",
+      body: [
+        "Throughput metinde saniyedeki çıktı tokenı, üretken görselde görsel başına saniye ya da video saniyesi olarak ölçülür. Sohbet için tek sayı yetmez: ilk tokena kadar geçen süre isteminizin prefill'ini, sabit decode hızı ise sonrasını kapsar. Bir model iyi ortalamayla yavaş, kötü ortalamayla hızlı hissettirebilir.",
+        "Decode ham hesapla değil bellek bant genişliğiyle sınırlıdır: her token modelin ağırlıklarının okunmasını gerektirir, yani tavan kabaca bant genişliğinin parametre başına bayta bölümüdür. Küçük bir {quantization} kullanmanın hızlı olmasının, üretim hızını ham hesaptan çok bant genişliğinin öngörmesinin ve katmanları sistem RAM'ine taşımanın hızı bir mertebe düşürmesinin sebebi budur.",
+        "Prefill ters yönde davranır: hesapla sınırlı ve paraleldir; büyük bir {batch-size} kullanmanın uzun bir istemde karşılığını vermesinin sebebi budur. Batch bellek de harcar, yani faydalı soru en yüksek varsayılan değil, hâlâ sığan en yüksek batch'tir.",
+        "Aktarılan hızlar kurulumlar arasında karşılaştırılamaz. Aynı model ve kart iki farklı {runner} içinde, ya da aynı runner farklı bayraklarla, iki kat veya daha fazla ayrışabilir; üretici sayısı ise genelde sizin kullanmayacağınız bir batch ve bağlam varsayar. Bu site hiçbirini yayınlamaz: snapshot hız ölçmez."
+      ]
+    }
+  },
+  {
+    slug: "batch-size",
+    category: "hardware",
+    related: ["throughput", "vram", "context-window"],
+    aliases: { en: ["batch", "n_batch", "batch size"], tr: ["batch", "batch size", "yığın boyutu"] },
+    en: {
+      term: "Batch size",
+      summary: "How many tokens or requests a runtime handles in one pass — memory traded for speed, and the usual reason a model that fits alone fails under load.",
+      body: [
+        "The name covers two different knobs. In local LLM tools, `--batch-size` (llama.cpp's `-b`, `n_batch`) is the prompt-processing batch: how many prompt tokens are evaluated in one forward pass. In a serving engine, batching means running several requests together — continuous batching in vLLM, for instance — which trades latency for total throughput.",
+        "Both follow the same rule: a bigger batch uses the hardware better and consumes more memory at the peak. Prompt batching allocates temporary compute buffers that grow with the batch, so raising it can turn a model that ran comfortably into one that runs out of memory on a long prompt, while leaving generation speed untouched.",
+        "Defaults are chosen to be safe on a small machine. If a long prompt fails to process on a card with {vram} to spare, lowering the batch is the cheapest fix; if prefill is the slow part and memory sits idle, raising it is the cheapest speed-up. Watch the peak, not the average.",
+        "It is also why a reported {throughput} figure needs its batch stated: batch 1 measures an interactive session, batch 32 measures a server, and neither predicts the other. A benchmark that hides its batch is measuring its own configuration."
+      ]
+    },
+    tr: {
+      term: "Batch boyutu",
+      summary: "Bir çalışma zamanının tek geçişte işlediği token ya da istek sayısı — hız için bellek takası ve tek başına sığan modelin yük altında çökmesinin olağan sebebi.",
+      body: [
+        "Ad iki farklı düğmeyi kapsar. Yerel LLM araçlarında `--batch-size` (llama.cpp'de `-b`, `n_batch`) istem işleme batch'idir: bir ileri geçişte kaç istem tokenının değerlendirileceği. Bir sunum motorunda ise batchleme birden çok isteği birlikte çalıştırmak demektir — örneğin vLLM'de sürekli batchleme — ve gecikmeyi toplam işlem hızıyla değiş tokuş eder.",
+        "İkisi de aynı kurala uyar: büyük batch donanımı daha iyi kullanır ve tepe belleği daha çok tüketir. İstem batch'i, batch ile büyüyen geçici hesaplama tamponları ayırır; bu yüzden onu yükseltmek, rahat çalışan bir modeli uzun bir istemde belleği yetmez hâle getirebilir, üretim hızına ise dokunmaz.",
+        "Varsayılanlar küçük bir makinede güvenli olacak şekilde seçilir. Uzun bir istem, {vram} boş bir kartta işlenemiyorsa batch'i düşürmek en ucuz çözümdür; prefill yavaş ve bellek boştaysa yükseltmek en ucuz hızlanmadır. Ortalamaya değil tepe değere bak.",
+        "Aktarılan bir {throughput} sayısının batch'ini belirtmesi gerekliliğinin sebebi de budur: batch 1 etkileşimli bir oturumu, batch 32 bir sunucuyu ölçer ve hiçbiri diğerini öngörmez. Batch'ini saklayan bir benchmark kendi yapılandırmasını ölçüyordur."
+      ]
+    }
+  },
+  {
+    slug: "chat-template",
+    category: "formats",
+    related: ["tokenizer", "inference"],
+    aliases: { en: ["chat_template", "jinja template", "prompt template"], tr: ["chat template", "sohbet kalıbı", "jinja"] },
+    en: {
+      term: "Chat template",
+      summary: "The exact text pattern a model expects its turns in — invisible in the weights, and the usual cause of a model that answers badly.",
+      body: [
+        "An instruction-tuned model was trained on one specific layout: system, user and assistant turns separated by markers such as `<|im_start|>` and `<|im_end|>`, or `[INST]` and `[/INST]`. To the model those markers are content, not decoration; strip them and the same weights behave like a model that has forgotten the format it learned.",
+        "The template ships as a Jinja string, usually a `chat_template` entry in `tokenizer_config.json` and sometimes a separate `.jinja` file. It defines where the system prompt goes, whether the assistant turn is prefilled, how tool calls and reasoning blocks are wrapped, and where the assistant turn ends — details that differ per family and per version of the same family.",
+        "That is why runtimes read the template from the repository instead of hardcoding one: llama.cpp applies it with its Jinja flag, and Ollama stores it in the model's Modelfile. Applying the wrong family's template produces a fluent, confused model with no error message to explain it.",
+        "So when a model rambles, ignores the system prompt or answers in the wrong format, the first thing to check is neither the {quantization} nor the sampler but the template — and it travels with the {tokenizer} files, which is why a copy of the weights without the config folder is not reproducible."
+      ]
+    },
+    tr: {
+      term: "Sohbet şablonu (chat template)",
+      summary: "Modelin turlarını beklediği tam metin kalıbı — ağırlıklarda görünmez ve kötü yanıt veren bir modelin olağan sebebi.",
+      body: [
+        "Talimatla eğitilmiş bir model tek bir düzeneğe göre eğitilir: sistem, kullanıcı ve asistan turları `<|im_start|>` ve `<|im_end|>` ya da `[INST]` ve `[/INST]` gibi işaretlerle ayrılır. Model için bu işaretler süs değil içeriktir; onları kaldırın, aynı ağırlıklar öğrendiği biçimi unutmuş bir model gibi davranır.",
+        "Şablon bir Jinja metni olarak gelir: genelde `tokenizer_config.json` içinde `chat_template` girdisi, bazen ayrı bir `.jinja` dosyası. Sistem isteminin nereye gittiğini, asistan turunun önceden doldurulup doldurulmadığını, araç çağrılarının ve akıl yürütme bloklarının nasıl sarıldığını ve asistan turunun nerede bittiğini tanımlar — aileden aileye ve aynı ailenin sürümünden sürümüne değişen ayrıntılar.",
+        "Çalışma zamanlarının şablonu tek bir tanesini sabit kodlamak yerine depodan okumasının sebebi budur: llama.cpp onu Jinja bayrağıyla uygular, Ollama modelin Modelfile'ında saklar. Yanlış ailenin şablonunu uygulamak, hiçbir hata iletisi vermeyen akıcı ve kafası karışmış bir model üretir.",
+        "Yani bir model saçmaladığında, sistem istemini yok saydığında ya da yanlış biçimde yanıtladığında ilk bakılacak şey {quantization} ya da örnekleyici değil şablondur — ve şablon {tokenizer} dosyalarıyla birlikte taşınır; bu yüzden ağırlıkların config klasörü olmayan bir kopyası yeniden üretilemez."
+      ]
+    }
+  },
+  {
+    slug: "license",
+    category: "concepts",
+    related: ["gated", "fine-tuning", "downloads"],
+    aliases: { en: ["licence", "license_name", "terms of use"], tr: ["lisans", "kullanım şartları", "lisans türü"] },
+    en: {
+      term: "Licence",
+      summary: "The terms attached to the weights — what you may run, change and redistribute, and why open weights is not the same as open source.",
+      body: [
+        "Hugging Face takes the licence metadata from a model card and exposes it as `license` or `license_name` on the repository: `apache-2.0`, `mit`, `cc-by-nc-4.0`, `llama3.1`, `gemma`, or `other`. The field is a pointer to a text; the text is what binds you, and it is one click away on the repository page.",
+        "Open weights are not automatically open source. A permissive licence such as Apache-2.0 allows commercial use and modification; a community licence can add acceptable-use terms, a naming requirement or a user-count threshold; a non-commercial licence forbids commercial deployment outright. A {fine-tuning} usually inherits the base model's terms, and a {gated} repository adds an acceptance step on top of them.",
+        "This site prints the licence when the snapshot has one and prints nothing when it does not — a missing field is unknown, not permission. The snapshot carries a licence for a minority of repositories, so the gap is normal and says nothing about the model itself.",
+        "Practical rule: check the licence before you build on a model, not after. Redistributing a quantized copy, hosting an endpoint and publishing a fine-tune each have their own conditions, and none of them are written in the file name."
+      ]
+    },
+    tr: {
+      term: "Lisans",
+      summary: "Ağırlıklara bağlı şartlar — neyi çalıştırabileceğiniz, değiştirebileceğiniz ve dağıtabileceğiniz; ve açık ağırlıkların neden açık kaynak olmadığı.",
+      body: [
+        "Hugging Face model kartındaki lisans metadatasını alır ve depoda `license` ya da `license_name` olarak sunar: `apache-2.0`, `mit`, `cc-by-nc-4.0`, `llama3.1`, `gemma` veya `other`. Alan bir metne işaret eder; sizi bağlayan o metindir ve depo sayfasında bir tık uzaktadır.",
+        "Açık ağırlıklar otomatik olarak açık kaynak değildir. Apache-2.0 gibi izin verici bir lisans ticari kullanıma ve değişikliğe izin verir; bir topluluk lisansı kabul edilebilir kullanım şartları, adlandırma zorunluluğu ya da kullanıcı sayısı eşiği ekleyebilir; ticari olmayan bir lisans ticari kullanımı tamamen yasaklar. Bir {fine-tuning} genelde temel modelin şartlarını devralır ve {gated} bir depo bunların üstüne bir kabul adımı ekler.",
+        "Bu site lisansı snapshot'ta varsa basar, yoksa hiçbir şey basmaz — eksik alan bilinmiyor demektir, izin anlamına gelmez. Snapshot depolardaki azınlık için lisans taşır; yani bu boşluk olağandır ve modelin kendisi hakkında bir şey söylemez.",
+        "Pratik kural: lisansı bir modelin üzerine bir şey kurduktan sonra değil, önce kontrol et. Kuantize bir kopyayı yeniden dağıtmak, bir uç nokta barındırmak ve bir ince ayar yayınlamak ayrı ayrı şartlara tabidir ve hiçbiri dosya adında yazmaz."
+      ]
+    }
   }
 ];
 
