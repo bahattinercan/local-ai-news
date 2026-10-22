@@ -20,7 +20,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { CATEGORY_RULES, categoryLabel } from "../src/lib/classify/rules.ts";
-import { NAV_SHORT } from "../src/components/shell/DeskNav.tsx";
+import { NAV_SHORT } from "../src/lib/classify/nav.ts";
 
 /**
  * The desks the nav prints: every category except `news`, which is a section

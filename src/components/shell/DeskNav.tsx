@@ -27,13 +27,6 @@ import { NAV_SHORT } from "@/lib/classify/nav";
  * in the masthead's disclosure below it, because the masthead replaces its live
  * snapshot block with that disclosure on small screens.
  */
-/* The short forms, and the comment that explains the width budget behind them,
-   now live in `src/lib/classify/nav.ts`: `scripts/check-nav-current.ts` has to
-   expect the same row this component prints, and it runs under tsx, so the table
-   cannot sit in a `.tsx`. Re-exported here for the callers that reached it
-   through `DeskNav`. */
-export { NAV_SHORT };
-
 /** The five section links, in the order they print; the key is the route segment. */
 export type DeskSection = "news" | "research" | "stats" | "compare" | "glossary";
 
