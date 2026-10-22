@@ -17,9 +17,14 @@ import type { Locale } from "@/i18n";
  * without a server.
  */
 
-const FALLBACK_SITE_URL = "https://openweightradar.com";
+/**
+ * Decision Q1 (docs/en/SEO-PLAN.md §14, v3): no custom domain will be used.
+ * The brand domain was never attached, so the public origin is the deployed
+ * Vercel host and the code default has to say the same thing as production.
+ */
+export const FALLBACK_SITE_URL = "https://local-ai-news.vercel.app";
 
-/** Read once per server process; `.env` is the only place the origin lives. */
+/** Read once per server process; `.env` is the only place the origin can differ. */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL).replace(/\/+$/, "");
 
 export const SITE_NAME = "OpenWeight Radar";
@@ -70,17 +75,66 @@ export function specCount(model: ClassifiedModel): number {
   return SPEC_KEYS.filter((key) => present(model[key])).length;
 }
 
+/** Four reported specs, or 200 characters of card prose, for a gate-passed model. */
+const SPEC_FLOOR = 4;
+
 /**
- * Decision S4: a gate-passed model with enough specs — or, after the card
- * backfill, enough prose — is worth indexing. Everything else stays reachable
- * but `noindex, follow`, so the site never ships 1 400 near-empty pages.
+ * Decision Q5 (docs/en/SEO-PLAN.md §14, v3): a model that reports six or more of
+ * the eight spec fields is indexable **even if it failed the quality gate**. Six
+ * facts make a page that answers a real question, and the gate's job is to keep
+ * empty rows out, not to overrule a row the source actually filled in.
+ */
+const SPEC_ALWAYS_INDEXABLE = 6;
+
+/**
+ * Decision S4 plus Q5: a gate-passed model with enough specs — or, after the
+ * card backfill, enough prose — is worth indexing, and so is any model that
+ * reports six or more specs regardless of the gate. Everything else stays
+ * reachable but `noindex, follow`, so the site never ships near-empty pages.
  *
- * Measured on the 2026-10-20 snapshot: 430 of 529 gate-passed models qualify
- * today; the same predicate expands to all 529 once `cardSummary` is filled.
+ * Measured on the committed `data/feed.json` snapshot (2026-10-14, 915 models):
+ * the pre-Q5 predicate admits 251 models, Q5 lifts that to 252 — one gate-failed
+ * row with seven reported specs. Sitemap URLs therefore move 792 → 794 across
+ * the two locales. (§15.1 measured 1 402 models in production; this snapshot is
+ * the smaller offline denominator the audit and the tests run against.)
  */
 export function isIndexableModel(model: ClassifiedModel): boolean {
-  return model.qualityPassed && (specCount(model) >= 4 || (model.cardSummary?.trim().length ?? 0) >= 200);
+  const specs = specCount(model);
+  if (specs >= SPEC_ALWAYS_INDEXABLE) return true;
+  return model.qualityPassed && (specs >= SPEC_FLOOR || (model.cardSummary?.trim().length ?? 0) >= 200);
 }
+
+/* ---------------------------------------------------------- crawler policy -- */
+
+/**
+ * Decision Q2 (docs/en/SEO-PLAN.md §14, v3): "allow search only". These agents
+ * train on the content, or fetch it to answer without a citation and a link, so
+ * `src/app/robots.ts` denies them the whole site. Kept here, not in the route
+ * file, because `scripts/seo-audit.ts` and the robots tests assert the same list.
+ */
+export const TRAINING_CRAWLERS = [
+  "GPTBot",
+  "ChatGPT-User",
+  "ClaudeBot",
+  "anthropic-ai",
+  "Google-Extended",
+  "CCBot",
+  "Bytespider",
+  "Applebot-Extended",
+  "meta-externalagent",
+  "cohere-ai",
+  "Diffbot"
+] as const;
+
+/**
+ * The one judgement call in Q2: PerplexityBot and OAI-SearchBot build an answer
+ * index that cites and links the page it read, which is what a search engine
+ * does. They stay allowed; adding either name to the list above flips them.
+ */
+export const ANSWER_ENGINE_CRAWLERS = ["PerplexityBot", "OAI-SearchBot"] as const;
+
+/** Classic search crawlers. The wildcard rule must keep serving all of them. */
+export const SEARCH_CRAWLERS = ["Googlebot", "Bingbot", "DuckDuckBot", "Applebot", "YandexBot"] as const;
 
 /** A paper with a stub summary is not a document; everything else is. */
 export function isIndexableNews(item: SnapshotNews): boolean {

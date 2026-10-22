@@ -54,7 +54,7 @@ export const OG_PALETTE = {
   ruleStrong: "#2a2823"
 } as const;
 
-/** The host a reader sees under the card, e.g. `openweightradar.com`. */
+/** The host a reader sees under the card, e.g. `local-ai-news.vercel.app`. */
 export const OG_HOST = SITE_URL.replace(/^https?:\/\//, "").replace(/\/+$/, "");
 
 /* -------------------------------------------------------------- the fonts -- */

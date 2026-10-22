@@ -35,8 +35,11 @@ import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { GLOSSARY } from "../src/lib/glossary.ts";
 import {
+  ANSWER_ENGINE_CRAWLERS,
   DESK_KEYS,
+  SEARCH_CRAWLERS,
   SITE_URL,
+  TRAINING_CRAWLERS,
   isIndexableModel,
   isIndexableNews,
   languageAlternates,
@@ -337,7 +340,16 @@ function checkSitemap(input: AuditInput): CheckResult {
   };
 }
 
-/** (f) robots disallows /api/ and advertises the sitemap. */
+/**
+ * (f) robots serves search, disallows /api/, denies the training crawlers and
+ * advertises the sitemap.
+ *
+ * The wildcard assertions below are the originals. The deny-group half was added
+ * for docs/en/SEO-PLAN.md §14 Q2 (v3, "allow search only"): a policy that keeps
+ * `*` clean but never writes the deny groups would pass the old check, so the
+ * check now asserts the decision itself and that no search engine is caught by
+ * it.
+ */
 function checkRobots(input: AuditInput): CheckResult {
   const failures: string[] = [];
   const rules = robotsRules(input.robots);
@@ -355,6 +367,33 @@ function checkRobots(input: AuditInput): CheckResult {
     }
   }
 
+  /* Q2: the training/fetch crawlers are denied in full, and a deny group that
+     also carries `Allow: /` is not a deny group (the tie goes to Allow). */
+  for (const bot of TRAINING_CRAWLERS) {
+    const own = rules.filter((rule) => asList(rule.userAgent).includes(bot));
+    if (own.length === 0) {
+      failures.push(`robots.txt has no rule for ${bot}: Q2 denies training and fetch crawlers`);
+      continue;
+    }
+    if (!own.some((rule) => asList(rule.disallow).includes("/"))) {
+      failures.push(`robots rule for ${bot}: does not disallow / (Q2 denies this crawler)`);
+    }
+    for (const rule of own) {
+      if (asList(rule.allow).includes("/")) {
+        failures.push(`robots rule for ${bot}: allows / next to a deny (Allow wins an equal-length tie)`);
+      }
+    }
+  }
+
+  /* The other half of Q2: search and answer engines must not be caught by it. */
+  for (const bot of [...SEARCH_CRAWLERS, ...ANSWER_ENGINE_CRAWLERS]) {
+    for (const rule of rules.filter((candidate) => asList(candidate.userAgent).includes(bot))) {
+      if (asList(rule.disallow).includes("/")) {
+        failures.push(`robots rule for ${bot}: disallows the whole site, but Q2 keeps search allowed`);
+      }
+    }
+  }
+
   const sitemaps = asList(input.robots.sitemap);
   const expected = `${input.siteUrl}/sitemap.xml`;
   if (!sitemaps.includes(expected)) {
@@ -364,7 +403,7 @@ function checkRobots(input: AuditInput): CheckResult {
   return {
     id: "robots",
     ok: failures.length === 0,
-    detail: `${rules.length} rules, sitemap ${sitemaps.join(", ") || "(none)"}`,
+    detail: `${rules.length} rules (${TRAINING_CRAWLERS.length} training crawlers denied, ${ANSWER_ENGINE_CRAWLERS.length} answer engines allowed), sitemap ${sitemaps.join(", ") || "(none)"}`,
     failures
   };
 }

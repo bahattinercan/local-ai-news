@@ -123,7 +123,76 @@ test("a gate-passed model needs four specs or 200 characters of prose to be inde
     ),
     true
   );
-  assert.equal(isIndexableModel(model({ qualityPassed: false })), false);
+  /* §14 Q5 changed the gate-failed half of this predicate: six or more specs now
+     index regardless of `qualityPassed`, so a thin gate-failed row is the case
+     that still has to stay out. */
+  assert.equal(
+    isIndexableModel(model({ qualityPassed: false, ...specFields({ of: 3 }) })),
+    false
+  );
+});
+
+/**
+ * A model reporting exactly `of` of the eight spec fields and no card prose, so
+ * a where-clause in the predicate tests reads as one number instead of eight
+ * hand-written `null`s that silently drift when `SPEC_KEYS` changes.
+ */
+function specFields(input: { of: number }): Partial<ClassifiedModel> {
+  const fieldNames = [
+    "paramsTotal",
+    "license",
+    "libraryName",
+    "storageBytes",
+    "vramEstGb",
+    "files",
+    "quantizations",
+    "runners"
+  ] as const;
+  const filled: Record<(typeof fieldNames)[number], unknown> = {
+    paramsTotal: 8_000_000_000,
+    license: "apache-2.0",
+    libraryName: "transformers",
+    storageBytes: 16_000_000_000,
+    vramEstGb: 5.2,
+    files: [{ name: "model-Q4_K_M.gguf", bytes: 5_000_000_000 }],
+    quantizations: ["Q4_K_M"],
+    runners: ["llama.cpp"]
+  };
+  const empty: Record<(typeof fieldNames)[number], unknown> = {
+    paramsTotal: null,
+    license: null,
+    libraryName: null,
+    storageBytes: null,
+    vramEstGb: null,
+    files: [],
+    quantizations: [],
+    runners: []
+  };
+  const fields: Record<string, unknown> = { cardSummary: null };
+  fieldNames.forEach((name, index) => {
+    fields[name] = index < input.of ? filled[name] : empty[name];
+  });
+  return fields as Partial<ClassifiedModel>;
+}
+
+test("a model with six or more reported specs is indexable even when the gate failed (§14 Q5)", () => {
+  assert.equal(isIndexableModel(model({ qualityPassed: false, cardSummary: null, ...specFields({ of: 6 }) })), true);
+  assert.equal(
+    isIndexableModel(model({ qualityPassed: false, cardSummary: "x".repeat(240), ...specFields({ of: 6 }) })),
+    true,
+    "a long summary on top of six specs must not change the answer"
+  );
+  assert.equal(
+    isIndexableModel(model({ qualityPassed: false, cardSummary: null, ...specFields({ of: 5 }) })),
+    false,
+    "five specs and no prose is still a thin gate-failed page"
+  );
+  assert.equal(
+    isIndexableModel(model({ qualityPassed: true, cardSummary: null, ...specFields({ of: 4 }) })),
+    true,
+    "the gate-passed four-spec floor is unchanged"
+  );
+  assert.equal(specCount(model({ cardSummary: null, ...specFields({ of: 6 }) })), 6, "the fixture reports six fields");
 });
 
 test("news indexability protects against stub papers but keeps releases", () => {

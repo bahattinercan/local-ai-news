@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { buildRss } from "@/lib/rss";
+import { SITE_URL } from "@/lib/seo";
 import { getNews } from "@/lib/store";
 
 const CACHE = "public, s-maxage=300";
@@ -7,7 +8,9 @@ const CACHE = "public, s-maxage=300";
 export async function GET(request: NextRequest) {
   const lang = request.nextUrl.searchParams.get("lang") ?? "en";
   const category = request.nextUrl.searchParams.get("category") ?? undefined;
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://openweightradar.com";
+  /* One origin for the whole site: the RSS channel link must never disagree with
+     the canonical host (docs/en/SEO-PLAN.md §14 Q1, v3 — no custom domain). */
+  const base = SITE_URL;
 
   // The feed mirrors /news, which excludes papers since the two surfaces split.
   const items = await getNews({ windowDays: 7, scope: "news", category, limit: 50 });

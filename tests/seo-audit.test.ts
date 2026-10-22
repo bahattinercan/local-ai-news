@@ -217,3 +217,50 @@ test("robots without the sitemap URL fails the robots check", () => {
     robots.failures.join("; ")
   );
 });
+
+/* §14 Q2 (v3, "allow search only"): the audit has to fail when the deny groups
+   are missing or when one of them catches a search engine. */
+test("robots without the training-crawler deny groups fails the robots check", () => {
+  const result = auditWith((input) => {
+    const rules = Array.isArray(input.robots.rules) ? input.robots.rules : [input.robots.rules ?? {}];
+    input.robots = {
+      rules: rules.filter((rule) => !asList(rule.userAgent).includes("GPTBot")),
+      sitemap: input.robots.sitemap
+    };
+  });
+  const robots = check(result, "robots");
+  assert.equal(robots.ok, false);
+  assert.ok(
+    robots.failures.some((failure) => failure.includes("GPTBot") && failure.includes("Q2")),
+    robots.failures.join("; ")
+  );
+  assert.equal(result.ok, false, "a missing deny group must exit non-zero");
+});
+
+test("robots that deny a search engine fails the robots check", () => {
+  const result = auditWith((input) => {
+    input.robots = {
+      rules: [
+        { userAgent: "*", allow: "/", disallow: ["/api/"] },
+        ...(Array.isArray(input.robots.rules)
+          ? input.robots.rules.filter((rule) => Array.isArray(rule.userAgent) && rule.userAgent.includes("CCBot"))
+          : []),
+        { userAgent: ["Googlebot"], disallow: "/" }
+      ],
+      sitemap: input.robots.sitemap
+    };
+  });
+  const robots = check(result, "robots");
+  assert.equal(robots.ok, false);
+  assert.ok(
+    robots.failures.some((failure) => failure.includes("Googlebot") && failure.includes("Q2")),
+    robots.failures.join("; ")
+  );
+  assert.equal(result.ok, false, "a denied search engine must exit non-zero");
+});
+
+/** Local mirror of the audit's own list helper; the test only reads strings. */
+function asList(value: string | string[] | undefined): string[] {
+  if (value === undefined) return [];
+  return Array.isArray(value) ? value : [value];
+}
