@@ -129,7 +129,7 @@ export function ComparePairs({
               href={compareHref(locale, pair.models.map((model) => model.slug))}
               className="group flex flex-wrap items-baseline gap-x-2 py-1.5 text-sm"
             >
-              <span className="label shrink-0 text-muted">{categoryLabel(pair.category)}</span>
+              <span className="label shrink-0 text-muted">{categoryLabel(pair.category, locale)}</span>
               <span className="min-w-0 break-words font-semibold group-hover:text-accent">{pair.models[0].name}</span>
               <span className="text-muted">{t(dict, "compare.vs")}</span>
               <span className="min-w-0 break-words font-semibold group-hover:text-accent">{pair.models[1].name}</span>

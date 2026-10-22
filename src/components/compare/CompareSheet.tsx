@@ -107,7 +107,7 @@ export function CompareSheet({
                           </Link>
                         </div>
                         <p className="mt-0.5 min-w-0 truncate text-xs text-muted">
-                          {model.externalId.split("/")[0]} · {categoryLabel(model.primaryCategory)} ·{' '}
+                          {model.externalId.split("/")[0]} · {categoryLabel(model.primaryCategory, locale)} ·{' '}
                           {t(dict, "compare.ageDays", { days: daysTracked(model.firstSeenAt, now) })}
                         </p>
                         {index === 0 ? (

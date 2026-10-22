@@ -48,7 +48,7 @@ export async function generateMetadata({
       description,
       publishedTime: item.publishedAt,
       modifiedTime: item.publishedAt,
-      section: item.categoryKey ? categoryLabel(item.categoryKey) : item.kind
+      section: item.categoryKey ? categoryLabel(item.categoryKey, locale) : item.kind
     },
     twitter: { card: "summary" },
     robots: isIndexableNews(item) ? undefined : { index: false, follow: true }
@@ -95,7 +95,7 @@ export default async function NewsItemPage({
           datePublished: item.publishedAt,
           url: item.url,
           publisher: item.organization ? { "@type": "Organization", name: item.organization } : undefined,
-          articleSection: item.categoryKey ? categoryLabel(item.categoryKey) : undefined
+          articleSection: item.categoryKey ? categoryLabel(item.categoryKey, locale) : undefined
         }}
       />
 
@@ -108,7 +108,7 @@ export default async function NewsItemPage({
       <article className="card p-5">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
           <Chip label={t(dict, `news.${item.kind}`)} tone={KIND_TONE[item.kind] ?? "accent"} />
-          {item.categoryKey ? <span className="text-muted">{categoryLabel(item.categoryKey)}</span> : null}
+          {item.categoryKey ? <span className="text-muted">{categoryLabel(item.categoryKey, locale)}</span> : null}
           <span className="flex items-center gap-1 font-mono text-muted">
             <Clock size={11} aria-hidden="true" /> {relativeTime(item.publishedAt)}
           </span>

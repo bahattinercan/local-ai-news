@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { getNews, countNews } from "@/lib/store";
-import { CATEGORY_RULES } from "@/lib/classify/rules";
+import { CATEGORY_RULES, categoryLabel } from "@/lib/classify/rules";
 import { clampPage } from "@/lib/query";
 import { cn } from "@/lib/format";
 import { dictionary, t, type Dictionary, type Locale } from "@/i18n";
@@ -141,12 +141,15 @@ function FilterSlip({
             active={kind !== ""}
           />
         ) : null}
+        {/* The desk names come from `categoryLabel`, the same helper the desk nav,
+            the rows and the desk page use: a hand-written `labelTr : labelEn` here
+            was a second place to keep the decision, and it drifted. */}
         <FilterRow
           idPrefix={idPrefix}
           name="category"
           label={t(dict, "filters.category")}
           value={category}
-          options={[["", "-"], ...CATEGORY_RULES.map((rule) => [rule.key, locale === "tr" ? rule.labelTr : rule.labelEn])]}
+          options={[["", "-"], ...CATEGORY_RULES.map((rule) => [rule.key, categoryLabel(rule.key, locale)])]}
           active={category !== ""}
         />
       </div>

@@ -87,7 +87,9 @@ export function StoryRow({
         <div className="min-w-0 flex-1">
           <p className="label flex flex-wrap items-center gap-x-2 whitespace-nowrap text-accent">
             {kindLabel}
-            {item.categoryKey && !large ? <span className="text-muted">{categoryLabel(item.categoryKey)}</span> : null}
+            {item.categoryKey && !large ? (
+              <span className="text-muted">{categoryLabel(item.categoryKey, locale)}</span>
+            ) : null}
           </p>
 
           <h3 className={large ? "mt-1.5" : "mt-1"}>

@@ -162,7 +162,7 @@ const CATEGORY_WORD: Record<string, { en: string; tr: string }> = {
 };
 
 export function categoryWord(key: string, locale: Locale = "en"): string {
-  return CATEGORY_WORD[key]?.[locale] ?? categoryLabel(key).toLowerCase();
+  return CATEGORY_WORD[key]?.[locale] ?? categoryLabel(key, locale).toLowerCase();
 }
 
 /**

@@ -97,9 +97,9 @@ export default async function CategoryPage({
       {/* Same shape as the index: a descriptive h1 plus a one-line statement, so
           the route explains itself on a phone where the masthead cannot. */}
       <PageHeader
-        title={categoryLabel(category)}
-        kicker={t(dict, "desk.title", { label: categoryLabel(category) })}
-        lede={t(dict, "desk.lede", { label: categoryLabel(category).toLowerCase() })}
+        title={categoryLabel(category, locale)}
+        kicker={t(dict, "desk.title", { label: categoryLabel(category, locale) })}
+        lede={t(dict, "desk.lede", { label: categoryLabel(category, locale).toLocaleLowerCase(locale) })}
       />
       {/* 150–250 words of evergreen desk copy. A paragraph, not a panel: the
           broadsheet separates with rules and type, and the feed below keeps the

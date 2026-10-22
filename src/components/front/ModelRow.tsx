@@ -55,7 +55,7 @@ export function ModelRow({
               the rules came out ragged (measured 2026-10-18). The age moved to the
               figure column, where it stacks under the download count. */}
           <p className="mt-0.5 flex items-center gap-x-2 overflow-hidden text-xs text-muted whitespace-nowrap">
-            <span className="shrink-0">{categoryLabel(model.primaryCategory)}</span>
+            <span className="shrink-0">{categoryLabel(model.primaryCategory, locale)}</span>
             {/* One runner plus a count, not a list: the column is ~150px and two
                 joined names truncated to `Ila…`, i.e. the useful half of the
                 sentence was the part that got cut. */}

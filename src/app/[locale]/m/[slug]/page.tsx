@@ -111,7 +111,7 @@ export default async function ModelPage({
           url: model.url,
           datePublished: model.createdAt,
           image: model.sampleImages[0],
-          description: `${categoryLabel(model.primaryCategory)} · ${model.libraryName ?? "unknown library"}`
+          description: `${categoryLabel(model.primaryCategory, locale)} · ${model.libraryName ?? "unknown library"}`
         }}
       />
 
@@ -142,7 +142,7 @@ export default async function ModelPage({
           <div className="min-w-0 flex-1">
             <h1 className="font-display text-2xl font-bold tracking-tight break-words">{model.externalId}</h1>
             <p className="mt-1 text-sm text-muted">
-              {categoryLabel(model.primaryCategory)} · {model.libraryName ?? "-"} ·{" "}
+              {categoryLabel(model.primaryCategory, locale)} · {model.libraryName ?? "-"} ·{" "}
               {model.paramsTotal ? `${formatParams(model.paramsTotal)} ${t(dict, "card.params")}` : t(dict, "card.paramsUnknown")}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">

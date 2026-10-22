@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n";
+
 export interface CategoryRule {
   key: string;
   labelEn: string;
@@ -170,13 +172,20 @@ export function classifyModel(
 }
 
 /**
- * Category names are taxonomy terms, not UI copy: they stay English in every
- * locale (product decision 2026-10-15). Only UI labels are translated. The
- * locale parameter was removed on purpose so a call site cannot silently
- * reintroduce Turkish category names.
+ * Category names are UI copy in the reader's language (owner decision
+ * 2026-10-22, which reverses the 2026-10-15 "terms stay English" decision that
+ * `docs/en/DESIGN.md` §9 recorded).
+ *
+ * What does *not* move is the taxonomy identity: `/c/coding` stays the URL, the
+ * `labelEn` / `labelTr` fields stay the data (`/api/categories` is unchanged),
+ * and `sortOrder` still orders the desks. Only the printed name is localized.
+ *
+ * `locale` is required rather than defaulted, so a call site cannot silently
+ * fall back to one language: forgetting it is a compile error, not an English
+ * label on a Turkish page. An unknown key still returns itself.
  */
-export function categoryLabel(key: string): string {
+export function categoryLabel(key: string, locale: Locale): string {
   const rule = CATEGORY_RULES.find((r) => r.key === key);
   if (!rule) return key;
-  return rule.labelEn;
+  return locale === "tr" ? rule.labelTr : rule.labelEn;
 }

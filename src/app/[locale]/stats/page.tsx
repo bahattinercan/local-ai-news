@@ -105,7 +105,7 @@ export default async function StatsPage({
   folded.forEach((slice, index) => {
     swatchOf.set(slice.category, slice.category === FOLDED_CATEGORY ? FOLDED_COLOR : DONUT_PALETTE[index]);
   });
-  const sliceLabel = (key: string) => (key === FOLDED_CATEGORY ? t(dict, "stats.other") : categoryLabel(key));
+  const sliceLabel = (key: string) => (key === FOLDED_CATEGORY ? t(dict, "stats.other") : categoryLabel(key, locale));
 
   const cadencePoints: DailyPoint[] = board.cadence.map((point) => ({
     date: point.date,
@@ -234,7 +234,7 @@ export default async function StatsPage({
           />
           <Stat
             label={t(dict, "stats.top")}
-            value={totals.top ? categoryLabel(totals.top.category) : "-"}
+            value={totals.top ? categoryLabel(totals.top.category, locale) : "-"}
             hint={totals.top ? `${count(totals.top.count)} · ${percent(totals.top.count / Math.max(1, totals.inView))}` : undefined}
           />
           <Stat
@@ -289,7 +289,7 @@ export default async function StatsPage({
                           aria-hidden="true"
                         />
                         <Link href={categoryHref(row.category)} className="min-w-0 truncate hover:text-accent">
-                          {categoryLabel(row.category)}
+                          {categoryLabel(row.category, locale)}
                         </Link>
                       </span>
                     </th>
@@ -323,7 +323,7 @@ export default async function StatsPage({
             slices={folded.map((slice) => ({
               label: sliceLabel(slice.category),
               value: slice.count,
-              members: slice.members?.map(categoryLabel)
+              members: slice.members?.map((member) => categoryLabel(member, locale))
             }))}
           />
           <p className="mt-2 text-xs text-muted">{t(dict, "stats.shareNote")}</p>
@@ -409,14 +409,14 @@ export default async function StatsPage({
               {gateRows.map((row) => (
                 <tr key={row.category} className="border-b border-rule/70">
                   <th scope="row" className="py-1.5 pr-3 text-left font-normal">
-                    {categoryLabel(row.category)}
+                    {categoryLabel(row.category, locale)}
                   </th>
                   <td className="py-1.5 text-right font-mono">{count(row.tracked)}</td>
                   <td className="py-1.5 text-right font-mono text-muted">{count(row.passed)}</td>
                   <td className="hidden py-1.5 pl-3 sm:table-cell">
                     <RateBar
                       value={row.passRate}
-                      label={`${categoryLabel(row.category)}: ${percent(row.passRate, 0)}`}
+                      label={`${categoryLabel(row.category, locale)}: ${percent(row.passRate, 0)}`}
                     />
                   </td>
                   <td className="w-14 py-1.5 text-right font-mono text-xs text-muted">{percent(row.passRate, 0)}</td>

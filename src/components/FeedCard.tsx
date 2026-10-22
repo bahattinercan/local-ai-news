@@ -62,7 +62,7 @@ export function FeedCard({
           </div>
 
           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted">
-            <span>{categoryLabel(model.primaryCategory)}</span>
+            <span>{categoryLabel(model.primaryCategory, locale)}</span>
             {model.libraryName ? (
               <>
                 <span aria-hidden="true">·</span>
