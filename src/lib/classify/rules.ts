@@ -61,7 +61,7 @@ export const CATEGORY_RULES: CategoryRule[] = [
   {
     key: "embedding",
     labelEn: "Embedding / RAG",
-    labelTr: "Embedding / RAG",
+    labelTr: "Gömme / RAG",
     pipelineTags: ["feature-extraction", "sentence-similarity"],
     tagRegex: "^(embedding|embeddings|reranker)$",
     sortOrder: 7
@@ -69,7 +69,7 @@ export const CATEGORY_RULES: CategoryRule[] = [
   {
     key: "vision",
     labelEn: "Vision / CV",
-    labelTr: "Görü",
+    labelTr: "Görme / CV",
     pipelineTags: [
       "object-detection",
       "image-segmentation",

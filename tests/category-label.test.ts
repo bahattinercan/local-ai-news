@@ -54,6 +54,21 @@ test("categoryLabel: every rule has a non-empty label in both locales", () => {
   }
 });
 
+/* ----------------------- (b2) the two labels that leaked on live /tr -- */
+
+test("categoryLabel: embedding and vision print localized Turkish labels", () => {
+  /* Both rows used to print a non-label on /tr: `embedding` was never
+     translated (the English "Embedding / RAG" verbatim) and `vision` printed
+     "Görü", which is neither a word nor a desk name. `NAV_SHORT.tr` already
+     carried the right stems (Gömme, Görme), so the desk labels now match them
+     in the same `<stem> / <modifier>` shape as their English counterparts. */
+  assert.equal(categoryLabel("embedding", "tr"), "Gömme / RAG");
+  assert.equal(categoryLabel("vision", "tr"), "Görme / CV");
+  /* The English side is unchanged: same shape, same wording as before. */
+  assert.equal(categoryLabel("embedding", "en"), "Embedding / RAG");
+  assert.equal(categoryLabel("vision", "en"), "Vision / CV");
+});
+
 /* --------------------------------- (c) the Turkish nav row stays narrow -- */
 
 test("nav short forms: every desk has a Turkish form of at most 9 characters", () => {
