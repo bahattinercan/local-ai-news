@@ -10,8 +10,8 @@ Kurallar `src/lib/classify/rules.ts` içinde ve `categories.match_rules` (JSONB)
 | coding | Coding | Kod | name/tag regex (`code`, `coder`, `codex`, `coding`, `swe`, `agentic`) - HF'de böyle bir pipeline_tag yok |
 | audio | Audio | Ses | `automatic-speech-recognition`, `text-to-speech`, `audio-to-text`, `music-generation`, `audio-classification` |
 | multimodal | Multimodal | Çoklu Mod | `visual-question-answering`, `image-to-text`, `document-question-answering` |
-| embedding | Embedding / RAG | Embedding / RAG | `feature-extraction`, `sentence-similarity`, reranker tag |
-| vision | Vision / CV | Görü | `object-detection`, `image-segmentation`, `depth-estimation`, `zero-shot-image-classification`, `image-classification` |
+| embedding | Embedding / RAG | Gömme / RAG | `feature-extraction`, `sentence-similarity`, reranker tag |
+| vision | Vision / CV | Görme / CV | `object-detection`, `image-segmentation`, `depth-estimation`, `zero-shot-image-classification`, `image-classification` |
 | robotics | Robotics / Agent | Robotik / Agent | `robotics`, `visual-document-retrieval`, function-calling tag |
 | news | Haber | Haber | daily papers + türetilmiş release |
 

@@ -74,8 +74,8 @@ Shown in the UI as a **"Runs locally"** badge, filterable.
 | 4 | Coding | Kod | `coding` | `text-generation` + tag/name regex (`code`, `coding`, `coder`, `codex`, `swe`, `agentic`) or curated org list |
 | 5 | Audio | Ses | `audio` | `automatic-speech-recognition`, `text-to-speech`, `audio-to-text`, `music-generation`, `audio-classification` |
 | 6 | Multimodal | Çoklu Mod | `multimodal` | `visual-question-answering`, `image-to-text`, `document-question-answering` |
-| 7 | Embedding / RAG | Embedding / RAG | `embedding` | `feature-extraction`, `sentence-similarity`, reranker signals |
-| 8 | Vision / CV | Görü | `vision` | `object-detection`, `image-segmentation`, `depth-estimation`, `zero-shot-image-classification`, `image-classification` |
+| 7 | Embedding / RAG | Gömme / RAG | `embedding` | `feature-extraction`, `sentence-similarity`, reranker signals |
+| 8 | Vision / CV | Görme / CV | `vision` | `object-detection`, `image-segmentation`, `depth-estimation`, `zero-shot-image-classification`, `image-classification` |
 | 9 | Robotics / Agent | Robotik / Agent | `robotics` | `robotics`, `visual-document-retrieval`, function-calling signals |
 | 10 | News | Haber | `news` | daily papers + derived release announcements |
 
