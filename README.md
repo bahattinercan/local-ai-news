@@ -4,6 +4,8 @@
 
 Track newly released **open-weight AI models you can run locally** - LLMs, image, video, audio, coding, multimodal, embedding, vision and robotics models - with a news feed that refreshes on a schedule.
 
+![OpenWeight Radar home desk: seven-day model feed with category tabs, a headline story, the most-downloaded list and the run-it-yourself panel](assets/openweight-radar-home.webp)
+
 The product name is **OpenWeight Radar**. The repository and deployment project are still called `local-ai-news`, and the public origin is `https://local-ai-news.vercel.app` (no custom domain by decision).
 
 Everything is built from **one JSON snapshot**. There is no Postgres/Neon database: an ingest job publishes `data/feed.json` to Vercel Blob, and the Next.js app reads it with a 15-minute cache plus the committed snapshot as a fallback.

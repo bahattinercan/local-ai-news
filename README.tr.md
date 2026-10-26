@@ -4,6 +4,8 @@
 
 Yerelde çalıştırabileceğin **açık ağırlıklı AI modellerini** - LLM, görüntü, video, ses, kod, çoklu mod, embedding, görü ve robotik modelleri - ve zamanlanmış olarak güncellenen bir haber akışını takip eder.
 
+![OpenWeight Radar ana masa: kategori sekmeli yedi günlük model akışı, baş haber, en çok indirilenler listesi ve kendin çalıştır paneli](assets/openweight-radar-home.webp)
+
 Ürün adı **OpenWeight Radar**. Depo ve dağıtım projesi hâlâ `local-ai-news` adını taşıyor; herkese açık kaynak `https://local-ai-news.vercel.app` (özel alan adı kullanılmama kararı alındı).
 
 Her şey **tek bir JSON anlık görüntüsünden** üretilir. Postgres/Neon veritabanı yoktur: ingest işi `data/feed.json` dosyasını Vercel Blob'a yayımlar, Next.js uygulaması dosyayı 15 dakikalık önbellekle okur ve depodaki kopyayı yedek olarak kullanır.
